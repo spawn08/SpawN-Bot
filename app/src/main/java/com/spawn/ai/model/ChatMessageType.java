@@ -3,10 +3,8 @@ package com.spawn.ai.model;
 public class ChatMessageType {
 
     private String message;
-
-    //0=User chat
-    //1= Bot Chat
-    private int viewType;
+    private int viewType; //0=User chat, 1= Bot Chat
+    private BotResponse botResponse;
 
     public String getMessage() {
         return message;
@@ -22,5 +20,13 @@ public class ChatMessageType {
 
     public void setViewType(int viewType) {
         this.viewType = viewType;
+    }
+
+    public BotResponse getBotResponse() {
+        return botResponse;
+    }
+
+    public void setBotResponse(BotResponse botResponse) {
+        this.botResponse = botResponse;
     }
 }
