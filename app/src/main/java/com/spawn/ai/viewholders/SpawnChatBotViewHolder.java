@@ -5,7 +5,6 @@ import android.view.View;
 
 public class SpawnChatBotViewHolder extends RecyclerView.ViewHolder {
 
-
     public SpawnChatBotViewHolder(View itemView) {
         super(itemView);
     }
