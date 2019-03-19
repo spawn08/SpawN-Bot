@@ -7,4 +7,6 @@ public interface IBotObserver {
     public void notifyBotResponse(BotResponse botResponse);
 
     public void notifyBotError();
+
+    public void loading();
 }

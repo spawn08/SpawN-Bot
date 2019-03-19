@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWebService;
-import com.spawn.ai.model.BotIntents;
 import com.spawn.ai.model.BotResponse;
 
 import okhttp3.OkHttpClient;
@@ -12,6 +11,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WebServiceUtils {
 
@@ -40,6 +40,7 @@ public class WebServiceUtils {
 
             retrofit = new Retrofit.Builder()
                     .baseUrl(BOT_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
                     .client(okHttpClient)
                     .build();
         }
@@ -62,6 +63,7 @@ public class WebServiceUtils {
     }
 
     public void callWebservice(String q) {
+        iBotObserver.loading();
         final IBotWebService iBotWebService = retrofit.create(IBotWebService.class);
         final Call<BotResponse> botIntentsCall = iBotWebService.getBotResponse(q);
         botIntentsCall.enqueue(new Callback<BotResponse>() {

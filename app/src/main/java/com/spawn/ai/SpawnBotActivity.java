@@ -1,26 +1,41 @@
 package com.spawn.ai;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.spawn.ai.adapters.SpawnChatbotAdapter;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
+import com.spawn.ai.interfaces.IBotObserver;
+import com.spawn.ai.model.BotResponse;
+import com.spawn.ai.model.ChatMessageType;
+import com.spawn.ai.network.WebServiceUtils;
+import com.spawn.ai.utils.DateTimeUtils;
+import com.spawn.ai.utils.JsonFileReader;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener {
+import constants.ChatViewTypes;
+
+public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver {
 
     private static final String TAG = SpawnBotActivity.class.getCanonicalName();
     public Context context;
@@ -30,6 +45,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private Locale locale;
     private boolean isSpeechEnd = false;
     private CountDownTimer countDownTimer;
+    private boolean isSpeechEnabled = false;
+    private ArrayList<ChatMessageType> botResponses;
+    private SpawnChatbotAdapter chatbotAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +56,16 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding = DataBindingUtil.setContentView(this, R.layout.activity_spawn_bot);
         activitySpawnBotBinding.setListener(this);
         locale = new Locale("en");
-
+        requestPermission();
         activitySpawnBotBinding.mic.setOnClickListener(this);
         activitySpawnBotBinding.micImage.setOnClickListener(this);
+        botResponses = new ArrayList<ChatMessageType>();
+        chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(false);
+        activitySpawnBotBinding.chatRecycler.setLayoutManager(linearLayoutManager);
+        activitySpawnBotBinding.chatRecycler.setAdapter(chatbotAdapter);
+
         initSpeech();
 
         activitySpawnBotBinding.mic.addAnimatorListener(new Animator.AnimatorListener() {
@@ -75,6 +100,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     }
 
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(SpawnBotActivity.this,
+                new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.INTERNET},
+                1);
+    }
+
     private void initSpeech() {
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
 
@@ -90,6 +121,22 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }
 
         speechRecognizer.setRecognitionListener(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    isSpeechEnabled = true;
+                } else {
+                    isSpeechEnabled = false;
+                    Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
+                }
+
+                break;
+        }
     }
 
     @Override
@@ -156,9 +203,17 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             ArrayList<String> returnSpeech = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             String speechString = returnSpeech.get(0);
             onEndOfSpeech();
+            callWitService(speechString);
             Log.d(getClass().getCanonicalName(), "Speech :" + speechString);
 
         }
+    }
+
+    private void callWitService(String speechString) {
+        WebServiceUtils.getInstance(this).setUpObserver(this);
+        WebServiceUtils.getInstance(this).setToken("6DDB2DLQQGDSBQ5PRKWHOS7RAEMWFXK7");
+        WebServiceUtils.getInstance(this).getRetrofitClient();
+        WebServiceUtils.getInstance(this).getBotResponse(speechString);
     }
 
     @Override
@@ -173,7 +228,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 && bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).size() > 0) {
             ArrayList<String> partialResults = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             String partialString = partialResults.get(0);
-
+            chatViews(partialString, 0, null);
             Log.d(TAG, "partialString :" + partialString);
         }
 
@@ -195,6 +250,58 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }.start();
     }
 
+    private void chatViews(String chatMessage, int type, BotResponse botResponse) {
+
+        switch (type) {
+            case ChatViewTypes.CHAT_VIEW_USER:
+                ChatMessageType chatMessageType = new ChatMessageType();
+                chatMessageType.setMessage(chatMessage);
+                chatMessageType.setViewType(0);
+                chatMessageType.setDate(new DateTimeUtils().getDate());
+                chatMessageType.setBotResponse(null);
+                if (botResponses.size() == 0)
+                    botResponses.add(chatMessageType);
+                else {
+                    botResponses.remove(botResponses.size() - 1);
+                    botResponses.add(chatMessageType);
+                }
+                // chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
+                chatbotAdapter.setAdapter(botResponses);
+
+                break;
+
+            case ChatViewTypes.CHAT_VIEW_BOT:
+                if (botResponse != null) {
+                    ChatMessageType chatMessageType1 = new ChatMessageType();
+                    if (botResponse.getEntities().getBotIntents() != null &&
+                            botResponse.getEntities().getBotIntents().size() > 0)
+                        chatMessageType1.setMessage(JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue().toString()));
+                    else
+                        chatMessageType1.setMessage("Sorry I could not understand what you just said.");
+                    chatMessageType1.setDate(new DateTimeUtils().getDate());
+                    chatMessageType1.setViewType(1);
+                    chatMessageType1.setBotResponse(null);
+                    botResponses.remove(botResponses.size() - 1);
+                    botResponses.add(chatMessageType1);
+                    // chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
+                    chatbotAdapter.setAdapter(botResponses);
+                    chatbotAdapter.notifyDataSetChanged();
+
+                }
+
+                break;
+
+            case ChatViewTypes.CHAT_VIEW_LOADING:
+                ChatMessageType chatMessageLoading = new ChatMessageType();
+                chatMessageLoading.setViewType(2);
+                botResponses.add(chatMessageLoading);
+                // chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
+                chatbotAdapter.setAdapter(botResponses);
+                break;
+        }
+
+    }
+
     @Override
     public void onEvent(int i, Bundle bundle) {
 
@@ -214,7 +321,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 break;
 
             case R.id.mic_image:
-                if (SpeechRecognizer.isRecognitionAvailable(this)) {
+                botResponses.clear();
+                chatbotAdapter.setAdapter(botResponses);
+                if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
                     initSpeech();
                     speechRecognizer.startListening(speechIntentDispatcher);
                     activitySpawnBotBinding.micImage.setVisibility(View.GONE);
@@ -225,6 +334,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                         speechRecognizer.cancel();
                         speechRecognizer.destroy();
                     }
+                    Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
+                    requestPermission();
 
                 }
 
@@ -245,4 +356,21 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }
 
     }
+
+    @Override
+    public void notifyBotResponse(BotResponse botResponse) {
+        chatViews(null, 1, botResponse);
+    }
+
+    @Override
+    public void notifyBotError() {
+
+    }
+
+    @Override
+    public void loading() {
+        chatViews(null, 2, null);
+    }
+
+
 }

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 public class Entities {
 
-    private ArrayList<BotIntents> botIntents;
+    private ArrayList<Intent> intent;
 
-    public ArrayList<BotIntents> getBotIntents() {
-        return botIntents;
+    public ArrayList<Intent> getBotIntents() {
+        return intent;
     }
 
-    public void setBotIntents(ArrayList<BotIntents> botIntents) {
-        this.botIntents = botIntents;
+    public void setBotIntents(ArrayList<Intent> botIntents) {
+        this.intent = botIntents;
     }
 }

@@ -66,11 +66,12 @@
                 android:background="@android:color/transparent" />
 
             <ImageView
-                android:layout_width="wrap_content"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/mic_image"
                 android:layout_centerHorizontal="true"
                 android:src="@drawable/ic_mic"
+                android:background="@drawable/mic_round_back"
                 android:scaleType="fitCenter" />
 
 

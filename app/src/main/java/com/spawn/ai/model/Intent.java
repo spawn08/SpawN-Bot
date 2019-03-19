@@ -1,6 +1,6 @@
 package com.spawn.ai.model;
 
-public class BotIntents {
+public class Intent {
 
     private String value;
     private String confidence;
