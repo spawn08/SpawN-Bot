@@ -9,4 +9,6 @@ public interface IBotObserver {
     public void notifyBotError();
 
     public void loading();
+
+    public void speakBot(String message);
 }

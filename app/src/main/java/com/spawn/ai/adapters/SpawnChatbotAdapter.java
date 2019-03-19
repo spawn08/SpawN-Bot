@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.spawn.ai.R;
+import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.viewholders.SpawnChatBotViewHolder;
 import com.spawn.ai.viewholders.SpawnChatLoadingViewHolder;
@@ -21,10 +22,12 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private Context context;
     private ArrayList<ChatMessageType> chatMessageType = new ArrayList<>();
+    IBotObserver iBotObserver;
 
     public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType) {
         this.context = context;
         this.chatMessageType = chatMessageType;
+        iBotObserver = (IBotObserver) context;
     }
 
     public void setAdapter(ArrayList<ChatMessageType> chatModels) {
@@ -72,11 +75,15 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 break;
             case ChatViewTypes.CHAT_VIEW_BOT:
+
                 SpawnChatBotViewHolder spawnChatBotViewHolder = (SpawnChatBotViewHolder) holder;
                 String botMessage = chatMessageType.get(position).getMessage();
                 String botDate = chatMessageType.get(position).getDate();
                 spawnChatBotViewHolder.bot_message.setText(botMessage);
                 spawnChatBotViewHolder.bot_time.setText(botDate);
+
+                if (iBotObserver != null)
+                    iBotObserver.speakBot(botMessage);
                 break;
 
             case ChatViewTypes.CHAT_VIEW_LOADING:

@@ -12,6 +12,7 @@ import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +35,7 @@ import java.util.Locale;
 
 import constants.ChatViewTypes;
 
-public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver {
+public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, TextToSpeech.OnInitListener {
 
     private static final String TAG = SpawnBotActivity.class.getCanonicalName();
     public Context context;
@@ -47,6 +48,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private boolean isSpeechEnabled = false;
     private ArrayList<ChatMessageType> botResponses;
     private SpawnChatbotAdapter chatbotAdapter;
+    private TextToSpeech textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         linearLayoutManager.setStackFromEnd(false);
         activitySpawnBotBinding.chatRecycler.setLayoutManager(linearLayoutManager);
         activitySpawnBotBinding.chatRecycler.setAdapter(chatbotAdapter);
+        textToSpeech = new TextToSpeech(this, this);
 
         initSpeech();
 
@@ -368,5 +371,24 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         chatViews(null, 2, null);
     }
 
+    @Override
+    public void speakBot(String message) {
+        textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
+    }
 
+
+    @Override
+    public void onInit(int i) {
+        if (i == TextToSpeech.SUCCESS) {
+            int result = textToSpeech.setLanguage(Locale.US);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e(this.getClass().getName(), "This Language is not supported");
+            } else {
+                Log.d(this.getClass().getName(), "Initilization Success!");
+            }
+        } else {
+            Log.e(this.getClass().getName(), "Initilization Failed!");
+        }
+    }
 }
