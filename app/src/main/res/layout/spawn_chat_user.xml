@@ -39,6 +39,7 @@
             android:gravity="end"
             android:paddingRight="10dp"
             android:text="8:12"
+            android:visibility="gone"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="14dp" />
 

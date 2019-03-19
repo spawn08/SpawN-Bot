@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -14,9 +15,7 @@ import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -265,7 +264,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     botResponses.remove(botResponses.size() - 1);
                     botResponses.add(chatMessageType);
                 }
-                // chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
                 chatbotAdapter.setAdapter(botResponses);
 
                 break;
@@ -277,13 +275,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                             botResponse.getEntities().getBotIntents().size() > 0)
                         chatMessageType1.setMessage(JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue().toString()));
                     else
-                        chatMessageType1.setMessage("Sorry I could not understand what you just said.");
+                        chatMessageType1.setMessage(getResources().getString(R.string.defalt_answer));
                     chatMessageType1.setDate(new DateTimeUtils().getDate());
                     chatMessageType1.setViewType(1);
                     chatMessageType1.setBotResponse(null);
                     botResponses.remove(botResponses.size() - 1);
                     botResponses.add(chatMessageType1);
-                    // chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
 
@@ -295,7 +292,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 ChatMessageType chatMessageLoading = new ChatMessageType();
                 chatMessageLoading.setViewType(2);
                 botResponses.add(chatMessageLoading);
-                // chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
                 chatbotAdapter.setAdapter(botResponses);
                 break;
         }

@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.spawn.ai.R;
-import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.viewholders.SpawnChatBotViewHolder;
 import com.spawn.ai.viewholders.SpawnChatLoadingViewHolder;
@@ -22,17 +21,14 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private Context context;
     private ArrayList<ChatMessageType> chatMessageType = new ArrayList<>();
-    RecyclerView parentRecyclerView;
 
     public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType) {
         this.context = context;
         this.chatMessageType = chatMessageType;
-        // notifyDataSetChanged();
     }
 
     public void setAdapter(ArrayList<ChatMessageType> chatModels) {
         this.chatMessageType = chatModels;
-        parentRecyclerView = (RecyclerView) ((SpawnBotActivity) context).findViewById(R.id.chat_recycler);
         notifyDataSetChanged();
     }
 
@@ -66,7 +62,6 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        // position = (chatMessageType.size() - 1);
         switch (chatMessageType.get(position).getViewType()) {
             case ChatViewTypes.CHAT_VIEW_USER:
                 SpawnChatUserViewHolder spawnChatUserViewHolder = (SpawnChatUserViewHolder) holder;
