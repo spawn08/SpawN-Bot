@@ -38,7 +38,7 @@
             android:layout_height="60dp"
             android:gravity="bottom"
             android:id="@+id/mic_rl"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true">
 

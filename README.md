@@ -1,13 +1,13 @@
 ## SpawNAI Chatbot
 **This is a chatbot application build using the Wit AI as a backend. The entry point to this application is SpawnBotActivity.**
 
-> * This uses retrofit for network calls.
-> * Android Speech to Text and Text to Speech library is used for conversation.
+>* **This uses retrofit for network calls.**
+>* **Android Speech to Text and Text to Speech library is used for conversation.**
+>* **Lottie Animation Library for Animation like Splash Screen Animation, Loading animation**
 
+>[Splash Screen UI](https://github.com/spawn08/SpawN-Bot/blob/master/app/src/main/res/drawable/Splash_Screen_Spawn_Bot.png)
 
-![Splash Screen](https://github.com/spawn08/SpawN-Bot/blob/master/app/src/main/res/drawable/Splash_Screen_Spawn_Bot.png)
-
-![Spawn Bot Activity](https://github.com/spawn08/SpawN-Bot/blob/master/app/src/main/res/drawable/Spawn_Bot_Activity.png)
+>[Spawn Bot Activity UI](https://github.com/spawn08/SpawN-Bot/blob/master/app/src/main/res/drawable/Spawn_Bot_Activity.png)
 
 ## 1. SpawnBotActivity - 
 >*_This is Main activity for this application. 
@@ -27,4 +27,5 @@ You can find all the code in **com.spawnai.ai.network** package inside applicati
 >* [Android Speech](https://developer.android.com/reference/android/speech/SpeechRecognizer)
 >* [Lottie Animation](https://airbnb.io/lottie/#/)
 
+## Contributors to this project are most welcome. _Happy Coding_
 
