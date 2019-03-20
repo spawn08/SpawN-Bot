@@ -35,7 +35,6 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         notifyDataSetChanged();
     }
 
-
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -57,9 +56,6 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         }
 
-        /*View view = LayoutInflater.from(context).inflate(R.layout.spawn_bot_loading, parent, false);
-        SpawnChatLoadingViewHolder spawnChatViewHolder = new SpawnChatLoadingViewHolder(view);
-        return spawnChatViewHolder;*/
         return null;
     }
 
