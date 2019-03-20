@@ -7,6 +7,7 @@
 
 ![Splash Screen](https://github.com/spawn08/SpawN-Bot/blob/master/app/src/main/res/drawable/Splash_Screen_Spawn_Bot.png)
 
+![Spawn Bot Activity](https://github.com/spawn08/SpawN-Bot/blob/master/app/src/main/res/drawable/Spawn_Bot_Activity.png)
 
 ## 1. SpawnBotActivity - 
 >*_This is Main activity for this application. 
