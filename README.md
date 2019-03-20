@@ -11,7 +11,8 @@
 
 ## 1. SpawnBotActivity - 
 >*_This is Main activity for this application. 
-It initializes the Android Speech components along with recyclerview for chat conversation._*
+It initializes the Android Speech components along with recyclerview for chat conversation.
+Please specify your Bearer token inside this activity in method **callWitService**_*
 
 ## 2. Networking - 
 >*_Retrofit 2.4.0 is used for making network calls to Wit AI service. An interceptor is written for authorization and is passed in subsequent retrofit calls. 

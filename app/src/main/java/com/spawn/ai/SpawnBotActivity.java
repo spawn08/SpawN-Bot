@@ -282,7 +282,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     chatMessageType1.setDate(new DateTimeUtils().getDate());
                     chatMessageType1.setViewType(1);
                     chatMessageType1.setBotResponse(null);
-                    botResponses.remove(botResponses.size() - 1);
+                    /*botResponses.remove(botResponses.size() - 1);*/
+                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                        botResponses.remove(botResponses.size() - 1);
                     botResponses.add(chatMessageType1);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
@@ -319,7 +321,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 break;
 
             case R.id.mic_image:
-                botResponses.clear();
+                // botResponses.clear();
                 chatbotAdapter.setAdapter(botResponses);
                 if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
                     initSpeech();
