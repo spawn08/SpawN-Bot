@@ -4,6 +4,10 @@
 > * This uses retrofit for network calls.
 > * Android Speech to Text and Text to Speech library is used for conversation.
 
+
+![Splash Screen](https://github.com/spawn08/SpawN-Bot/blob/master/app/src/main/res/drawable/Splash_Screen_Spawn_Bot.png)
+
+
 ## 1. SpawnBotActivity - 
 >*_This is Main activity for this application. 
 It initializes the Android Speech components along with recyclerview for chat conversation._*

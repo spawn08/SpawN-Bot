@@ -1,0 +1,45 @@
+{
+  "bot_hi": {
+    "type": 1,
+    "message": [
+      "Hey Hi!!",
+      "Hello there!!",
+      "How can I help you."
+    ]
+  },
+  "mcgm_like": {
+    "type": 1,
+    "message": [
+      "Thank you.",
+      "I like you too!!"
+    ]
+  },
+  "bot_bye": {
+    "type": 1,
+    "message": [
+      "See you soon!!",
+      "Bye bye!!",
+      "Good bye, see you soon."
+    ]
+  },
+  "bot_morning": {
+    "type": 1,
+    "message": [
+      "Good Morning.",
+      "Hey, Good Morning !!"
+    ]
+  },
+  "mcgm_love": {
+    "type": 1,
+    "message": [
+      "Thank you. Anything I can help you with?",
+      "I can't believe this moment finally came. You should know I think you're the best."
+    ]
+  },
+  "bot_health": {
+    "type": 1,
+    "message": [
+      "I am doing great"
+    ]
+  }
+}
