@@ -8,3 +8,4 @@
 /build
 /captures
 .externalNativeBuild
+/app/src/main/assets/bot_data_mcgm.json
