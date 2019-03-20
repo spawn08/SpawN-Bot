@@ -213,7 +213,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void callWitService(String speechString) {
         WebServiceUtils.getInstance(this).setUpObserver(this);
-        WebServiceUtils.getInstance(this).setToken("6DDB2DLQQGDSBQ5PRKWHOS7RAEMWFXK7");
+        WebServiceUtils.getInstance(this).setToken("Your Token Here");
         WebServiceUtils.getInstance(this).getRetrofitClient();
         WebServiceUtils.getInstance(this).getBotResponse(speechString);
     }
