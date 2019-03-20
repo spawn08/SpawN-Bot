@@ -20,6 +20,6 @@ You can find all the code in **com.spawnai.ai.network** package inside applicati
 >* [Wit AI](https://wit.ai)
 >* [Retrofit Client](https://square.github.io/retrofit/)
 >* [Android Speech](https://developer.android.com/reference/android/speech/SpeechRecognizer)
-
+>* [Lottie Animation](https://airbnb.io/lottie/#/)
 
 

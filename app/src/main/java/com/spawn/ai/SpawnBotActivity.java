@@ -312,7 +312,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             case R.id.mic:
                 initSpeech();
                 speechRecognizer.startListening(speechIntentDispatcher);
-                //activitySpawnBotBinding.mic.setBackground(getResources().getDrawable(android.R.color.transparent));
                 activitySpawnBotBinding.micImage.setVisibility(View.GONE);
                 activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
                 activitySpawnBotBinding.mic.playAnimation();
