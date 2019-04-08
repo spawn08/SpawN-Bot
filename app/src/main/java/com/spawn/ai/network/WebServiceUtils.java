@@ -1,12 +1,18 @@
 package com.spawn.ai.network;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWebService;
+import com.spawn.ai.interfaces.ISpawnAPI;
 import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.ChatCardModel;
+import com.spawn.ai.model.SpawnEntityModel;
+import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.utils.JsonFileReader;
+
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -20,6 +26,8 @@ public class WebServiceUtils {
     private static WebServiceUtils webServiceUtils;
     private Retrofit retrofit;
     private static final String BOT_URL = "https://api.wit.ai";
+    public static String API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+    public static String SPAWN_API = "https://spawnai.com/";
     private static IBotObserver iBotObserver;
     String token;
 
@@ -91,5 +99,72 @@ public class WebServiceUtils {
                 iBotObserver.notifyBotError();
             }
         });
+    }
+
+    public void callSpawnAPI(String query) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(SPAWN_API)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        Call<List<SpawnEntityModel>> data = spawnAPI.getEntity(query);
+
+        data.enqueue(new Callback<List<SpawnEntityModel>>() {
+            @Override
+            public void onResponse(Call<List<SpawnEntityModel>> call, Response<List<SpawnEntityModel>> response) {
+                try {
+
+                    List<SpawnEntityModel> model = response.body();
+                    callWikiAPI(model.get(0).getValue());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<SpawnEntityModel>> call, Throwable t) {
+                Log.e("ERROR: ", t.getMessage());
+
+            }
+        });
+    }
+
+    public void callWikiAPI(final String entity) {
+
+        final String cloneEntity = entity.trim().replace(" ", "_");
+        Log.d("ENTITY: ", cloneEntity);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        Call<SpawnWikiModel> data = spawnAPI.getWiki(cloneEntity);
+        data.enqueue(new Callback<SpawnWikiModel>() {
+            @Override
+            public void onResponse(Call<SpawnWikiModel> call, Response<SpawnWikiModel> response) {
+                if (response.isSuccessful()) {
+                    Log.d("API CONTENT: ", response.body().toString());
+                    SpawnWikiModel spawnWikiModel = response.body();
+                    if (spawnWikiModel.getType().equals("disambiguation")) {
+                        //Handle case for page not found
+                    } else {
+
+                    }
+
+                } else {
+                    //Handle case for page not found
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SpawnWikiModel> call, Throwable t) {
+                //Handle case for failure
+
+            }
+        });
+
     }
 }
