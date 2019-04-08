@@ -1,5 +1,6 @@
 package com.spawn.ai.interfaces;
 
+
 import com.spawn.ai.model.BotResponse;
 
 import retrofit2.Call;

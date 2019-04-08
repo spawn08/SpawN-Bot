@@ -9,6 +9,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -22,18 +23,16 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.spawn.ai.adapters.SpawnChatbotAdapter;
+import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
 import com.spawn.ai.interfaces.IBotObserver;
-import com.spawn.ai.model.BotResponse;
+import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.DateTimeUtils;
-import com.spawn.ai.utils.JsonFileReader;
 
 import java.util.ArrayList;
 import java.util.Locale;
-
-import constants.ChatViewTypes;
 
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, TextToSpeech.OnInitListener {
 
@@ -213,7 +212,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void callWitService(String speechString) {
         WebServiceUtils.getInstance(this).setUpObserver(this);
-        WebServiceUtils.getInstance(this).setToken("Your Token Here");
         WebServiceUtils.getInstance(this).getRetrofitClient();
         WebServiceUtils.getInstance(this).getBotResponse(speechString);
     }
@@ -252,7 +250,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }.start();
     }
 
-    private void chatViews(String chatMessage, int type, BotResponse botResponse) {
+    private void chatViews(String chatMessage, int type, ChatCardModel chatCardModel) {
 
         switch (type) {
             case ChatViewTypes.CHAT_VIEW_USER:
@@ -261,6 +259,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 chatMessageType.setViewType(0);
                 chatMessageType.setDate(new DateTimeUtils().getDate());
                 chatMessageType.setBotResponse(null);
+                chatMessageType.setAction(null);
                 if (botResponses.size() == 0)
                     botResponses.add(chatMessageType);
                 else {
@@ -272,19 +271,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 break;
 
             case ChatViewTypes.CHAT_VIEW_BOT:
-                if (botResponse != null) {
+                if (chatCardModel != null) {
                     ChatMessageType chatMessageType1 = new ChatMessageType();
-                    if (botResponse.getEntities().getBotIntents() != null &&
-                            botResponse.getEntities().getBotIntents().size() > 0)
-                        chatMessageType1.setMessage(JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue().toString()));
-                    else
-                        chatMessageType1.setMessage(getResources().getString(R.string.defalt_answer));
+                    chatMessageType1.setMessage(chatCardModel.getMessage());
                     chatMessageType1.setDate(new DateTimeUtils().getDate());
-                    chatMessageType1.setViewType(1);
+                    chatMessageType1.setViewType(chatCardModel.getType());
+                    chatMessageType1.setAction(chatCardModel.getAction());
                     chatMessageType1.setBotResponse(null);
-                    /*botResponses.remove(botResponses.size() - 1);*/
-                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
-                        botResponses.remove(botResponses.size() - 1);
+                    botResponses.remove(botResponses.size() - 1);
                     botResponses.add(chatMessageType1);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
@@ -299,6 +293,24 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 botResponses.add(chatMessageLoading);
                 chatbotAdapter.setAdapter(botResponses);
                 break;
+
+            case ChatViewTypes.CHAT_VIEW_CARD:
+                if (chatCardModel != null) {
+                    ChatMessageType chatMessageType1 = new ChatMessageType();
+                    chatMessageType1.setMessage(chatCardModel.getMessage());
+                    chatMessageType1.setDate(new DateTimeUtils().getDate());
+                    chatMessageType1.setButtonText(chatCardModel.getButton_text());
+                    chatMessageType1.setViewType(chatCardModel.getType());
+                    chatMessageType1.setAction(chatCardModel.getAction());
+                    chatMessageType1.setBotResponse(null);
+                    botResponses.remove(botResponses.size() - 1);
+                    botResponses.add(chatMessageType1);
+                    chatbotAdapter.setAdapter(botResponses);
+                    chatbotAdapter.notifyDataSetChanged();
+
+                }
+                break;
+
         }
 
     }
@@ -310,36 +322,35 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.mic:
+        int i = view.getId();
+        if (i == R.id.mic) {
+            initSpeech();
+            speechRecognizer.startListening(speechIntentDispatcher);
+            activitySpawnBotBinding.micImage.setVisibility(View.GONE);
+            activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
+            activitySpawnBotBinding.mic.playAnimation();
+
+
+        } else if (i == R.id.mic_image) {
+            botResponses.clear();
+            chatbotAdapter.setAdapter(botResponses);
+            if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
                 initSpeech();
                 speechRecognizer.startListening(speechIntentDispatcher);
                 activitySpawnBotBinding.micImage.setVisibility(View.GONE);
                 activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
                 activitySpawnBotBinding.mic.playAnimation();
-
-                break;
-
-            case R.id.mic_image:
-                // botResponses.clear();
-                chatbotAdapter.setAdapter(botResponses);
-                if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
-                    initSpeech();
-                    speechRecognizer.startListening(speechIntentDispatcher);
-                    activitySpawnBotBinding.micImage.setVisibility(View.GONE);
-                    activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
-                    activitySpawnBotBinding.mic.playAnimation();
-                } else {
-                    if (speechRecognizer != null) {
-                        speechRecognizer.cancel();
-                        speechRecognizer.destroy();
-                    }
-                    Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
-                    requestPermission();
-
+            } else {
+                if (speechRecognizer != null) {
+                    speechRecognizer.cancel();
+                    speechRecognizer.destroy();
                 }
+                Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
+                requestPermission();
 
-                break;
+            }
+
+
         }
     }
 
@@ -351,6 +362,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 speechRecognizer.cancel();
                 speechRecognizer.destroy();
             }
+            if (textToSpeech != null) {
+                textToSpeech.stop();
+                textToSpeech.shutdown();
+                textToSpeech = null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -358,8 +374,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     }
 
     @Override
-    public void notifyBotResponse(BotResponse botResponse) {
-        chatViews(null, 1, botResponse);
+    public void notifyBotResponse(ChatCardModel chatCardModel) {
+        chatViews(null, chatCardModel.getType(), chatCardModel);
     }
 
     @Override
@@ -374,7 +390,42 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     @Override
     public void speakBot(String message) {
-        textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
+        if (Build.VERSION.SDK_INT < 21) {
+            textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+
+        } else {
+            textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
+        }
+    }
+
+    @Override
+    public void setAction(String action) {
+        /*if (action.equals("license")) {
+            Intent intent = new Intent(this, LicenseRenewalActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        } else if (action.equals("finish")) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                }
+            }, 2000);
+
+        } else if (action.equals("garden")) {
+            Intent intent = new Intent(this, GenerateApplicationActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        } else if (action.equals("complaint")) {
+            Intent intent = new Intent(this, ComplaintActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        } else if (action.equals("water")) {
+            Intent i = new Intent(this, MenuActivity.class);
+            i.putExtra("serviceType", ConstantData.CONST_SERVICETYPE_WATER);
+            startActivity(i);
+        }*/
     }
 
 

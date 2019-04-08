@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.spawn.ai.R;
 
+
 public class SpawnChatBotViewHolder extends RecyclerView.ViewHolder {
 
     public TextView bot_message, bot_time;

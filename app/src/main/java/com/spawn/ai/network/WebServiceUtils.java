@@ -5,6 +5,8 @@ import android.content.Context;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWebService;
 import com.spawn.ai.model.BotResponse;
+import com.spawn.ai.model.ChatCardModel;
+import com.spawn.ai.utils.JsonFileReader;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -70,8 +72,15 @@ public class WebServiceUtils {
             @Override
             public void onResponse(Call<BotResponse> call, Response<BotResponse> response) {
                 if (response.isSuccessful()) {
+                    ChatCardModel chatCardModel = null;
                     BotResponse botResponse = response.body();
-                    iBotObserver.notifyBotResponse(botResponse);
+                    if (botResponse.getEntities().getBotIntents() != null &&
+                            botResponse.getEntities().getBotIntents().size() > 0)
+                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue(), 4);
+                    else {
+                        chatCardModel = new ChatCardModel("", JsonFileReader.getInstance().getDefaultAnswer(), 1, "");
+                    }
+                    iBotObserver.notifyBotResponse(chatCardModel);
                 } else {
                     iBotObserver.notifyBotError();
                 }

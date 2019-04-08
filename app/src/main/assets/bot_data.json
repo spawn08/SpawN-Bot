@@ -5,14 +5,18 @@
       "Hey Hi!!",
       "Hello there!!",
       "How can I help you."
-    ]
+    ],
+    "button_text": "",
+    "action": ""
   },
   "mcgm_like": {
     "type": 1,
     "message": [
       "Thank you.",
       "I like you too!!"
-    ]
+    ],
+    "button_text": "",
+    "action": ""
   },
   "bot_bye": {
     "type": 1,
@@ -20,26 +24,67 @@
       "See you soon!!",
       "Bye bye!!",
       "Good bye, see you soon."
-    ]
+    ],
+    "button_text": "",
+    "action": "finish"
   },
   "bot_morning": {
     "type": 1,
     "message": [
       "Good Morning.",
       "Hey, Good Morning !!"
-    ]
+    ],
+    "button_text": "",
+    "action": ""
   },
   "mcgm_love": {
     "type": 1,
     "message": [
       "Thank you. Anything I can help you with?",
       "I can't believe this moment finally came. You should know I think you're the best."
-    ]
+    ],
+    "button_text": "",
+    "action": ""
   },
   "bot_health": {
     "type": 1,
     "message": [
       "I am doing great"
-    ]
+    ],
+    "button_text": "",
+    "action": ""
+  },
+  "mumbai_commissioner": {
+    "type": 1,
+    "message": [
+      "Shri. Ajoy Mehta is commisioner of Municipal Corporation of Greater Mumbai."
+    ],
+    "button_text": "",
+    "action": ""
+  },
+  "mumbai_mahapor": {
+    "type": 1,
+    "message": [
+      "Shri. Vishwanath Mahadeshwar is the Mayor of Mumbai."
+    ],
+    "button_text": "",
+    "action": ""
+  },
+  "mcgm_assistant_name": {
+    "type": 1,
+    "message": [
+      "I am MCGM Assistant. Happy and ready to help."
+    ],
+    "button_text": "",
+    "action": ""
+  },
+  "default": {
+    "type": 1,
+    "message": [
+      "Sorry, I could not understand what you just said.",
+      "I don't have an answer for this at the moment."
+    ],
+    "button_text": "",
+    "action": ""
   }
 }

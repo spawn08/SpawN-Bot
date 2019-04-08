@@ -6,8 +6,6 @@ import android.widget.TextView;
 
 import com.spawn.ai.R;
 
-import org.w3c.dom.Text;
-
 public class SpawnChatUserViewHolder extends RecyclerView.ViewHolder {
 
     public TextView user_message, user_time;

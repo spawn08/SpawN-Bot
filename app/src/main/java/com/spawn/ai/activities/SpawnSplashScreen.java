@@ -3,14 +3,17 @@ package com.spawn.ai.activities;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
+import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.JsonFileReader;
+
+import constants.AppConstants;
 
 public class SpawnSplashScreen extends AppCompatActivity {
 
@@ -22,7 +25,10 @@ public class SpawnSplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spawn_splash_screen);
         context = this;
-        JsonFileReader.getInstance().readFile(this, "bot_data.json");
+        //JsonFileReader.getInstance().readFile(this);
+        WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
+        JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
+        JsonFileReader.getInstance().readFile(this);
         spawnLogo = (LottieAnimationView) findViewById(R.id.spawn_logo);
         spawnLogo.setRepeatMode(-1);
         spawnLogo.playAnimation();

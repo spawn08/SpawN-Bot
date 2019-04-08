@@ -2,18 +2,23 @@ package com.spawn.ai.utils;
 
 import android.content.Context;
 
+import com.spawn.ai.constants.ChatViewTypes;
+import com.spawn.ai.model.ChatCardModel;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.security.Key;
 import java.util.Random;
+
 
 public class JsonFileReader {
 
     private static JsonFileReader jsonFileReader;
     private String fileContents;
+    private String fileName = "bot_data.json";
+    private ChatCardModel cardModel;
 
     public static JsonFileReader getInstance() {
         if (jsonFileReader == null) {
@@ -22,7 +27,11 @@ public class JsonFileReader {
         return jsonFileReader;
     }
 
-    public String readFile(Context context, String fileName) {
+    public void fileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String readFile(Context context) {
         String json = null;
         try {
             InputStream is = context.getAssets().open(fileName);
@@ -50,19 +59,87 @@ public class JsonFileReader {
         return jsonObject;
     }
 
-    public String getJsonFromKey(String key) {
+    public ChatCardModel getJsonFromKey(String key, int i) {
         String message = "";
+        ChatCardModel chatCardModel = new ChatCardModel("", getDefaultAnswer(), 1, "");
         try {
-            if (fileContents != null) {
-                JSONObject data = new JSONObject(fileContents);
-                JSONObject body = data.getJSONObject(key);
-                JSONArray jsonArray = body.getJSONArray("message");
-                int index = new Random().nextInt(jsonArray.length());
-                message = jsonArray.get(index).toString();
+            switch (i) {
+                case ChatViewTypes.CHAT_VIEW_BOT:
+                    if (fileContents != null) {
+                        JSONObject data = new JSONObject(fileContents);
+                        JSONObject body = (data.has(key)) ? data.getJSONObject(key) : data.getJSONObject("default");
+                        JSONArray jsonArray = body.getJSONArray("message");
+                        int index = new Random().nextInt(jsonArray.length());
+                        message = jsonArray.get(index).toString();
+                        chatCardModel = new ChatCardModel(body.getString("button_text"),
+                                message,
+                                body.getInt("type"), body.getString("action"));
+                        setCardModel(chatCardModel);
+                        return chatCardModel;
+                    }
+
+                case ChatViewTypes.CHAT_VIEW_CARD:
+                    if (fileContents != null) {
+                        JSONObject data = new JSONObject(fileContents);
+                        JSONObject body = (data.has(key)) ? data.getJSONObject(key) : data.getJSONObject("default");
+                        JSONArray jsonArray = body.getJSONArray("message");
+                        int index = new Random().nextInt(jsonArray.length());
+                        message = jsonArray.get(index).toString();
+                        chatCardModel = new ChatCardModel(body.getString("button_text"),
+                                message,
+                                body.getInt("type"), body.getString("action"));
+                        setCardModel(chatCardModel);
+                        return chatCardModel;
+                    }
+
+                case ChatViewTypes.CHAT_VIEW_DEFAULT:
+                    if (fileContents != null) {
+                        JSONObject data = new JSONObject(fileContents);
+                        JSONObject body = (data.has(key)) ? data.getJSONObject(key) : data.getJSONObject("default");
+                        JSONArray jsonArray = body.getJSONArray("message");
+                        int index = new Random().nextInt(jsonArray.length());
+                        message = jsonArray.get(index).toString();
+                        chatCardModel = new ChatCardModel(body.getString("button_text"),
+                                message,
+                                body.getInt("type"), body.getString("action"));
+                        setCardModel(chatCardModel);
+                        return chatCardModel;
+                    }
+                    return chatCardModel;
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            return null;
+            return chatCardModel;
+        }
+        return chatCardModel;
+    }
+
+    private void setCardModel(ChatCardModel cardModel) {
+        this.cardModel = cardModel;
+    }
+
+    public ChatCardModel getCardModel() {
+        return this.cardModel;
+    }
+
+    public String getDefaultAnswer() {
+        String message = "";
+        if (fileContents != null) {
+            try {
+                JSONObject data = new JSONObject(fileContents);
+                if (data.has("default")) {
+                    JSONObject body = data.getJSONObject("default");
+                    JSONArray jsonArray = body.getJSONArray("message");
+                    int index = new Random().nextInt(jsonArray.length());
+                    message = jsonArray.get(index).toString();
+                } else {
+                    message = "Sorry, I could not understand what you just said";
+                }
+                return message;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                message = "Sorry, I could not understand what you just said";
+            }
         }
         return message;
     }

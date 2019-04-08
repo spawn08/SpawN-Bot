@@ -6,6 +6,8 @@ public class ChatMessageType {
     private int viewType; //0=User chat, 1= Bot Chat
     private BotResponse botResponse;
     private String date;
+    private String buttonText;
+    private String action;
 
     public String getMessage() {
         return message;
@@ -37,5 +39,21 @@ public class ChatMessageType {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getButtonText() {
+        return buttonText;
+    }
+
+    public void setButtonText(String buttonText) {
+        this.buttonText = buttonText;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
     }
 }

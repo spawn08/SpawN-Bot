@@ -8,15 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.spawn.ai.R;
+import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.viewholders.SpawnChatBotViewHolder;
+import com.spawn.ai.viewholders.SpawnChatCardViewHolder;
 import com.spawn.ai.viewholders.SpawnChatLoadingViewHolder;
 import com.spawn.ai.viewholders.SpawnChatUserViewHolder;
 
 import java.util.ArrayList;
-
-import constants.ChatViewTypes;
 
 public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -54,6 +54,11 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 SpawnChatLoadingViewHolder spawnChatLoadingViewHolder = new SpawnChatLoadingViewHolder(viewLoading);
                 return spawnChatLoadingViewHolder;
 
+            case ChatViewTypes.CHAT_VIEW_CARD:
+                View cardView = LayoutInflater.from(context).inflate(R.layout.spawn_chat_card, parent, false);
+                SpawnChatCardViewHolder spawnChatCardViewHolder = new SpawnChatCardViewHolder(cardView);
+                return spawnChatCardViewHolder;
+
         }
 
         return null;
@@ -80,12 +85,34 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 if (iBotObserver != null)
                     iBotObserver.speakBot(botMessage);
+
+                if (chatMessageType.get(position).getAction() != null &&
+                        !chatMessageType.get(position).getAction().isEmpty())
+                    iBotObserver.setAction(chatMessageType.get(position).getAction());
+
                 break;
 
             case ChatViewTypes.CHAT_VIEW_LOADING:
                 SpawnChatLoadingViewHolder spawnChatLoadingViewHolder = (SpawnChatLoadingViewHolder) holder;
                 spawnChatLoadingViewHolder.loading.setVisibility(View.VISIBLE);
                 spawnChatLoadingViewHolder.loading.playAnimation();
+                break;
+
+            case ChatViewTypes.CHAT_VIEW_CARD:
+                SpawnChatCardViewHolder spawnChatCardViewHolder = (SpawnChatCardViewHolder) holder;
+                spawnChatCardViewHolder.spawn_card_text.setText(chatMessageType.get(position).getMessage());
+                spawnChatCardViewHolder.card_button.setText(chatMessageType.get(position).getButtonText());
+                final int pos = position;
+                spawnChatCardViewHolder.card_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        iBotObserver.setAction(chatMessageType.get(pos).getAction());
+
+                    }
+                });
+
+                if (iBotObserver != null)
+                    iBotObserver.speakBot(chatMessageType.get(position).getMessage());
                 break;
         }
 
