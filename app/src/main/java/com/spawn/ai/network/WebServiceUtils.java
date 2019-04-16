@@ -68,13 +68,13 @@ public class WebServiceUtils {
     public void getBotResponse(String q) {
 
         if (retrofit != null) {
-            if (q.length() > 2)
+            if (q.split(" ").length > 2)
                 callSpawnAPI(q);
             else callWikiAPI(q);
 
         } else {
             retrofit = getRetrofitClient();
-            if (q.length() > 2)
+            if (q.split(" ").length > 2)
                 callSpawnAPI(q);
             else callWikiAPI(q);
         }
@@ -151,7 +151,7 @@ public class WebServiceUtils {
     }
 
     public void callWikiAPI(final String entity) {
-
+        iBotObserver.loading();
         final String cloneEntity = entity.trim().replace(" ", "_");
         Log.d("ENTITY: ", cloneEntity);
 
