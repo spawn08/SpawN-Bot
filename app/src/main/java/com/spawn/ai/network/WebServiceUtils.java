@@ -68,11 +68,15 @@ public class WebServiceUtils {
     public void getBotResponse(String q) {
 
         if (retrofit != null) {
-            callSpawnAPI(q);
+            if (q.length() > 2)
+                callSpawnAPI(q);
+            else callWikiAPI(q);
 
         } else {
             retrofit = getRetrofitClient();
-            callSpawnAPI(q);
+            if (q.length() > 2)
+                callSpawnAPI(q);
+            else callWikiAPI(q);
         }
     }
 
@@ -123,9 +127,13 @@ public class WebServiceUtils {
             @Override
             public void onResponse(Call<List<SpawnEntityModel>> call, Response<List<SpawnEntityModel>> response) {
                 try {
-
-                    List<SpawnEntityModel> model = response.body();
-                    callWikiAPI(model.get(0).getValue());
+                    if (response.isSuccessful()) {
+                        List<SpawnEntityModel> model = response.body();
+                        callWikiAPI(model.get(0).getValue());
+                    } else {
+                        ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                        iBotObserver.notifyBotResponse(chatCardModel);
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -135,6 +143,8 @@ public class WebServiceUtils {
             @Override
             public void onFailure(Call<List<SpawnEntityModel>> call, Throwable t) {
                 Log.e("ERROR: ", t.getMessage());
+                ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                iBotObserver.notifyBotResponse(chatCardModel);
 
             }
         });
@@ -144,6 +154,7 @@ public class WebServiceUtils {
 
         final String cloneEntity = entity.trim().replace(" ", "_");
         Log.d("ENTITY: ", cloneEntity);
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
                 .addConverterFactory(GsonConverterFactory.create())

@@ -16,6 +16,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/container"
         android:background="@color/white"
         tools:context=".SpawnBotActivity">
 
@@ -23,12 +24,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/mic_rl"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:id="@+id/recycler_container"
+            android:clickable="true">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/chat_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:clickable="true"
+
+                />
 
 
         </LinearLayout>
@@ -77,6 +83,15 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/container_stop"
+            android:background="@android:color/transparent"
+            android:visibility="visible"
+            android:layout_above="@+id/mic_rl">
+
+        </RelativeLayout>
 
     </RelativeLayout>
 </layout>

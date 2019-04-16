@@ -27,11 +27,13 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Context context;
     private ArrayList<ChatMessageType> chatMessageType = new ArrayList<>();
     IBotObserver iBotObserver;
+    private RecyclerView recyclerView;
 
-    public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType) {
+    public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType, RecyclerView recyclerView) {
         this.context = context;
         this.chatMessageType = chatMessageType;
         iBotObserver = (IBotObserver) context;
+        this.recyclerView = recyclerView;
     }
 
     public void setAdapter(ArrayList<ChatMessageType> chatMessageType) {
@@ -126,12 +128,30 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
                 spawnWikiViewHolder.wikiTitle.setText(chatMessageType.get(position).getSpawnWikiModel().getDescription());
-                Glide.with(context)
-                        .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_portrait).error(R.drawable.default_portrait))
-                        .load(chatMessageType.get(position).getSpawnWikiModel().getThumbnail().getSource())
-                        .into(spawnWikiViewHolder.wikiImage);
-                spawnWikiViewHolder.wikiParagraph.setText(chatMessageType.get(position).getSpawnWikiModel().getTitle());
+                if (chatMessageType.get(position).getSpawnWikiModel().getThumbnail() != null) {
+                    Glide.with(context)
+                            .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_portrait).error(R.drawable.default_portrait))
+                            .load(chatMessageType.get(position).getSpawnWikiModel().getThumbnail().getSource())
+                            .into(spawnWikiViewHolder.wikiImage);
+                } else {
+                    Glide.with(context)
+                            .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_portrait).error(R.drawable.default_portrait))
+                            .load(R.drawable.thumbnail_not_found)
+                            .into(spawnWikiViewHolder.wikiImage);
+                }
+                if (chatMessageType.get(position).getSpawnWikiModel().getTitle().length() > 2)
+                    spawnWikiViewHolder.wikiParagraph.setText(chatMessageType.get(position).getSpawnWikiModel().getTitle());
+                else
+                    spawnWikiViewHolder.wikiParagraph.setText(chatMessageType.get(position).getSpawnWikiModel().getTitle() + " - " +
+                            chatMessageType.get(position).getSpawnWikiModel().getDescription()
+                    );
 
+                recyclerView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        iBotObserver.notifyBotError();
+                    }
+                });
                 if (iBotObserver != null)
                     iBotObserver.speakBot(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract()));
 

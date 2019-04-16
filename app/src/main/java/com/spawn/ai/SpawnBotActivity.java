@@ -9,7 +9,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -59,11 +58,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.setListener(this);
         locale = new Locale("en");
         requestPermission();
+
         activitySpawnBotBinding.mic.setOnClickListener(this);
         activitySpawnBotBinding.micImage.setOnClickListener(this);
+        activitySpawnBotBinding.recyclerContainer.setOnClickListener(this);
         activitySpawnBotBinding.chatRecycler.setOnClickListener(this);
+
         botResponses = new ArrayList<ChatMessageType>();
-        chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
+        chatbotAdapter = new SpawnChatbotAdapter(this, botResponses, activitySpawnBotBinding.chatRecycler);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(false);
         activitySpawnBotBinding.chatRecycler.setLayoutManager(linearLayoutManager);
@@ -152,7 +154,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void onBeginningOfSpeech() {
         Log.d(TAG, "onBeginningOfSpeech");
-
+        activitySpawnBotBinding.containerStop.setVisibility(View.VISIBLE);
+        activitySpawnBotBinding.containerStop.setOnClickListener(this);
+        activitySpawnBotBinding.containerStop.requestFocus();
     }
 
     @Override
@@ -174,6 +178,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.micImage.setVisibility(View.VISIBLE);
         activitySpawnBotBinding.mic.setVisibility(View.GONE);
 
+
     }
 
     @Override
@@ -181,16 +186,23 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         Log.d(TAG, "ERROR " + i);
         switch (i) {
             case SpeechRecognizer.ERROR_NETWORK:
+                activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                 onEndOfSpeech();
                 Toast.makeText(this, "No Network", Toast.LENGTH_LONG);
                 break;
             case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                 onEndOfSpeech();
                 Toast.makeText(this, "No permission to perform the action", Toast.LENGTH_LONG);
                 break;
 
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                 onEndOfSpeech();
+                break;
+
+            case SpeechRecognizer.ERROR_NO_MATCH:
+                activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                 break;
         }
     }
@@ -366,8 +378,20 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 requestPermission();
             }
 
+        } else if (i == R.id.recycler_container) {
+
+            if (textToSpeech != null &&
+                    textToSpeech.isSpeaking()) {
+                textToSpeech.stop();
+            }
         } else if (i == R.id.chat_recycler) {
 
+            if (textToSpeech != null &&
+                    textToSpeech.isSpeaking()) {
+                textToSpeech.stop();
+            }
+        } else if (i == R.id.container_stop) {
+            activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
             if (textToSpeech != null &&
                     textToSpeech.isSpeaking()) {
                 textToSpeech.stop();
@@ -401,7 +425,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     @Override
     public void notifyBotError() {
-
+        if (textToSpeech != null &&
+                textToSpeech.isSpeaking()) {
+            textToSpeech.stop();
+        }
     }
 
     @Override
