@@ -7,14 +7,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.spawn.ai.R;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
+import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.viewholders.SpawnChatBotViewHolder;
 import com.spawn.ai.viewholders.SpawnChatCardViewHolder;
 import com.spawn.ai.viewholders.SpawnChatLoadingViewHolder;
 import com.spawn.ai.viewholders.SpawnChatUserViewHolder;
+import com.spawn.ai.viewholders.SpawnWikiViewHolder;
 
 import java.util.ArrayList;
 
@@ -30,8 +34,8 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         iBotObserver = (IBotObserver) context;
     }
 
-    public void setAdapter(ArrayList<ChatMessageType> chatModels) {
-        this.chatMessageType = chatModels;
+    public void setAdapter(ArrayList<ChatMessageType> chatMessageType) {
+        this.chatMessageType = chatMessageType;
         notifyDataSetChanged();
     }
 
@@ -59,6 +63,10 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 SpawnChatCardViewHolder spawnChatCardViewHolder = new SpawnChatCardViewHolder(cardView);
                 return spawnChatCardViewHolder;
 
+            case ChatViewTypes.CHAT_VIEW_WIKI:
+                View wikiView = LayoutInflater.from(context).inflate(R.layout.spawn_wiki_view, parent, false);
+                SpawnWikiViewHolder wikiViewHolder = new SpawnWikiViewHolder(wikiView);
+                return wikiViewHolder;
         }
 
         return null;
@@ -114,6 +122,21 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 if (iBotObserver != null)
                     iBotObserver.speakBot(chatMessageType.get(position).getMessage());
                 break;
+
+            case ChatViewTypes.CHAT_VIEW_WIKI:
+                SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
+                spawnWikiViewHolder.wikiTitle.setText(chatMessageType.get(position).getSpawnWikiModel().getDescription());
+                Glide.with(context)
+                        .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_portrait).error(R.drawable.default_portrait))
+                        .load(chatMessageType.get(position).getSpawnWikiModel().getThumbnail().getSource())
+                        .into(spawnWikiViewHolder.wikiImage);
+                spawnWikiViewHolder.wikiParagraph.setText(chatMessageType.get(position).getSpawnWikiModel().getTitle());
+
+                if (iBotObserver != null)
+                    iBotObserver.speakBot(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract()));
+
+
+                break;
         }
 
     }
@@ -126,5 +149,21 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public int getItemViewType(int position) {
         return chatMessageType.get(position).getViewType();
+    }
+
+    public String getInfoFromExtract(String extract) {
+        String text = "";
+        try {
+            String[] splitExtract = extract.split("\\.");
+            if (splitExtract.length > 1) {
+                text = splitExtract[0] + ". " + splitExtract[1];
+            } else {
+                text = splitExtract[0];
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return text + ".";
     }
 }

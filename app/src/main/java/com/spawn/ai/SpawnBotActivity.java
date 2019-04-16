@@ -26,15 +26,17 @@ import com.spawn.ai.adapters.SpawnChatbotAdapter;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
 import com.spawn.ai.interfaces.IBotObserver;
+import com.spawn.ai.interfaces.IBotWikiNLP;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
+import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.DateTimeUtils;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, TextToSpeech.OnInitListener {
+public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
 
     private static final String TAG = SpawnBotActivity.class.getCanonicalName();
     public Context context;
@@ -59,6 +61,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         requestPermission();
         activitySpawnBotBinding.mic.setOnClickListener(this);
         activitySpawnBotBinding.micImage.setOnClickListener(this);
+        activitySpawnBotBinding.chatRecycler.setOnClickListener(this);
         botResponses = new ArrayList<ChatMessageType>();
         chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -311,6 +314,20 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 }
                 break;
 
+            case ChatViewTypes.CHAT_VIEW_WIKI:
+                if (chatCardModel != null) {
+                    ChatMessageType wikiType = new ChatMessageType();
+                    wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
+                    wikiType.setViewType(chatCardModel.getType());
+                    botResponses.remove(botResponses.size() - 1);
+                    botResponses.add(wikiType);
+                    chatbotAdapter.setAdapter(botResponses);
+                    chatbotAdapter.notifyDataSetChanged();
+
+                }
+
+                break;
+
         }
 
     }
@@ -347,10 +364,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 }
                 Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
                 requestPermission();
-
             }
 
+        } else if (i == R.id.chat_recycler) {
 
+            if (textToSpeech != null &&
+                    textToSpeech.isSpeaking()) {
+                textToSpeech.stop();
+            }
         }
     }
 
@@ -442,5 +463,15 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         } else {
             Log.e(this.getClass().getName(), "Initilization Failed!");
         }
+    }
+
+    @Override
+    public void showUI(ChatCardModel chatCardModel) {
+        chatViews(null, chatCardModel.getType(), chatCardModel);
+    }
+
+    @Override
+    public void showNotFound(SpawnWikiModel spawnWikiModel) {
+
     }
 }

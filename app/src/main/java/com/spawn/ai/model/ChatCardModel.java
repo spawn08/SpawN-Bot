@@ -6,12 +6,18 @@ public class ChatCardModel {
     String message;
     int type;
     String action;
+    SpawnWikiModel spawnWikiModel;
 
     public ChatCardModel(String text, String message, int type, String action) {
         this.button_text = text;
         this.message = message;
         this.type = type;
         this.action = action;
+    }
+
+    public ChatCardModel(SpawnWikiModel spawnWikiModel, int type) {
+        this.spawnWikiModel = spawnWikiModel;
+        this.type = type;
     }
 
     public String getButton_text() {
@@ -28,5 +34,9 @@ public class ChatCardModel {
 
     public String getAction() {
         return this.action;
+    }
+
+    public SpawnWikiModel getSpawnWikiModel() {
+        return spawnWikiModel;
     }
 }

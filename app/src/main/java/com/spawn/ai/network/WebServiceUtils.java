@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWebService;
+import com.spawn.ai.interfaces.IBotWikiNLP;
 import com.spawn.ai.interfaces.ISpawnAPI;
 import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.ChatCardModel;
@@ -14,6 +15,7 @@ import com.spawn.ai.utils.JsonFileReader;
 
 import java.util.List;
 
+import constants.AppConstants;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,6 +31,7 @@ public class WebServiceUtils {
     public static String API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
     public static String SPAWN_API = "https://spawnai.com/";
     private static IBotObserver iBotObserver;
+    private IBotWikiNLP iBotWikiNLP;
     String token;
 
     public static WebServiceUtils getInstance(Context context) {
@@ -40,6 +43,7 @@ public class WebServiceUtils {
 
     public void setUpObserver(Context context) {
         this.iBotObserver = (IBotObserver) context;
+        this.iBotWikiNLP = (IBotWikiNLP) context;
     }
 
     public Retrofit getRetrofitClient() {
@@ -64,11 +68,11 @@ public class WebServiceUtils {
     public void getBotResponse(String q) {
 
         if (retrofit != null) {
-            callWebservice(q);
+            callSpawnAPI(q);
 
         } else {
             retrofit = getRetrofitClient();
-            callWebservice(q);
+            callSpawnAPI(q);
         }
     }
 
@@ -102,8 +106,13 @@ public class WebServiceUtils {
     }
 
     public void callSpawnAPI(String query) {
+        iBotObserver.loading();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                .build();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(SPAWN_API)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -146,16 +155,22 @@ public class WebServiceUtils {
             @Override
             public void onResponse(Call<SpawnWikiModel> call, Response<SpawnWikiModel> response) {
                 if (response.isSuccessful()) {
+                    ChatCardModel chatCardModel = null;
                     Log.d("API CONTENT: ", response.body().toString());
                     SpawnWikiModel spawnWikiModel = response.body();
                     if (spawnWikiModel.getType().equals("disambiguation")) {
                         //Handle case for page not found
+                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                        iBotObserver.notifyBotResponse(chatCardModel);
                     } else {
-
+                        chatCardModel = new ChatCardModel(spawnWikiModel, 5);
+                        iBotWikiNLP.showUI(chatCardModel);
                     }
 
                 } else {
                     //Handle case for page not found
+                    ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                    iBotObserver.notifyBotResponse(fallBack);
                 }
             }
 

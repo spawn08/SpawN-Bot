@@ -8,6 +8,7 @@ public class ChatMessageType {
     private String date;
     private String buttonText;
     private String action;
+    private SpawnWikiModel spawnWikiModel;
 
     public String getMessage() {
         return message;
@@ -55,5 +56,13 @@ public class ChatMessageType {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public SpawnWikiModel getSpawnWikiModel() {
+        return spawnWikiModel;
+    }
+
+    public void setSpawnWikiModel(SpawnWikiModel spawnWikiModel) {
+        this.spawnWikiModel = spawnWikiModel;
     }
 }
