@@ -127,16 +127,18 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
-                spawnWikiViewHolder.wikiTitle.setText(chatMessageType.get(position).getSpawnWikiModel().getDescription());
+                spawnWikiViewHolder.wikiTitle.setText(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract()) + "...");
                 if (chatMessageType.get(position).getSpawnWikiModel().getThumbnail() != null) {
                     Glide.with(context)
-                            .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_portrait).error(R.drawable.default_portrait))
+                            .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.thumbnail_not_found).error(R.drawable.thumbnail_not_found))
                             .load(chatMessageType.get(position).getSpawnWikiModel().getThumbnail().getSource())
+                            .apply(RequestOptions.circleCropTransform())
                             .into(spawnWikiViewHolder.wikiImage);
                 } else {
                     Glide.with(context)
-                            .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_portrait).error(R.drawable.default_portrait))
+                            .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.thumbnail_not_found).error(R.drawable.thumbnail_not_found))
                             .load(R.drawable.thumbnail_not_found)
+                            .apply(RequestOptions.circleCropTransform())
                             .into(spawnWikiViewHolder.wikiImage);
                 }
                 if (chatMessageType.get(position).getSpawnWikiModel().getTitle().length() > 2)
@@ -153,8 +155,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     }
                 });
                 if (iBotObserver != null)
-                    iBotObserver.speakBot(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract()));
-
+                    iBotObserver.speakBot(chatMessageType.get(position).getSpawnWikiModel().getExtract());
 
                 break;
         }

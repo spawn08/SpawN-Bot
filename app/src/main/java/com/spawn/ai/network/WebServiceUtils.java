@@ -68,15 +68,15 @@ public class WebServiceUtils {
     public void getBotResponse(String q) {
 
         if (retrofit != null) {
-            if (q.split(" ").length > 2)
-                callSpawnAPI(q);
-            else callWikiAPI(q);
+            //  if (q.split(" ").length > 2)
+            callSpawnAPI(q);
+            // else callWikiAPI(q);
 
         } else {
             retrofit = getRetrofitClient();
-            if (q.split(" ").length > 2)
-                callSpawnAPI(q);
-            else callWikiAPI(q);
+            // if (q.split(" ").length > 2)
+            callSpawnAPI(q);
+            // else callWikiAPI(q);
         }
     }
 

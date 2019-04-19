@@ -154,6 +154,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void onBeginningOfSpeech() {
         Log.d(TAG, "onBeginningOfSpeech");
+        if (textToSpeech != null &&
+                textToSpeech.isSpeaking()) {
+            textToSpeech.stop();
+        }
         activitySpawnBotBinding.containerStop.setVisibility(View.VISIBLE);
         activitySpawnBotBinding.containerStop.setOnClickListener(this);
         activitySpawnBotBinding.containerStop.requestFocus();
@@ -304,6 +308,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
             case ChatViewTypes.CHAT_VIEW_LOADING:
                 ChatMessageType chatMessageLoading = new ChatMessageType();
+                if (botResponses.size() > 0 && botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                    botResponses.remove(botResponses.size() - 1);
                 chatMessageLoading.setViewType(2);
                 botResponses.add(chatMessageLoading);
                 chatbotAdapter.setAdapter(botResponses);
