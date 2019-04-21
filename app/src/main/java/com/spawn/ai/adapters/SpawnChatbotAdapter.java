@@ -10,9 +10,11 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.spawn.ai.R;
+import com.spawn.ai.activities.SpawnWebActivity;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
+import com.spawn.ai.model.Intent;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.utils.async.DumpTask;
 import com.spawn.ai.utils.async.FireCalls;
@@ -100,7 +102,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 if (chatMessageType.get(position).getAction() != null &&
                         !chatMessageType.get(position).getAction().isEmpty())
-                    iBotObserver.setAction(chatMessageType.get(position).getAction());
+                    iBotObserver.setAction(chatMessageType.get(position).getAction(), null);
 
                 break;
 
@@ -118,7 +120,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 spawnChatCardViewHolder.card_button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        iBotObserver.setAction(chatMessageType.get(pos).getAction());
+                        iBotObserver.setAction(chatMessageType.get(pos).getAction(), null);
 
                     }
                 });
@@ -129,8 +131,9 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
-                SpawnWikiModel spawnWikiModel = chatMessageType.get(position).getSpawnWikiModel();
+                final SpawnWikiModel spawnWikiModel = chatMessageType.get(position).getSpawnWikiModel();
                 spawnWikiViewHolder.wikiTitle.setText(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
+
                 if (chatMessageType.get(position).getSpawnWikiModel().getThumbnail() != null) {
                     Glide.with(context)
                             .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.thumbnail_not_found).error(R.drawable.thumbnail_not_found))
@@ -144,12 +147,22 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             .apply(RequestOptions.circleCropTransform())
                             .into(spawnWikiViewHolder.wikiImage);
                 }
-                if (chatMessageType.get(position).getSpawnWikiModel().getTitle().length() > 2)
+                if (chatMessageType.get(position).getSpawnWikiModel().getTitle().length() > 2) {
                     spawnWikiViewHolder.wikiParagraph.setText(spawnWikiModel.getTitle());
-                else
+                    spawnWikiViewHolder.wikiButton.setText(spawnWikiModel.getTitle());
+                } else {
                     spawnWikiViewHolder.wikiParagraph.setText(spawnWikiModel.getTitle() + " - " +
                             spawnWikiModel.getDescription()
                     );
+                    spawnWikiViewHolder.wikiButton.setText(spawnWikiModel.getTitle() + " - " + spawnWikiModel.getDescription());
+                }
+                spawnWikiViewHolder.wikiButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        iBotObserver.setAction("web_action", spawnWikiModel);
+
+                    }
+                });
 
                 recyclerView.setOnClickListener(new View.OnClickListener() {
                     @Override

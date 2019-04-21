@@ -1,6 +1,7 @@
 package com.spawn.ai.interfaces;
 
 import com.spawn.ai.model.ChatCardModel;
+import com.spawn.ai.model.SpawnWikiModel;
 
 public interface IBotObserver {
 
@@ -12,5 +13,5 @@ public interface IBotObserver {
 
     public void speakBot(String message);
 
-    public void setAction(String action);
+    public void setAction(String action, SpawnWikiModel spawnWikiModel);
 }

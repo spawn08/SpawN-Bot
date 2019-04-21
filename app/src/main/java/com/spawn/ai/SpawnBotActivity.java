@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.spawn.ai.activities.SpawnWebActivity;
 import com.spawn.ai.adapters.SpawnChatbotAdapter;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
@@ -458,7 +459,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     }
 
     @Override
-    public void setAction(String action) {
+    public void setAction(String action, SpawnWikiModel spawnWikiModel) {
+        if (action.equals("web_action")) {
+            Intent intent = new Intent(this, SpawnWebActivity.class);
+            intent.putExtra("url", spawnWikiModel.getContent_urls().getMobile().getPage());
+            startActivity(intent);
+        }
         /*if (action.equals("license")) {
             Intent intent = new Intent(this, LicenseRenewalActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

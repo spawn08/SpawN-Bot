@@ -14,7 +14,6 @@
         android:supportsRtl="true"
         android:theme="@style/SpawnNoActioBar"
         tools:replace="theme">
-
         <activity
             android:name=".SpawnBotActivity"
             android:configChanges="fontScale|orientation|screenSize"
@@ -22,7 +21,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/SpawnNoActioBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
-
         <activity
             android:name=".activities.SpawnSplashScreen"
             android:screenOrientation="portrait">
@@ -32,6 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.SpawnWebActivity"></activity>
     </application>
 
 </manifest>
