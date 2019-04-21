@@ -11,6 +11,7 @@ public class SpawnWikiModel {
     public String displaytitle;
     public String description;
     public String extract;
+    public String lang;
     public Thumbnail thumbnail;
     public String type;
     public Content_Urls content_urls;
@@ -69,6 +70,14 @@ public class SpawnWikiModel {
 
     public void setContent_urls(Content_Urls content_urls) {
         this.content_urls = content_urls;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 
     @Override

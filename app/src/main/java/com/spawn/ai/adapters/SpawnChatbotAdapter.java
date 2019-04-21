@@ -14,6 +14,8 @@ import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.utils.async.DumpTask;
+import com.spawn.ai.utils.async.FireCalls;
 import com.spawn.ai.viewholders.SpawnChatBotViewHolder;
 import com.spawn.ai.viewholders.SpawnChatCardViewHolder;
 import com.spawn.ai.viewholders.SpawnChatLoadingViewHolder;
@@ -127,7 +129,8 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
-                spawnWikiViewHolder.wikiTitle.setText(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract()) + "...");
+                SpawnWikiModel spawnWikiModel = chatMessageType.get(position).getSpawnWikiModel();
+                spawnWikiViewHolder.wikiTitle.setText(getInfoFromExtract(spawnWikiModel.getExtract()) + "..");
                 if (chatMessageType.get(position).getSpawnWikiModel().getThumbnail() != null) {
                     Glide.with(context)
                             .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.thumbnail_not_found).error(R.drawable.thumbnail_not_found))
@@ -142,10 +145,10 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             .into(spawnWikiViewHolder.wikiImage);
                 }
                 if (chatMessageType.get(position).getSpawnWikiModel().getTitle().length() > 2)
-                    spawnWikiViewHolder.wikiParagraph.setText(chatMessageType.get(position).getSpawnWikiModel().getTitle());
+                    spawnWikiViewHolder.wikiParagraph.setText(spawnWikiModel.getTitle());
                 else
-                    spawnWikiViewHolder.wikiParagraph.setText(chatMessageType.get(position).getSpawnWikiModel().getTitle() + " - " +
-                            chatMessageType.get(position).getSpawnWikiModel().getDescription()
+                    spawnWikiViewHolder.wikiParagraph.setText(spawnWikiModel.getTitle() + " - " +
+                            spawnWikiModel.getDescription()
                     );
 
                 recyclerView.setOnClickListener(new View.OnClickListener() {

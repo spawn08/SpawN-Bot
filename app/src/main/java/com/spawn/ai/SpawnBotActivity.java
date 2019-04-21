@@ -31,6 +31,8 @@ import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.DateTimeUtils;
+import com.spawn.ai.utils.async.DumpTask;
+import com.spawn.ai.utils.async.FireCalls;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -222,9 +224,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             activitySpawnBotBinding.mic.invalidate();
             ArrayList<String> returnSpeech = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             String speechString = returnSpeech.get(0);
-            onEndOfSpeech();
-            callWitService(speechString);
             Log.d(getClass().getCanonicalName(), "Speech :" + speechString);
+            onEndOfSpeech();
+            chatViews(speechString, 0, null);
+            callWitService(speechString);
 
         }
     }
@@ -247,11 +250,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 && bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).size() > 0) {
             ArrayList<String> partialResults = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             String partialString = partialResults.get(0);
-            chatViews(partialString, 0, null);
+            //if (partialString.length() % 2 == 0)
+            //   chatViews(partialString, 0, null);
             Log.d(TAG, "partialString :" + partialString);
         }
 
-        countDownTimer = new CountDownTimer(1000, 3000) {
+        countDownTimer = new CountDownTimer(1000, 4000) {
             @Override
             public void onTick(long l) {
 
@@ -334,6 +338,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 if (chatCardModel != null) {
+                    FireCalls.exec(new DumpTask(chatCardModel.getSpawnWikiModel()));
                     ChatMessageType wikiType = new ChatMessageType();
                     wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
                     wikiType.setViewType(chatCardModel.getType());
