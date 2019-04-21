@@ -130,7 +130,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
                 SpawnWikiModel spawnWikiModel = chatMessageType.get(position).getSpawnWikiModel();
-                spawnWikiViewHolder.wikiTitle.setText(getInfoFromExtract(spawnWikiModel.getExtract()) + "..");
+                spawnWikiViewHolder.wikiTitle.setText(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
                 if (chatMessageType.get(position).getSpawnWikiModel().getThumbnail() != null) {
                     Glide.with(context)
                             .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.thumbnail_not_found).error(R.drawable.thumbnail_not_found))
@@ -158,7 +158,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     }
                 });
                 if (iBotObserver != null)
-                    iBotObserver.speakBot(chatMessageType.get(position).getSpawnWikiModel().getExtract());
+                    iBotObserver.speakBot(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "speak"));
 
                 break;
         }
@@ -175,15 +175,25 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return chatMessageType.get(position).getViewType();
     }
 
-    public String getInfoFromExtract(String extract) {
+    public String getInfoFromExtract(String extract, String type) {
         String text = "";
         try {
             String[] splitExtract = extract.split("\\.");
-            if (splitExtract.length > 1) {
+            if (type.equals("speak")) {
+                text = splitExtract[0];
+            } else {
+                if (splitExtract.length > 1) {
+                    text = splitExtract[0] + ". " + splitExtract[1] + "..";
+                } else {
+                    text = splitExtract[0];
+                }
+            }
+            /*if (splitExtract.length > 1) {
                 text = splitExtract[0] + ". " + splitExtract[1];
             } else {
                 text = splitExtract[0];
-            }
+            }*/
+
 
         } catch (Exception e) {
             e.printStackTrace();

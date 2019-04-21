@@ -22,17 +22,23 @@
             android:layout_height="1dp"
             android:layout_margin="4dp"
             android:textColor="@color/colorPrimary" />-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="@drawable/image_gradient_background">
 
-        <ImageView
-            android:id="@+id/wiki_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:background="#ffffff"
-            android:src="@drawable/thumbnail_not_found"
-            android:padding="2dp"
-            android:layout_gravity="center"
-            android:scaleType="fitXY" />
+            <ImageView
+                android:id="@+id/wiki_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:background="@android:color/transparent"
+                android:padding="2dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/thumbnail_not_found" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/wiki_paragraph"
@@ -56,10 +62,10 @@
             android:id="@+id/wiki_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="start"
-            android:text="SpawN"
-            android:padding="5dp"
             android:layout_margin="3dp"
+            android:gravity="start"
+            android:padding="5dp"
+            android:text="SpawN"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="18sp" />
 
