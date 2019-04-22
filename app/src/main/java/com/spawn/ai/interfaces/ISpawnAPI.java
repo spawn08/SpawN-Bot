@@ -1,5 +1,6 @@
 package com.spawn.ai.interfaces;
 
+import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
 
@@ -27,5 +28,8 @@ public interface ISpawnAPI {
 
     @POST("post_wiki")
     Call<SpawnWikiModel> postData(@Body SpawnWikiModel spawnWikiModel);
+
+    @GET("api/classify")
+    Call<BotResponse> getIntent(@Query("model_name") String model_name, @Query("query") String query);
 
 }

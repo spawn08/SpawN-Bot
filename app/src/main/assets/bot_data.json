@@ -9,7 +9,7 @@
     "button_text": "",
     "action": ""
   },
-  "mcgm_like": {
+  "bot_like": {
     "type": 1,
     "message": [
       "Thank you.",
@@ -28,16 +28,46 @@
     "button_text": "",
     "action": "finish"
   },
-  "bot_morning": {
+  "bot_shutup": {
     "type": 1,
     "message": [
-      "Good Morning.",
-      "Hey, Good Morning !!"
+      "I was just trying to help you.!!",
+      "Sorry, I wanted to help you.."
+    ],
+    "button_text": "",
+    "action": "shutup"
+  },
+  "morning": {
+    "type": 1,
+    "message": [
+      "Good Morning. How are you doing?",
+      "Hey, Good Morning. How are you doing?"
     ],
     "button_text": "",
     "action": ""
   },
-  "mcgm_love": {
+  "bot_greet_reply": {
+    "type": 1,
+    "message": [
+      "Glad to hear that.",
+      "Glad to hear that. Have a great day ahead."
+    ],
+    "button_text": "",
+    "action": ""
+  },
+  "bot_quotes": {
+    "type": 1,
+    "message": [
+      "Life is 10% what happens to you and 90% how you react to it.",
+      "Don’t let yesterday take up too much of today.",
+      "You don't chose your passion. Your passion chose you.",
+      "May your love never end and if you need a friend, there's a seat here along side me.",
+      "Do or do not. There is no try."
+    ],
+    "button_text": "",
+    "action": ""
+  },
+  "bot_love": {
     "type": 1,
     "message": [
       "Thank you. Anything I can help you with?",
@@ -46,34 +76,34 @@
     "button_text": "",
     "action": ""
   },
-  "bot_health": {
+  "greet": {
     "type": 1,
     "message": [
-      "I am doing great"
+      "I am doing great. What can I help you with?"
     ],
     "button_text": "",
     "action": ""
   },
-  "mumbai_commissioner": {
+  "evening": {
     "type": 1,
     "message": [
-      "Shri. Ajoy Mehta is commisioner of Municipal Corporation of Greater Mumbai."
+      "Good Evening. How are you doing?"
     ],
     "button_text": "",
     "action": ""
   },
-  "mumbai_mahapor": {
+  "bot_skills": {
     "type": 1,
     "message": [
-      "Shri. Vishwanath Mahadeshwar is the Mayor of Mumbai."
+      "I can help you with finding information about person, place, organization, monuments, or any entity you can think of."
     ],
     "button_text": "",
     "action": ""
   },
-  "mcgm_assistant_name": {
+  "spawn_name": {
     "type": 1,
     "message": [
-      "I am MCGM Assistant. Happy and ready to help."
+      "I am Professor SpawN. Happy and ready to help."
     ],
     "button_text": "",
     "action": ""

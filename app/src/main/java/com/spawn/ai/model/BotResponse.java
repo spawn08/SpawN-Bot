@@ -5,6 +5,7 @@ public class BotResponse {
     private String msg_id;
     private String _text;
     private Entities entities;
+    private Intent intent;
 
     public String getMsg_id() {
         return msg_id;
@@ -28,5 +29,13 @@ public class BotResponse {
 
     public void setEntities(Entities entities) {
         this.entities = entities;
+    }
+
+    public Intent getIntent() {
+        return intent;
+    }
+
+    public void setIntent(Intent intent) {
+        this.intent = intent;
     }
 }

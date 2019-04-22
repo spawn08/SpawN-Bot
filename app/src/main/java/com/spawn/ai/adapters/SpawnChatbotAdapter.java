@@ -97,7 +97,8 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 spawnChatBotViewHolder.bot_message.setText(botMessage);
                 spawnChatBotViewHolder.bot_time.setText(botDate);
 
-                if (iBotObserver != null)
+                if (iBotObserver != null
+                        && !chatMessageType.get(position).getAction().equals("shutup"))
                     iBotObserver.speakBot(botMessage);
 
                 if (chatMessageType.get(position).getAction() != null &&
@@ -109,7 +110,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case ChatViewTypes.CHAT_VIEW_LOADING:
                 SpawnChatLoadingViewHolder spawnChatLoadingViewHolder = (SpawnChatLoadingViewHolder) holder;
                 spawnChatLoadingViewHolder.loading.setVisibility(View.VISIBLE);
-                spawnChatLoadingViewHolder.loading.playAnimation();
+                //spawnChatLoadingViewHolder.loading.playAnimation();
                 break;
 
             case ChatViewTypes.CHAT_VIEW_CARD:

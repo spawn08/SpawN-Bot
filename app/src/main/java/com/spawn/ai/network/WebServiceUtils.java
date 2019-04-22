@@ -69,13 +69,13 @@ public class WebServiceUtils {
 
         if (retrofit != null) {
             //  if (q.split(" ").length > 2)
-            callSpawnAPI(q);
+            callSpawnML(q);
             // else callWikiAPI(q);
 
         } else {
             retrofit = getRetrofitClient();
             // if (q.split(" ").length > 2)
-            callSpawnAPI(q);
+            callSpawnML(q);
             // else callWikiAPI(q);
         }
     }
@@ -105,6 +105,45 @@ public class WebServiceUtils {
             @Override
             public void onFailure(Call<BotResponse> call, Throwable t) {
                 iBotObserver.notifyBotError();
+            }
+        });
+    }
+
+    public void callSpawnML(final String q) {
+        iBotObserver.loading();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(SPAWN_API)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        Call<BotResponse> data = spawnAPI.getIntent("spawn", q);
+
+        data.enqueue(new Callback<BotResponse>() {
+            @Override
+            public void onResponse(Call<BotResponse> call, Response<BotResponse> response) {
+                if (response.isSuccessful()) {
+                    ChatCardModel chatCardModel = null;
+                    BotResponse botResponse = response.body();
+                    if (botResponse.getIntent().getValue() != null &&
+                            !botResponse.getIntent().getValue().isEmpty()) {
+                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getValue(), 4);
+                        iBotObserver.notifyBotResponse(chatCardModel);
+                    } else {
+                        callSpawnAPI(q);
+                    }
+
+                } else {
+                    callSpawnAPI(q);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BotResponse> call, Throwable t) {
+                callSpawnAPI(q);
             }
         });
     }

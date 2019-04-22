@@ -13,6 +13,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -464,41 +465,26 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             Intent intent = new Intent(this, SpawnWebActivity.class);
             intent.putExtra("url", spawnWikiModel.getContent_urls().getMobile().getPage());
             startActivity(intent);
-        }
-        /*if (action.equals("license")) {
-            Intent intent = new Intent(this, LicenseRenewalActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
         } else if (action.equals("finish")) {
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    finish();
-                }
-            }, 2000);
+            finish();
+        }
 
-        } else if (action.equals("garden")) {
-            Intent intent = new Intent(this, GenerateApplicationActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        } else if (action.equals("complaint")) {
-            Intent intent = new Intent(this, ComplaintActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        } else if (action.equals("water")) {
-            Intent i = new Intent(this, MenuActivity.class);
-            i.putExtra("serviceType", ConstantData.CONST_SERVICETYPE_WATER);
-            startActivity(i);
-        }*/
     }
 
 
     @Override
     public void onInit(int i) {
         if (i == TextToSpeech.SUCCESS) {
-            int result = textToSpeech.setLanguage(Locale.US);
-
+            int result = -1;
+            if (Build.BRAND.equalsIgnoreCase("samsung")) {
+                result = textToSpeech.setLanguage(new Locale("en", "in"));
+            } else {
+                result = textToSpeech.setLanguage(new Locale("en", "IND"));
+                //textToSpeech.setSpeechRate(0.99f);
+            }
+            textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
+            //result = textToSpeech.setLanguage(Locale.US);
+            textToSpeech.setPitch(0.68f);
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e(this.getClass().getName(), "This Language is not supported");
             } else {
@@ -518,4 +504,32 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     public void showNotFound(SpawnWikiModel spawnWikiModel) {
 
     }
+
+    UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
+        @Override
+        public void onStart(String s) {
+
+        }
+
+        @Override
+        public void onDone(String s) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
+                }
+            });
+
+        }
+
+        @Override
+        public void onError(String s) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
+                }
+            });
+        }
+    };
 }

@@ -5,15 +5,16 @@ import android.view.View;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.spawn.ai.R;
+import com.spawn.ai.utils.DotProgressBar;
 
 public class SpawnChatLoadingViewHolder extends RecyclerView.ViewHolder {
 
-    public LottieAnimationView loading;
+    public DotProgressBar loading;
 
     public SpawnChatLoadingViewHolder(View itemView) {
         super(itemView);
 
-        loading = (LottieAnimationView) itemView.findViewById(R.id.bot_loading);
+        loading = (DotProgressBar) itemView.findViewById(R.id.bot_loading);
 
     }
 }
