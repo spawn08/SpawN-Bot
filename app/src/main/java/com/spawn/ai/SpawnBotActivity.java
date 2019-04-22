@@ -477,14 +477,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         if (i == TextToSpeech.SUCCESS) {
             int result = -1;
             if (Build.BRAND.equalsIgnoreCase("samsung")) {
-                result = textToSpeech.setLanguage(new Locale("en", "in"));
+                result = textToSpeech.setLanguage(new Locale("en", "us"));
             } else {
-                result = textToSpeech.setLanguage(new Locale("en", "IND"));
+                result = textToSpeech.setLanguage(new Locale("en", "US"));
                 //textToSpeech.setSpeechRate(0.99f);
             }
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
             //result = textToSpeech.setLanguage(Locale.US);
-            textToSpeech.setPitch(0.68f);
+            //textToSpeech.setPitch(0.68f);
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e(this.getClass().getName(), "This Language is not supported");
             } else {
