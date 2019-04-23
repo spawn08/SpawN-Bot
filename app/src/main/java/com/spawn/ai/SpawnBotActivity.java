@@ -480,14 +480,20 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     @Override
     public void setAction(String action, SpawnWikiModel spawnWikiModel) {
+        Handler handler = new Handler();
         if (action.equals("web_action")) {
             Intent intent = new Intent(this, SpawnWebActivity.class);
             intent.putExtra("url", spawnWikiModel.getContent_urls().getMobile().getPage());
             startActivity(intent);
         } else if (action.equals("finish")) {
-            finish();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                }
+            }, 1500);
+
         } else if (action.equals("speak")) {
-            Handler handler = new Handler();
 
             handler.postDelayed(new Runnable() {
                 @Override
