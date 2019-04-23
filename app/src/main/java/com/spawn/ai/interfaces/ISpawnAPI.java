@@ -28,7 +28,7 @@ public interface ISpawnAPI {
     Call<List<SpawnEntityModel>> getEntity(@Query("q") String query);
 
     @POST("post_wiki")
-    Call<SpawnWikiModel> postData(@Body SpawnWikiModel spawnWikiModel);
+    Call<Object> postData(@Body Object spawnWikiModel);
 
     @GET("api/classify")
     Call<BotResponse> getIntent(@Query("model_name") String model_name, @Query("query") String query);

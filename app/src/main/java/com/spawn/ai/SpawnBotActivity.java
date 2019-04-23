@@ -33,8 +33,6 @@ import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.DateTimeUtils;
-import com.spawn.ai.utils.async.DumpTask;
-import com.spawn.ai.utils.async.FireCalls;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -341,7 +339,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 if (chatCardModel != null) {
-                    FireCalls.exec(new DumpTask(chatCardModel.getSpawnWikiModel()));
                     ChatMessageType wikiType = new ChatMessageType();
                     wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
                     wikiType.setViewType(chatCardModel.getType());

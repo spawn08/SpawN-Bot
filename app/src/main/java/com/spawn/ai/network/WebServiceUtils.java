@@ -13,6 +13,8 @@ import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.utils.JsonFileReader;
+import com.spawn.ai.utils.async.DumpTask;
+import com.spawn.ai.utils.async.FireCalls;
 
 import java.util.List;
 
@@ -129,6 +131,7 @@ public class WebServiceUtils {
                 if (response.isSuccessful()) {
                     ChatCardModel chatCardModel = null;
                     BotMLResponse botResponse = response.body();
+                    FireCalls.exec(new DumpTask(botResponse));
                     if (botResponse.getIntent().getName() != null &&
                             !botResponse.getIntent().getName().isEmpty()) {
                         chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
@@ -209,6 +212,7 @@ public class WebServiceUtils {
                     ChatCardModel chatCardModel = null;
                     Log.d("API CONTENT: ", response.body().toString());
                     SpawnWikiModel spawnWikiModel = response.body();
+                    FireCalls.exec(new DumpTask(spawnWikiModel));
                     if (spawnWikiModel.getType().equals("disambiguation")) {
                         //Handle case for page not found
                         chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);

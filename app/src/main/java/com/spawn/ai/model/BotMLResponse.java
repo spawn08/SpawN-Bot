@@ -1,9 +1,11 @@
 package com.spawn.ai.model;
 
+import java.util.ArrayList;
+
 public class BotMLResponse {
 
     private Intent intent;
-    private Entities entities;
+    private ArrayList<Entities> entities;
     private String text;
     private String project;
     private String model;
@@ -16,11 +18,11 @@ public class BotMLResponse {
         this.intent = intent;
     }
 
-    public Entities getEntities() {
+    public ArrayList<Entities> getEntities() {
         return entities;
     }
 
-    public void setEntities(Entities entities) {
+    public void setEntities(ArrayList<Entities> entities) {
         this.entities = entities;
     }
 
