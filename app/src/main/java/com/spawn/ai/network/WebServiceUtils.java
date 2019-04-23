@@ -7,6 +7,7 @@ import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWebService;
 import com.spawn.ai.interfaces.IBotWikiNLP;
 import com.spawn.ai.interfaces.ISpawnAPI;
+import com.spawn.ai.model.BotMLResponse;
 import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnEntityModel;
@@ -92,7 +93,7 @@ public class WebServiceUtils {
                     BotResponse botResponse = response.body();
                     if (botResponse.getEntities().getBotIntents() != null &&
                             botResponse.getEntities().getBotIntents().size() > 0)
-                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue(), 4);
+                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getName(), 4);
                     else {
                         chatCardModel = new ChatCardModel("", JsonFileReader.getInstance().getDefaultAnswer(), 1, "");
                     }
@@ -120,17 +121,17 @@ public class WebServiceUtils {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-        Call<BotResponse> data = spawnAPI.getIntent("spawn", q);
+        Call<BotMLResponse> data = spawnAPI.getIntentTensor("spawn", "spawn_wiki", q);
 
-        data.enqueue(new Callback<BotResponse>() {
+        data.enqueue(new Callback<BotMLResponse>() {
             @Override
-            public void onResponse(Call<BotResponse> call, Response<BotResponse> response) {
+            public void onResponse(Call<BotMLResponse> call, Response<BotMLResponse> response) {
                 if (response.isSuccessful()) {
                     ChatCardModel chatCardModel = null;
-                    BotResponse botResponse = response.body();
-                    if (botResponse.getIntent().getValue() != null &&
-                            !botResponse.getIntent().getValue().isEmpty()) {
-                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getValue(), 4);
+                    BotMLResponse botResponse = response.body();
+                    if (botResponse.getIntent().getName() != null &&
+                            !botResponse.getIntent().getName().isEmpty()) {
+                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
                         iBotObserver.notifyBotResponse(chatCardModel);
                     } else {
                         callSpawnAPI(q);
@@ -142,7 +143,7 @@ public class WebServiceUtils {
             }
 
             @Override
-            public void onFailure(Call<BotResponse> call, Throwable t) {
+            public void onFailure(Call<BotMLResponse> call, Throwable t) {
                 callSpawnAPI(q);
             }
         });

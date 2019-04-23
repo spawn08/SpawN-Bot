@@ -2,8 +2,17 @@ package com.spawn.ai.model;
 
 public class Intent {
 
+    private String name;
     private String value;
-    private String confidence;
+    private double confidence;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getValue() {
         return value;
@@ -13,11 +22,11 @@ public class Intent {
         this.value = value;
     }
 
-    public String getConfidence() {
+    public double getConfidence() {
         return confidence;
     }
 
-    public void setConfidence(String confidence) {
+    public void setConfidence(double confidence) {
         this.confidence = confidence;
     }
 }

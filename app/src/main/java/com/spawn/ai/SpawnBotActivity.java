@@ -67,6 +67,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.micImage.setOnClickListener(this);
         activitySpawnBotBinding.recyclerContainer.setOnClickListener(this);
         activitySpawnBotBinding.chatRecycler.setOnClickListener(this);
+        activitySpawnBotBinding.arrowBack.setOnClickListener(this);
 
         botResponses = new ArrayList<ChatMessageType>();
         chatbotAdapter = new SpawnChatbotAdapter(this, botResponses, activitySpawnBotBinding.chatRecycler);
@@ -409,6 +410,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     textToSpeech.isSpeaking()) {
                 textToSpeech.stop();
             }
+        } else if (i == R.id.arrow_back) {
+            finish();
         }
     }
 
