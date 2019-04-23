@@ -2,12 +2,10 @@
   "bot_hi": {
     "type": 1,
     "message": [
-      "Hey Hi!!",
-      "Hello there!!",
-      "How can I help you."
+      "Hey Hi!!. How can I help you.?"
     ],
     "button_text": "",
-    "action": ""
+    "action": "speak"
   },
   "bot_like": {
     "type": 1,
