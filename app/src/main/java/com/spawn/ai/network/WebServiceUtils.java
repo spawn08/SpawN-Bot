@@ -133,7 +133,7 @@ public class WebServiceUtils {
                     BotMLResponse botResponse = response.body();
                     FireCalls.exec(new DumpTask(botResponse));
                     if (botResponse.getIntent().getName() != null &&
-                            !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.65) {
+                            !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.71) {
                         chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
                         iBotObserver.notifyBotResponse(chatCardModel);
                     } else {

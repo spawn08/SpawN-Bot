@@ -133,6 +133,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        initSpeech();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
@@ -209,7 +215,15 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 break;
 
             case SpeechRecognizer.ERROR_NO_MATCH:
-                activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
+                //activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
+                if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
+                    if (speechRecognizer == null)
+                        initSpeech();
+                    speechRecognizer.startListening(speechIntentDispatcher);
+                    activitySpawnBotBinding.micImage.setVisibility(View.GONE);
+                    activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
+                    activitySpawnBotBinding.mic.playAnimation();
+                }
                 break;
         }
     }
@@ -364,7 +378,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     public void onClick(View view) {
         int i = view.getId();
         if (i == R.id.mic) {
-            initSpeech();
+            if (speechRecognizer == null)
+                initSpeech();
+            //initSpeech();
             speechRecognizer.startListening(speechIntentDispatcher);
             activitySpawnBotBinding.micImage.setVisibility(View.GONE);
             activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
@@ -375,7 +391,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             botResponses.clear();
             chatbotAdapter.setAdapter(botResponses);
             if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
-                initSpeech();
+                if (speechRecognizer == null)
+                    initSpeech();
+                //initSpeech();
                 speechRecognizer.startListening(speechIntentDispatcher);
                 activitySpawnBotBinding.micImage.setVisibility(View.GONE);
                 activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
