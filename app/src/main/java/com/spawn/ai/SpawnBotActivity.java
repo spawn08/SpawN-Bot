@@ -9,6 +9,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -485,8 +486,32 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             startActivity(intent);
         } else if (action.equals("finish")) {
             finish();
+        } else if (action.equals("speak")) {
+            Handler handler = new Handler();
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startListen();
+                }
+            }, 2500);
+
         }
 
+    }
+
+    private void startListen() {
+        if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
+            botResponses.clear();
+            chatbotAdapter.setAdapter(botResponses);
+            if (speechRecognizer == null)
+                initSpeech();
+            //initSpeech();
+            speechRecognizer.startListening(speechIntentDispatcher);
+            activitySpawnBotBinding.micImage.setVisibility(View.GONE);
+            activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
+            activitySpawnBotBinding.mic.playAnimation();
+        }
     }
 
 

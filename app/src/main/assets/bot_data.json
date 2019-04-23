@@ -108,6 +108,14 @@
     "button_text": "",
     "action": ""
   },
+  "greet": {
+    "type": 1,
+    "message": [
+      "I am doing great. How can I help you?"
+    ],
+    "button_text": "",
+    "action": "speak"
+  },
   "default": {
     "type": 1,
     "message": [
