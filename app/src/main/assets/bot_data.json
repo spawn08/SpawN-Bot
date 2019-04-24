@@ -1,4 +1,13 @@
 {
+  "questions":[
+    "Who is Narendra Modi",
+    "Tell me about Mumbai",
+    "I don't know about Carlos Slim",
+    "Where is Mumbai located?",
+    "I can answer single word query like- 'mathematics', 'fourier transform'",
+    "Tell me something about Barack Obama"
+
+  ],
   "bot_hi": {
     "type": 1,
     "message": [

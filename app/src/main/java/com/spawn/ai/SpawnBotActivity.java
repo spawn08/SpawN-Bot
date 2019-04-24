@@ -21,6 +21,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.spawn.ai.activities.SpawnWebActivity;
@@ -34,6 +36,7 @@ import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.DateTimeUtils;
+import com.spawn.ai.utils.JsonFileReader;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -52,6 +55,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private ArrayList<ChatMessageType> botResponses;
     private SpawnChatbotAdapter chatbotAdapter;
     private TextToSpeech textToSpeech;
+    private ArrayList<String> questions = JsonFileReader.getInstance().getQuestions();
+
+    private Animation slideIn;
+    private Animation slideOut;
+    int textCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +85,56 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         textToSpeech = new TextToSpeech(this, this);
 
         initSpeech();
+
+        slideIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in);
+        slideOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out);
+        //slideIn.setDuration(5000);
+        slideIn.setRepeatMode(Animation.RESTART);
+        slideIn.setRepeatCount(Animation.INFINITE);
+
+        slideOut.setRepeatMode(Animation.RESTART);
+        slideOut.setRepeatCount(Animation.INFINITE);
+
+        activitySpawnBotBinding.textviewAnim.setText(questions.get(0));
+        activitySpawnBotBinding.textviewAnim.setAnimation(slideIn);
+
+        slideIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                if (textCount >= questions.size())
+                    textCount = 0;
+
+                activitySpawnBotBinding.textviewAnim.setText(questions.get(textCount));
+                textCount++;
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                activitySpawnBotBinding.textviewAnim.startAnimation(slideOut);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                //activitySpawnBotBinding.textviewAnim.setAnimation(slideIn);
+            }
+        });
+
+        slideOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                activitySpawnBotBinding.textviewAnim.startAnimation(slideIn);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
 
         activitySpawnBotBinding.mic.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
@@ -389,6 +447,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
 
         } else if (i == R.id.mic_image) {
+            if (activitySpawnBotBinding.recyclerContainer.getVisibility() == View.GONE)
+                activitySpawnBotBinding.recyclerContainer.setVisibility(View.VISIBLE);
+            activitySpawnBotBinding.textviewAnimation.setVisibility(View.GONE);
             botResponses.clear();
             chatbotAdapter.setAdapter(botResponses);
             if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {

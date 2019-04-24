@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -19,6 +20,7 @@ public class JsonFileReader {
     private String fileContents;
     private String fileName = "bot_data.json";
     private ChatCardModel cardModel;
+    ArrayList<String> questions = new ArrayList<String>();
 
     public static JsonFileReader getInstance() {
         if (jsonFileReader == null) {
@@ -142,6 +144,30 @@ public class JsonFileReader {
             }
         }
         return message;
+    }
+
+    public void setQuestions() {
+
+        if (fileContents != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(fileContents);
+                JSONArray jsonArray = jsonObject.getJSONArray("questions");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    questions.add(jsonArray.getString(i));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public ArrayList<String> getQuestions() {
+        if (questions != null)
+            return questions;
+        else
+            setQuestions();
+        return questions;
     }
 
     public String getFileContents() {

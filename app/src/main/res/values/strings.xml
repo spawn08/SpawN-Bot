@@ -3,4 +3,5 @@
 
     <string name="defalt_answer">Sorry I could not understand what you just said.</string>
     <string name="wit_token">LAVGTLGKQQ7LRXSZHOTYDKWEOXRCBQ2Y</string>
+    <string name="header_text">Here are somethings you can ask me:</string>
 </resources>

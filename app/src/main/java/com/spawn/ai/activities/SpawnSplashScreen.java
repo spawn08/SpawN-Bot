@@ -29,6 +29,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
         WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
         JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
         JsonFileReader.getInstance().readFile(this);
+        JsonFileReader.getInstance().setQuestions();
         spawnLogo = (LottieAnimationView) findViewById(R.id.spawn_logo);
         spawnLogo.setRepeatMode(-1);
         spawnLogo.playAnimation();
