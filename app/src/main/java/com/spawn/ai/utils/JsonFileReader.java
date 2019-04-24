@@ -1,14 +1,17 @@
 package com.spawn.ai.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.model.ChatCardModel;
+import com.spawn.ai.network.WebServiceUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
@@ -33,21 +36,34 @@ public class JsonFileReader {
         this.fileName = fileName;
     }
 
-    public String readFile(Context context) {
-        String json = null;
-        try {
-            InputStream is = context.getAssets().open(fileName);
-            byte[] bytes = new byte[is.available()];
-            is.read(bytes);
-            is.close();
-            json = new String(bytes, "utf-8");
-            this.fileContents = json;
+    public void readFile(Context context) {
+        fileContents = WebServiceUtils.getInstance(context).getFileContents().toString();
+        Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
+        if (fileContents == null && !fileContents.isEmpty()) {
+            String json = null;
+            try {
+                InputStream is = context.getAssets().open(fileName);
+                byte[] bytes = new byte[is.available()];
+                is.read(bytes);
+                is.close();
+                json = new String(bytes, "utf-8");
+                this.fileContents = json;
+                Log.d(JsonFileReader.class.getSimpleName(), "File read from asset");
+            } catch (Exception e) {
+                e.printStackTrace();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return json;
+            }
+        }/* else {
+            String filename = "bot_data.json";
+            FileOutputStream outputStream;
+            try {
+                outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+                outputStream.write(fileContents.getBytes());
+                outputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }*/
     }
 
     public JSONObject convertToJson(String contents) {

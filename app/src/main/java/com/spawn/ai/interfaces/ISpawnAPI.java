@@ -1,9 +1,12 @@
 package com.spawn.ai.interfaces;
 
+import com.google.gson.JsonElement;
 import com.spawn.ai.model.BotMLResponse;
 import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -32,6 +35,9 @@ public interface ISpawnAPI {
 
     @GET("api/classify")
     Call<BotResponse> getIntent(@Query("model_name") String model_name, @Query("query") String query);
+
+    @GET("api/getFile")
+    Call<JsonElement> getFile(@Query("fileName") String fileName);
 
     @GET("api/classify")
     Call<BotMLResponse> getIntentTensor(@Query("model") String model, @Query("project") String project, @Query("q") String q);

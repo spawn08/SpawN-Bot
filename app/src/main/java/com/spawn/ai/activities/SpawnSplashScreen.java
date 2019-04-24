@@ -27,9 +27,9 @@ public class SpawnSplashScreen extends AppCompatActivity {
         context = this;
         //JsonFileReader.getInstance().readFile(this);
         WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
+        WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER);
         JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
-        JsonFileReader.getInstance().readFile(this);
-        JsonFileReader.getInstance().setQuestions();
+
         spawnLogo = (LottieAnimationView) findViewById(R.id.spawn_logo);
         spawnLogo.setRepeatMode(-1);
         spawnLogo.playAnimation();
@@ -59,6 +59,8 @@ public class SpawnSplashScreen extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                JsonFileReader.getInstance().readFile(context);
+                JsonFileReader.getInstance().setQuestions();
                 Intent intent = new Intent(context, SpawnBotActivity.class);
                 startActivity(intent);
                 finish();

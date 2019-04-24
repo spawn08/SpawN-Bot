@@ -95,7 +95,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         slideOut.setRepeatMode(Animation.RESTART);
         slideOut.setRepeatCount(Animation.INFINITE);
 
-        activitySpawnBotBinding.textviewAnim.setText(questions.get(0));
+        if (questions.size() > 0)
+            activitySpawnBotBinding.textviewAnim.setText(questions.get(0));
         activitySpawnBotBinding.textviewAnim.setAnimation(slideIn);
 
         slideIn.setAnimationListener(new Animation.AnimationListener() {
@@ -104,7 +105,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 if (textCount >= questions.size())
                     textCount = 0;
 
-                activitySpawnBotBinding.textviewAnim.setText(questions.get(textCount));
+                if (questions.size() > 0)
+                    activitySpawnBotBinding.textviewAnim.setText(questions.get(textCount));
                 textCount++;
             }
 

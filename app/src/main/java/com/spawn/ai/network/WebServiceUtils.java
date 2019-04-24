@@ -3,6 +3,7 @@ package com.spawn.ai.network;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.JsonElement;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWebService;
 import com.spawn.ai.interfaces.IBotWikiNLP;
@@ -15,6 +16,8 @@ import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.utils.JsonFileReader;
 import com.spawn.ai.utils.async.DumpTask;
 import com.spawn.ai.utils.async.FireCalls;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -36,6 +39,8 @@ public class WebServiceUtils {
     private static IBotObserver iBotObserver;
     private IBotWikiNLP iBotWikiNLP;
     String token;
+    private JSONObject fileContents;
+    private JsonElement serverFileContents;
 
     public static WebServiceUtils getInstance(Context context) {
         if (webServiceUtils == null) {
@@ -236,5 +241,47 @@ public class WebServiceUtils {
             }
         });
 
+    }
+
+    public void getFile(String fileName) {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(SPAWN_API)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        Call<JsonElement> data = spawnAPI.getFile(fileName);
+
+        data.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                try {
+                    if (response.isSuccessful()) {
+                        JsonElement file = response.body();
+                        setFileContents(file);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("ERROR: ", t.getMessage());
+
+            }
+        });
+    }
+
+    public JsonElement getFileContents() {
+        return serverFileContents;
+    }
+
+    public void setFileContents(JsonElement fileContents) {
+        this.serverFileContents = fileContents;
     }
 }
