@@ -19,3 +19,20 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-ignorewarnings
+-keep class com.spawn.ai.model.* {*;}
+-keepclassmembers class com.spawn.ai.model.* {*;}
+
+-keep class com.spawn.ai.model.content_urls.* {*;}
+
+-keep class com.spawn.ai.activities.SpawnWebActivity {*;}
+
+-keep class com.spawn.ai.interfaces.* {*;}
+
+-keep class com.google.gson.* {*;}
+-keepclassmembers class com.google.gson.* {*;}
+
+-keep class com.spawn.ai.network.WebServiceUtils {
+    com.google.gson.JsonElement getFileContents();
+    void setFileContents(com.google.gson.JsonElement);
+}

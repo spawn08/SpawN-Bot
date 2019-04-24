@@ -17,8 +17,6 @@ import com.spawn.ai.utils.JsonFileReader;
 import com.spawn.ai.utils.async.DumpTask;
 import com.spawn.ai.utils.async.FireCalls;
 
-import org.json.JSONObject;
-
 import java.util.List;
 
 import constants.AppConstants;
@@ -39,7 +37,6 @@ public class WebServiceUtils {
     private static IBotObserver iBotObserver;
     private IBotWikiNLP iBotWikiNLP;
     String token;
-    private JSONObject fileContents;
     private JsonElement serverFileContents;
 
     public static WebServiceUtils getInstance(Context context) {

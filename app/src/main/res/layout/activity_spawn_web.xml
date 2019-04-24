@@ -13,9 +13,23 @@
         <WebView
             android:id="@+id/info_wiki"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="gone">
 
         </WebView>
+
+        <com.spawn.ai.utils.DotProgressBar
+            android:id="@+id/web_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_gravity="start"
+            app:amount="3"
+            android:layout_centerInParent="true"
+            app:animationDirection="right"
+            app:durations="200"
+            app:endColor="@color/colorPrimary"
+            app:startColor="@color/sky_blue"
+            android:visibility="visible" />
 
     </RelativeLayout>
 
