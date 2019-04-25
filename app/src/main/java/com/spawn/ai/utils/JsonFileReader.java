@@ -3,6 +3,7 @@ package com.spawn.ai.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.network.WebServiceUtils;
@@ -37,33 +38,29 @@ public class JsonFileReader {
     }
 
     public void readFile(Context context) {
-        fileContents = WebServiceUtils.getInstance(context).getFileContents().toString();
-        Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
-        if (fileContents == null && !fileContents.isEmpty()) {
-            String json = null;
-            try {
-                InputStream is = context.getAssets().open(fileName);
-                byte[] bytes = new byte[is.available()];
-                is.read(bytes);
-                is.close();
-                json = new String(bytes, "utf-8");
-                this.fileContents = json;
-                Log.d(JsonFileReader.class.getSimpleName(), "File read from asset");
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            if (WebServiceUtils.getInstance(context).getFileContents() != null)
+                fileContents = WebServiceUtils.getInstance(context).getFileContents().toString();
+            Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
+            if (fileContents == null && !fileContents.isEmpty()) {
+                String json = null;
+                try {
+                    InputStream is = context.getAssets().open(fileName);
+                    byte[] bytes = new byte[is.available()];
+                    is.read(bytes);
+                    is.close();
+                    json = new String(bytes, "utf-8");
+                    this.fileContents = json;
+                    Log.d(JsonFileReader.class.getSimpleName(), "File read from asset");
+                } catch (Exception e) {
+                    e.printStackTrace();
 
+                }
             }
-        }/* else {
-            String filename = "bot_data.json";
-            FileOutputStream outputStream;
-            try {
-                outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-                outputStream.write(fileContents.getBytes());
-                outputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }*/
+        }catch (Exception e){
+            e.printStackTrace();
+            Crashlytics.logException(e);
+        }
     }
 
     public JSONObject convertToJson(String contents) {
@@ -72,6 +69,7 @@ public class JsonFileReader {
             jsonObject = new JSONObject(contents);
         } catch (Exception e) {
             e.printStackTrace();
+            Crashlytics.logException(e);
             return null;
         }
         return jsonObject;
@@ -127,6 +125,7 @@ public class JsonFileReader {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+            Crashlytics.logException(e);
             return chatCardModel;
         }
         return chatCardModel;
@@ -156,6 +155,7 @@ public class JsonFileReader {
                 return message;
             } catch (JSONException e) {
                 e.printStackTrace();
+                Crashlytics.logException(e);
                 message = "Sorry, I could not understand what you just said";
             }
         }
@@ -174,6 +174,7 @@ public class JsonFileReader {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                Crashlytics.logException(e);
             }
         }
     }

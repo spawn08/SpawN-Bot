@@ -25,6 +25,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.spawn.ai.activities.SpawnWebActivity;
 import com.spawn.ai.adapters.SpawnChatbotAdapter;
 import com.spawn.ai.constants.ChatViewTypes;
@@ -40,6 +43,8 @@ import com.spawn.ai.utils.JsonFileReader;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import io.fabric.sdk.android.Fabric;
 
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
 
@@ -69,7 +74,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.setListener(this);
         locale = new Locale("en");
         requestPermission();
-
+        Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App open"));
         activitySpawnBotBinding.mic.setOnClickListener(this);
         activitySpawnBotBinding.micImage.setOnClickListener(this);
         activitySpawnBotBinding.recyclerContainer.setOnClickListener(this);
@@ -258,6 +263,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void onError(int i) {
         Log.d(TAG, "ERROR " + i);
+        Crashlytics.log(TAG + " Speech ERROR " + i);
         switch (i) {
             case SpeechRecognizer.ERROR_NETWORK:
                 activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
@@ -284,6 +290,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     activitySpawnBotBinding.micImage.setVisibility(View.GONE);
                     activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
                     activitySpawnBotBinding.mic.playAnimation();
+
                 }
                 break;
         }
@@ -446,7 +453,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             activitySpawnBotBinding.micImage.setVisibility(View.GONE);
             activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
             activitySpawnBotBinding.mic.playAnimation();
-
+            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Mic Listening"));
 
         } else if (i == R.id.mic_image) {
             if (activitySpawnBotBinding.recyclerContainer.getVisibility() == View.GONE)
@@ -470,6 +477,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
                 requestPermission();
             }
+            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Mic Listening"));
 
         } else if (i == R.id.recycler_container) {
 
@@ -507,8 +515,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 textToSpeech.shutdown();
                 textToSpeech = null;
             }
+            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App close"));
         } catch (Exception e) {
             e.printStackTrace();
+            Crashlytics.logException(e);
         }
 
     }
@@ -535,9 +545,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     public void speakBot(String message) {
         if (Build.VERSION.SDK_INT < 21) {
             textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null);
-
+            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App Speaking"));
         } else {
             textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
+            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App Speaking"));
         }
     }
 
@@ -545,6 +556,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     public void setAction(String action, SpawnWikiModel spawnWikiModel) {
         Handler handler = new Handler();
         if (action.equals("web_action")) {
+            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Web Open"));
             Intent intent = new Intent(this, SpawnWebActivity.class);
             intent.putExtra("url", spawnWikiModel.getContent_urls().getMobile().getPage());
             startActivity(intent);
@@ -561,6 +573,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Context conversation"));
                     startListen();
                 }
             }, 2500);
@@ -590,8 +603,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             int result = -1;
             if (Build.BRAND.equalsIgnoreCase("samsung")) {
                 result = textToSpeech.setLanguage(new Locale("en", "us"));
+                Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("ttsLanguage", "Samsung - en_us"));
             } else {
                 result = textToSpeech.setLanguage(new Locale("en", "US"));
+                Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("ttsLanguage", "Others - en_US"));
                 //textToSpeech.setSpeechRate(0.99f);
             }
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
@@ -604,6 +619,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             }
         } else {
             Log.e(this.getClass().getName(), "Initilization Failed!");
+            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("ttsInitialization", "Failure"));
         }
     }
 

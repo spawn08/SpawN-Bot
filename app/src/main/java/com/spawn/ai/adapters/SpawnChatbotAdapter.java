@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
@@ -207,6 +208,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         } catch (Exception e) {
             e.printStackTrace();
+            Crashlytics.logException(e);
         }
         return text + ".";
     }

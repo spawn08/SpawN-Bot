@@ -3,7 +3,12 @@ package com.spawn.ai.network;
 import android.content.Context;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
+import com.google.android.gms.common.util.CrashUtils;
 import com.google.gson.JsonElement;
+import com.google.gson.annotations.SerializedName;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWebService;
 import com.spawn.ai.interfaces.IBotWikiNLP;
@@ -37,6 +42,8 @@ public class WebServiceUtils {
     private static IBotObserver iBotObserver;
     private IBotWikiNLP iBotWikiNLP;
     String token;
+
+    @SerializedName("serverFileContents")
     private JsonElement serverFileContents;
 
     public static WebServiceUtils getInstance(Context context) {
@@ -115,44 +122,50 @@ public class WebServiceUtils {
     }
 
     public void callSpawnML(final String q) {
-        iBotObserver.loading();
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(SPAWN_API)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-        Call<BotMLResponse> data = spawnAPI.getIntentTensor("spawn", "spawn_wiki", q);
+        try {
+            iBotObserver.loading();
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                    .build();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(SPAWN_API)
+                    .client(okHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+            Call<BotMLResponse> data = spawnAPI.getIntentTensor("spawn", "spawn_wiki", q);
 
-        data.enqueue(new Callback<BotMLResponse>() {
-            @Override
-            public void onResponse(Call<BotMLResponse> call, Response<BotMLResponse> response) {
-                if (response.isSuccessful()) {
-                    ChatCardModel chatCardModel = null;
-                    BotMLResponse botResponse = response.body();
-                    FireCalls.exec(new DumpTask(botResponse));
-                    if (botResponse.getIntent().getName() != null &&
-                            !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.72) {
-                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
-                        iBotObserver.notifyBotResponse(chatCardModel);
+            data.enqueue(new Callback<BotMLResponse>() {
+                @Override
+                public void onResponse(Call<BotMLResponse> call, Response<BotMLResponse> response) {
+                    if (response.isSuccessful()) {
+                        ChatCardModel chatCardModel = null;
+                        BotMLResponse botResponse = response.body();
+                        FireCalls.exec(new DumpTask(botResponse));
+                        if (botResponse.getIntent().getName() != null &&
+                                !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.72) {
+                            chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
+                            iBotObserver.notifyBotResponse(chatCardModel);
+                        } else {
+                            callSpawnAPI(q);
+                        }
+
                     } else {
                         callSpawnAPI(q);
                     }
+                }
 
-                } else {
+                @Override
+                public void onFailure(Call<BotMLResponse> call, Throwable t) {
                     callSpawnAPI(q);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<BotMLResponse> call, Throwable t) {
-                callSpawnAPI(q);
-            }
-        });
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Crashlytics.logException(e);
+        }
     }
+
 
     public void callSpawnAPI(String query) {
         iBotObserver.loading();
@@ -182,6 +195,7 @@ public class WebServiceUtils {
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Crashlytics.log(1, "Webservice -->", e.getMessage());
                 }
             }
 
@@ -234,6 +248,7 @@ public class WebServiceUtils {
             @Override
             public void onFailure(Call<SpawnWikiModel> call, Throwable t) {
                 //Handle case for failure
+                Crashlytics.log(1, "Webservice Request Error -->", t.getMessage());
 
             }
         });
@@ -241,37 +256,44 @@ public class WebServiceUtils {
     }
 
     public void getFile(String fileName) {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(SPAWN_API)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        try {
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                    .build();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(SPAWN_API)
+                    .client(okHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
 
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-        Call<JsonElement> data = spawnAPI.getFile(fileName);
+            final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+            Call<JsonElement> data = spawnAPI.getFile(fileName);
 
-        data.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                try {
-                    if (response.isSuccessful()) {
-                        JsonElement file = response.body();
-                        setFileContents(file);
+            data.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    try {
+                        if (response.isSuccessful()) {
+                            JsonElement file = response.body();
+                            setFileContents(file);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Crashlytics.log(1, "Webservice -->", e.getMessage());
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
 
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Log.e("ERROR: ", t.getMessage());
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.e("ERROR: ", t.getMessage());
+                    Crashlytics.log(1, "Webservice Request Error -->", t.getMessage());
 
-            }
-        });
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Crashlytics.log(1, "Webservice", e.getMessage());
+        }
     }
 
     public JsonElement getFileContents() {

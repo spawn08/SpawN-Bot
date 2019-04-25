@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "223118979484",
+    "firebase_url": "https://professor-spawn.firebaseio.com",
+    "project_id": "professor-spawn",
+    "storage_bucket": "professor-spawn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223118979484:android:f863899531c985c4",
+        "android_client_info": {
+          "package_name": "com.spawn.ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "223118979484-2sl5eu5n3db4nugn6tbkr0ud3a9gbpbo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACZfwTcdta1JSH4YjDFyy9K-0I_9Ppl90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "223118979484-2sl5eu5n3db4nugn6tbkr0ud3a9gbpbo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

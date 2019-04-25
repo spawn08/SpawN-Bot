@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
+        android:name=".SpawnAiApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -31,6 +32,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.SpawnWebActivity"></activity>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="da91da40bae862cff16ec5aae8cef1c2d5073c4f" />
     </application>
 
 </manifest>

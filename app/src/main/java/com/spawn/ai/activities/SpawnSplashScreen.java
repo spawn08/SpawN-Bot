@@ -8,12 +8,14 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.JsonFileReader;
 
 import constants.AppConstants;
+import io.fabric.sdk.android.Fabric;
 
 public class SpawnSplashScreen extends AppCompatActivity {
 
@@ -26,9 +28,14 @@ public class SpawnSplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_spawn_splash_screen);
         context = this;
         //JsonFileReader.getInstance().readFile(this);
-        WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
-        WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER);
-        JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
+        try {
+            WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
+            WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER);
+            JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Crashlytics.logException(e);
+        }
 
         spawnLogo = (LottieAnimationView) findViewById(R.id.spawn_logo);
         spawnLogo.setRepeatMode(-1);
