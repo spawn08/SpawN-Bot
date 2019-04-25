@@ -186,7 +186,8 @@ public class JsonFileReader {
         if (fileContents != null) {
             try {
                 JSONObject jsonObject = new JSONObject(fileContents);
-                value = jsonObject.getString(key);
+                if (jsonObject.has(key))
+                    value = jsonObject.getString(key);
                 return value;
 
             } catch (Exception e) {

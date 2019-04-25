@@ -38,6 +38,7 @@ import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.network.WebServiceUtils;
+import com.spawn.ai.utils.AlertUpdateDialog;
 import com.spawn.ai.utils.DateTimeUtils;
 import com.spawn.ai.utils.JsonFileReader;
 
@@ -69,6 +70,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (JsonFileReader.getInstance().getValueFromJson("force_update").equalsIgnoreCase("true")) {
+            setUpAlertDialog();
+        }
         context = this;
         activitySpawnBotBinding = DataBindingUtil.setContentView(this, R.layout.activity_spawn_bot);
         activitySpawnBotBinding.setListener(this);
@@ -175,6 +180,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             }
         });
 
+    }
+
+    private void setUpAlertDialog() {
+        AlertUpdateDialog alertUpdateDialog = new AlertUpdateDialog(this);
+        alertUpdateDialog.show();
     }
 
     private void requestPermission() {
@@ -571,11 +581,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             }, 1500);
 
         } else if (action.equals("speak")) {
-
+            Answers.getInstance()
+                    .logCustom(new CustomEvent(this.getClass().getSimpleName())
+                            .putCustomAttribute("action", "Context conversation"));
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Context conversation"));
                     startListen();
                 }
             }, 2500);
