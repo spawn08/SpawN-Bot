@@ -255,7 +255,7 @@ public class WebServiceUtils {
 
     }
 
-    public void getFile(String fileName) {
+    public void getFile(String fileName, final Context context) {
         try {
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
@@ -276,6 +276,11 @@ public class WebServiceUtils {
                         if (response.isSuccessful()) {
                             JsonElement file = response.body();
                             setFileContents(file);
+                            if (file != null) {
+                                JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
+                                JsonFileReader.getInstance().readFile(context, file);
+                                JsonFileReader.getInstance().setQuestions();
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

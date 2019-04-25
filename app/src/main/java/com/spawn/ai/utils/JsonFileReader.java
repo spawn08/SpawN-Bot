@@ -4,15 +4,14 @@ import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.JsonElement;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.model.ChatCardModel;
-import com.spawn.ai.network.WebServiceUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
@@ -21,7 +20,7 @@ import java.util.Random;
 public class JsonFileReader {
 
     private static JsonFileReader jsonFileReader;
-    private String fileContents;
+    private static String fileContents;
     private String fileName = "bot_data.json";
     private ChatCardModel cardModel;
     ArrayList<String> questions = new ArrayList<String>();
@@ -37,29 +36,33 @@ public class JsonFileReader {
         this.fileName = fileName;
     }
 
-    public void readFile(Context context) {
+    public void readFile(Context context, JsonElement file) {
         try {
-            if (WebServiceUtils.getInstance(context).getFileContents() != null)
-                fileContents = WebServiceUtils.getInstance(context).getFileContents().toString();
+            fileContents = file.toString();
             Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
-            if (fileContents == null && !fileContents.isEmpty()) {
-                String json = null;
-                try {
-                    InputStream is = context.getAssets().open(fileName);
-                    byte[] bytes = new byte[is.available()];
-                    is.read(bytes);
-                    is.close();
-                    json = new String(bytes, "utf-8");
-                    this.fileContents = json;
-                    Log.d(JsonFileReader.class.getSimpleName(), "File read from asset");
-                } catch (Exception e) {
-                    e.printStackTrace();
-
-                }
-            }
-        }catch (Exception e){
+            loadLocalFile(context);
+        } catch (Exception e) {
             e.printStackTrace();
+            loadLocalFile(context);
             Crashlytics.logException(e);
+        }
+    }
+
+    private void loadLocalFile(Context context) {
+        if (fileContents == null || fileContents.isEmpty()) {
+            String json = null;
+            try {
+                InputStream is = context.getAssets().open(fileName);
+                byte[] bytes = new byte[is.available()];
+                is.read(bytes);
+                is.close();
+                json = new String(bytes, "utf-8");
+                this.fileContents = json;
+                Log.d(JsonFileReader.class.getSimpleName(), "File read from asset");
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
         }
     }
 
@@ -163,7 +166,6 @@ public class JsonFileReader {
     }
 
     public void setQuestions() {
-
         if (fileContents != null) {
             try {
                 JSONObject jsonObject = new JSONObject(fileContents);
@@ -177,6 +179,23 @@ public class JsonFileReader {
                 Crashlytics.logException(e);
             }
         }
+    }
+
+    public String getValueFromJson(String key) {
+        String value = "";
+        if (fileContents != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(fileContents);
+                value = jsonObject.getString(key);
+                return value;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+                return value;
+            }
+        }
+        return value;
     }
 
     public ArrayList<String> getQuestions() {

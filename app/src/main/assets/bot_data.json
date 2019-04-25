@@ -1,11 +1,13 @@
 {
-  "questions":[
+  "questions_title": "Questions you can ask me:",
+  "questions": [
     "Who is Narendra Modi",
     "Tell me about Mumbai",
     "I don't know about Carlos Slim",
     "Where is Mumbai located?",
     "I can answer single word query like- 'mathematics', 'fourier transform'",
-    "Tell me something about Barack Obama"
+    "Tell me something about Barack Obama",
+    "tell me about World War 2"
 
   ],
   "bot_hi": {
@@ -83,14 +85,6 @@
     "button_text": "",
     "action": ""
   },
-  "greet": {
-    "type": 1,
-    "message": [
-      "I am doing great. What can I help you with?"
-    ],
-    "button_text": "",
-    "action": ""
-  },
   "evening": {
     "type": 1,
     "message": [
@@ -119,6 +113,14 @@
     "type": 1,
     "message": [
       "I am doing great. How can I help you?"
+    ],
+    "button_text": "",
+    "action": "speak"
+  },
+  "bot_identity": {
+    "type": 1,
+    "message": [
+      "I am your Professor SpawN. How can I help you?"
     ],
     "button_text": "",
     "action": "speak"

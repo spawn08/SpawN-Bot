@@ -32,7 +32,4 @@
 -keep class com.google.gson.* {*;}
 -keepclassmembers class com.google.gson.* {*;}
 
--keep class com.spawn.ai.network.WebServiceUtils {
-    com.google.gson.JsonElement getFileContents();
-    void setFileContents(com.google.gson.JsonElement);
-}
+-keep class com.crashlytics.android.* {*;}

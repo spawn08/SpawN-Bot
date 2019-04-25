@@ -91,6 +91,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
         initSpeech();
 
+        activitySpawnBotBinding.headerText.setText(JsonFileReader.getInstance().getValueFromJson("questions_title"));
+
         slideIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in);
         slideOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out);
         //slideIn.setDuration(5000);

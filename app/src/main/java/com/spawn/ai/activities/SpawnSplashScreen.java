@@ -30,8 +30,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
         //JsonFileReader.getInstance().readFile(this);
         try {
             WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
-            WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER);
-            JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
+            WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER,context);
         } catch (Exception e) {
             e.printStackTrace();
             Crashlytics.logException(e);
@@ -66,8 +65,6 @@ public class SpawnSplashScreen extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                JsonFileReader.getInstance().readFile(context);
-                JsonFileReader.getInstance().setQuestions();
                 Intent intent = new Intent(context, SpawnBotActivity.class);
                 startActivity(intent);
                 finish();
