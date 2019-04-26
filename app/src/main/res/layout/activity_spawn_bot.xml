@@ -52,7 +52,8 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/mic_rl"
             android:layout_below="@+id/title_bar"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="3dp"
             android:clickable="true"
             android:visibility="gone">
 
