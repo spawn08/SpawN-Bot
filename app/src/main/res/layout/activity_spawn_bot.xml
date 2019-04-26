@@ -52,8 +52,8 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/mic_rl"
             android:layout_below="@+id/title_bar"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="3dp"
+            android:layout_marginTop="8dp"
             android:clickable="true"
             android:visibility="gone">
 
@@ -83,10 +83,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="@string/header_text"
                 android:textColor="@color/colorPrimary"
-                android:layout_marginTop="10dp"
                 android:textSize="18sp" />
 
             <TextView
@@ -94,10 +94,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:layout_margin="15dp"
                 android:gravity="center_horizontal"
                 android:text=""
                 android:textColor="@color/colorPrimary"
-                android:layout_margin="15dp"
                 android:textSize="18sp" />
 
 

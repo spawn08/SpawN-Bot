@@ -45,8 +45,6 @@ import com.spawn.ai.utils.JsonFileReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import io.fabric.sdk.android.Fabric;
-
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
 
     private static final String TAG = SpawnBotActivity.class.getCanonicalName();
@@ -87,7 +85,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.arrowBack.setOnClickListener(this);
 
         botResponses = new ArrayList<ChatMessageType>();
-        chatbotAdapter = new SpawnChatbotAdapter(this, botResponses, activitySpawnBotBinding.chatRecycler);
+        chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(false);
         activitySpawnBotBinding.chatRecycler.setLayoutManager(linearLayoutManager);
@@ -295,7 +293,18 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
             case SpeechRecognizer.ERROR_NO_MATCH:
                 //activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
-                if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
+                new CountDownTimer(1000, 2500) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
+                    }
+                }.start();
+               /* if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
                     if (speechRecognizer == null)
                         initSpeech();
                     speechRecognizer.startListening(speechIntentDispatcher);
@@ -303,7 +312,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
                     activitySpawnBotBinding.mic.playAnimation();
 
-                }
+                }*/
                 break;
         }
     }

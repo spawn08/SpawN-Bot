@@ -8,6 +8,8 @@ public class ChatMessageType {
     private String date;
     private String buttonText;
     private String action;
+    private boolean speakFinish = false;
+    private boolean actionCompleted = false;
     private SpawnWikiModel spawnWikiModel;
 
     public String getMessage() {
@@ -64,5 +66,21 @@ public class ChatMessageType {
 
     public void setSpawnWikiModel(SpawnWikiModel spawnWikiModel) {
         this.spawnWikiModel = spawnWikiModel;
+    }
+
+    public boolean isSpeakFinish() {
+        return speakFinish;
+    }
+
+    public void setSpeakFinish(boolean speakFinish) {
+        this.speakFinish = speakFinish;
+    }
+
+    public boolean isActionCompleted() {
+        return actionCompleted;
+    }
+
+    public void setActionCompleted(boolean actionCompleted) {
+        this.actionCompleted = actionCompleted;
     }
 }

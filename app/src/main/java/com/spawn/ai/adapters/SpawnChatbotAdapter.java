@@ -28,13 +28,11 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Context context;
     private ArrayList<ChatMessageType> chatMessageType = new ArrayList<>();
     IBotObserver iBotObserver;
-    private RecyclerView recyclerView;
 
-    public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType, RecyclerView recyclerView) {
+    public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType) {
         this.context = context;
         this.chatMessageType = chatMessageType;
         iBotObserver = (IBotObserver) context;
-        this.recyclerView = recyclerView;
     }
 
     public void setAdapter(ArrayList<ChatMessageType> chatMessageType) {
@@ -76,7 +74,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         switch (chatMessageType.get(position).getViewType()) {
             case ChatViewTypes.CHAT_VIEW_USER:
                 SpawnChatUserViewHolder spawnChatUserViewHolder = (SpawnChatUserViewHolder) holder;
@@ -95,12 +93,18 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 spawnChatBotViewHolder.bot_time.setText(botDate);
 
                 if (iBotObserver != null
-                        && !chatMessageType.get(position).getAction().equals("shutup"))
+                        && !chatMessageType.get(position).getAction().equals("shutup")
+                        && !chatMessageType.get(position).isSpeakFinish()) {
+                    chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(botMessage);
+                }
 
                 if (chatMessageType.get(position).getAction() != null &&
-                        !chatMessageType.get(position).getAction().isEmpty())
+                        !chatMessageType.get(position).getAction().isEmpty() &&
+                        !chatMessageType.get(position).isActionCompleted()) {
+                    chatMessageType.get(position).setActionCompleted(true);
                     iBotObserver.setAction(chatMessageType.get(position).getAction(), null);
+                }
 
                 break;
 
@@ -118,13 +122,17 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 spawnChatCardViewHolder.card_button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        chatMessageType.get(position).setActionCompleted(true);
                         iBotObserver.setAction(chatMessageType.get(pos).getAction(), null);
 
                     }
                 });
 
-                if (iBotObserver != null)
+                if (iBotObserver != null && !chatMessageType.get(position).isSpeakFinish()) {
+                    chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(chatMessageType.get(position).getMessage());
+                }
+
                 break;
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
@@ -157,20 +165,22 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 spawnWikiViewHolder.wikiButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        chatMessageType.get(position).setActionCompleted(true);
                         iBotObserver.setAction("web_action", spawnWikiModel);
 
                     }
                 });
 
-                recyclerView.setOnClickListener(new View.OnClickListener() {
+                spawnWikiViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         iBotObserver.notifyBotError();
                     }
                 });
-                if (iBotObserver != null)
+                if (iBotObserver != null && !chatMessageType.get(position).isSpeakFinish()) {
+                    chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "speak"));
-
+                }
                 break;
         }
 
@@ -199,12 +209,6 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     text = splitExtract[0];
                 }
             }
-            /*if (splitExtract.length > 1) {
-                text = splitExtract[0] + ". " + splitExtract[1];
-            } else {
-                text = splitExtract[0];
-            }*/
-
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -30,7 +30,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
         //JsonFileReader.getInstance().readFile(this);
         try {
             WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
-            WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER,context);
+            WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER, context);
         } catch (Exception e) {
             e.printStackTrace();
             Crashlytics.logException(e);
