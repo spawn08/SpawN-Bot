@@ -92,7 +92,7 @@ public class WebServiceUtils {
         }
     }
 
-    public void callWebservice(String q) {
+    /*public void callWebservice(String q) {
         iBotObserver.loading();
         final IBotWebService iBotWebService = retrofit.create(IBotWebService.class);
         final Call<BotResponse> botIntentsCall = iBotWebService.getBotResponse(q);
@@ -119,7 +119,7 @@ public class WebServiceUtils {
                 iBotObserver.notifyBotError();
             }
         });
-    }
+    }*/
 
     public void callSpawnML(final String q) {
         try {
@@ -133,7 +133,7 @@ public class WebServiceUtils {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-            Call<BotMLResponse> data = spawnAPI.getIntentTensor("spawn", "spawn_wiki", q);
+            Call<BotMLResponse> data = spawnAPI.getEntityExtract(q);
 
             data.enqueue(new Callback<BotMLResponse>() {
                 @Override
@@ -143,11 +143,22 @@ public class WebServiceUtils {
                         BotMLResponse botResponse = response.body();
                         FireCalls.exec(new DumpTask(botResponse));
                         if (botResponse.getIntent().getName() != null &&
-                                !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.72) {
+                                !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.80) {
                             chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
                             iBotObserver.notifyBotResponse(chatCardModel);
                         } else {
-                            callSpawnAPI(q);
+                            if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getValue() != null)
+                                callWikiAPI(botResponse.getEntities().get(0).getValue().get(0));
+                            else {
+                                if (botResponse.getIntent().getName() != null &&
+                                        !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.60) {
+                                    chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
+                                    iBotObserver.notifyBotResponse(chatCardModel);
+                                } else {
+                                    ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                                    iBotObserver.notifyBotResponse(fallbackModel);
+                                }
+                            }
                         }
 
                     } else {

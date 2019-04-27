@@ -42,4 +42,7 @@ public interface ISpawnAPI {
     @GET("api/classify")
     Call<BotMLResponse> getIntentTensor(@Query("model") String model, @Query("project") String project, @Query("q") String q);
 
+    @GET("entity_extract")
+    Call<BotMLResponse> getEntityExtract(@Query("q") String q);
+
 }

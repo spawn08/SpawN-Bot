@@ -8,7 +8,6 @@
     "I can answer single word query like- 'mathematics', 'fourier transform'",
     "Tell me something about Barack Obama",
     "tell me about World War 2"
-
   ],
   "bot_hi": {
     "type": 1,
@@ -135,12 +134,12 @@
     "action": ""
   },
   "default_wiki": {
-    "type": 1,
+    "type": 3,
     "message": [
       "I could not find any information.",
       "I don't have an answer for this at the moment."
     ],
-    "button_text": "",
-    "action": ""
+    "button_text": "Google Search",
+    "action": "google_search"
   }
 }

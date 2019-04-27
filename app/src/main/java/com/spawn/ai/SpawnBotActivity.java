@@ -65,6 +65,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private Animation slideOut;
     int textCount;
 
+    private static String spokenString = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -328,6 +330,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             activitySpawnBotBinding.mic.invalidate();
             ArrayList<String> returnSpeech = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             String speechString = returnSpeech.get(0);
+            spokenString = speechString;
             Log.d(getClass().getCanonicalName(), "Speech :" + speechString);
             onEndOfSpeech();
             chatViews(speechString, 0, null);
@@ -600,6 +603,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 }
             }, 2500);
 
+        } else if (action.equalsIgnoreCase("google_search")) {
+            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Google Search"));
+            Intent intent = new Intent(this, SpawnWebActivity.class);
+            intent.putExtra("url", getResources().getString(R.string.google_search) + spokenString);
+            startActivity(intent);
         }
 
     }
@@ -633,7 +641,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             }
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
             //result = textToSpeech.setLanguage(Locale.US);
-            //textToSpeech.setPitch(0.68f);
+            //            //textToSpeech.setPitch(0.68f);
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e(this.getClass().getName(), "This Language is not supported");
             } else {
