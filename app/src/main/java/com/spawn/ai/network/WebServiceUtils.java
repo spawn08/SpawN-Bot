@@ -242,8 +242,15 @@ public class WebServiceUtils {
                     FireCalls.exec(new DumpTask(spawnWikiModel));
                     if (spawnWikiModel.getType().equals("disambiguation")) {
                         //Handle case for page not found
-                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
-                        iBotObserver.notifyBotResponse(chatCardModel);
+                        String[] disambiguationSplit = spawnWikiModel.getExtract().split(":");
+                        if (disambiguationSplit.length > 1 && disambiguationSplit[1].length() > 10) {
+                            spawnWikiModel.setDescription(disambiguationSplit[1]);
+                            chatCardModel = new ChatCardModel(spawnWikiModel, 5);
+                            iBotWikiNLP.showUI(chatCardModel);
+                        } else {
+                            chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                            iBotObserver.notifyBotResponse(chatCardModel);
+                        }
                     } else {
                         chatCardModel = new ChatCardModel(spawnWikiModel, 5);
                         iBotWikiNLP.showUI(chatCardModel);
