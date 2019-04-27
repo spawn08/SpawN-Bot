@@ -41,6 +41,7 @@ import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.AlertUpdateDialog;
 import com.spawn.ai.utils.DateTimeUtils;
 import com.spawn.ai.utils.JsonFileReader;
+import com.spawn.ai.utils.SharedPreferenceUtility;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -64,6 +65,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private Animation slideIn;
     private Animation slideOut;
     int textCount;
+    private ChatMessageType chatMessage;
 
     private static String spokenString = "";
 
@@ -80,11 +82,16 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         locale = new Locale("en");
         requestPermission();
         Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App open"));
-        activitySpawnBotBinding.mic.setOnClickListener(this);
-        activitySpawnBotBinding.micImage.setOnClickListener(this);
-        activitySpawnBotBinding.recyclerContainer.setOnClickListener(this);
-        activitySpawnBotBinding.chatRecycler.setOnClickListener(this);
-        activitySpawnBotBinding.arrowBack.setOnClickListener(this);
+
+        setUpClickListener();
+
+        if (SharedPreferenceUtility.getInstance(this).getPreference("speak")) {
+            activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
+            activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
+        } else {
+            activitySpawnBotBinding.volumeUp.setVisibility(View.GONE);
+            activitySpawnBotBinding.volumeDown.setVisibility(View.VISIBLE);
+        }
 
         botResponses = new ArrayList<ChatMessageType>();
         chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
@@ -129,7 +136,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-                //activitySpawnBotBinding.textviewAnim.setAnimation(slideIn);
+
             }
         });
 
@@ -180,6 +187,16 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             }
         });
 
+    }
+
+    private void setUpClickListener() {
+        activitySpawnBotBinding.mic.setOnClickListener(this);
+        activitySpawnBotBinding.micImage.setOnClickListener(this);
+        activitySpawnBotBinding.recyclerContainer.setOnClickListener(this);
+        activitySpawnBotBinding.chatRecycler.setOnClickListener(this);
+        activitySpawnBotBinding.arrowBack.setOnClickListener(this);
+        activitySpawnBotBinding.volumeUp.setOnClickListener(this);
+        activitySpawnBotBinding.volumeDown.setOnClickListener(this);
     }
 
     private void setUpAlertDialog() {
@@ -245,7 +262,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 textToSpeech.isSpeaking()) {
             textToSpeech.stop();
         }
-        activitySpawnBotBinding.containerStop.setVisibility(View.VISIBLE);
+        activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
         activitySpawnBotBinding.containerStop.setOnClickListener(this);
         activitySpawnBotBinding.containerStop.requestFocus();
     }
@@ -393,7 +410,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 if (botResponses.size() == 0)
                     botResponses.add(chatMessageType);
                 else {
-                    botResponses.remove(botResponses.size() - 1);
+                    // botResponses.remove(botResponses.size() - 1);
                     botResponses.add(chatMessageType);
                 }
                 chatbotAdapter.setAdapter(botResponses);
@@ -408,11 +425,13 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     chatMessageType1.setViewType(chatCardModel.getType());
                     chatMessageType1.setAction(chatCardModel.getAction());
                     chatMessageType1.setBotResponse(null);
-                    botResponses.remove(botResponses.size() - 1);
+                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                        botResponses.remove(botResponses.size() - 1);
                     botResponses.add(chatMessageType1);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
-
+                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
+                    setChatMessage(chatMessageType1);
                 }
 
                 break;
@@ -439,7 +458,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     botResponses.add(chatMessageType1);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
-
+                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
                 }
                 break;
 
@@ -452,7 +471,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     botResponses.add(wikiType);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
-
+                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
                 }
 
                 break;
@@ -483,7 +502,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             if (activitySpawnBotBinding.recyclerContainer.getVisibility() == View.GONE)
                 activitySpawnBotBinding.recyclerContainer.setVisibility(View.VISIBLE);
             activitySpawnBotBinding.textviewAnimation.setVisibility(View.GONE);
-            botResponses.clear();
+            //botResponses.clear();
             chatbotAdapter.setAdapter(botResponses);
             if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
                 if (speechRecognizer == null)
@@ -509,20 +528,62 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     textToSpeech.isSpeaking()) {
                 textToSpeech.stop();
             }
+        } else if (i == R.id.volume_down) {
+            setUpVolumeButton(false);
+        } else if (i == R.id.volume_up) {
+            setUpVolumeButton(true);
+
         } else if (i == R.id.chat_recycler) {
 
             if (textToSpeech != null &&
                     textToSpeech.isSpeaking()) {
                 textToSpeech.stop();
             }
-        } else if (i == R.id.container_stop) {
+        } /*else if (i == R.id.container_stop) {
             activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
             if (textToSpeech != null &&
                     textToSpeech.isSpeaking()) {
                 textToSpeech.stop();
             }
-        } else if (i == R.id.arrow_back) {
+        }*/ else if (i == R.id.arrow_back) {
             finish();
+        }
+
+    }
+
+    public void setUpVolumeButton(boolean setup) {
+        if (setup) {
+            if (activitySpawnBotBinding.volumeDown.getVisibility() == View.GONE) {
+                activitySpawnBotBinding.volumeDown.setVisibility(View.VISIBLE);
+                activitySpawnBotBinding.volumeUp.setVisibility(View.GONE);
+                SharedPreferenceUtility.getInstance(this).storePreference("speak", false);
+                if (chatMessage != null)
+                    chatMessage.setSpeakFinish(true);
+                notifyBotError();
+            } else {
+                activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
+                activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
+                SharedPreferenceUtility.getInstance(this).storePreference("speak", true);
+                if (chatMessage != null)
+                    speakBot(chatMessage.getShortMessage());
+
+            }
+        } else {
+            if (activitySpawnBotBinding.volumeDown.getVisibility() == View.GONE) {
+                activitySpawnBotBinding.volumeDown.setVisibility(View.VISIBLE);
+                activitySpawnBotBinding.volumeUp.setVisibility(View.GONE);
+                SharedPreferenceUtility.getInstance(this).storePreference("speak", false);
+                if (chatMessage != null)
+                    chatMessage.setSpeakFinish(true);
+                notifyBotError();
+            } else {
+                activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
+                activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
+                SharedPreferenceUtility.getInstance(this).storePreference("speak", true);
+                if (chatMessage != null)
+                    speakBot(chatMessage.getShortMessage());
+
+            }
         }
     }
 
@@ -612,9 +673,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     }
 
+    @Override
+    public void setChatMessage(ChatMessageType chatMessage) {
+        this.chatMessage = chatMessage;
+    }
+
     private void startListen() {
         if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
-            botResponses.clear();
+            //botResponses.clear();
             chatbotAdapter.setAdapter(botResponses);
             if (speechRecognizer == null)
                 initSpeech();
@@ -637,11 +703,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             } else {
                 result = textToSpeech.setLanguage(new Locale("en", "US"));
                 Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("ttsLanguage", "Others - en_US"));
-                //textToSpeech.setSpeechRate(0.99f);
             }
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
-            //result = textToSpeech.setLanguage(Locale.US);
-            //            //textToSpeech.setPitch(0.68f);
+
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e(this.getClass().getName(), "This Language is not supported");
             } else {
@@ -656,11 +720,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void showUI(ChatCardModel chatCardModel) {
         chatViews(null, chatCardModel.getType(), chatCardModel);
-    }
-
-    @Override
-    public void showNotFound(SpawnWikiModel spawnWikiModel) {
-
     }
 
     UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {

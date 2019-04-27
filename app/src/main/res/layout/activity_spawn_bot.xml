@@ -43,6 +43,28 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_action_name" />
 
+            <ImageView
+                android:id="@+id/volume_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_volume_up" />
+
+            <ImageView
+                android:id="@+id/volume_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_volume_down"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
@@ -153,7 +175,7 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/mic_rl"
             android:background="@android:color/transparent"
-            android:visibility="visible">
+            android:visibility="gone">
 
         </RelativeLayout>
 

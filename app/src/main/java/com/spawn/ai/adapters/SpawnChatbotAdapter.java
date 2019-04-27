@@ -15,6 +15,7 @@ import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.utils.SharedPreferenceUtility;
 import com.spawn.ai.viewholders.SpawnChatBotViewHolder;
 import com.spawn.ai.viewholders.SpawnChatCardViewHolder;
 import com.spawn.ai.viewholders.SpawnChatLoadingViewHolder;
@@ -94,9 +95,19 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 if (iBotObserver != null
                         && !chatMessageType.get(position).getAction().equals("shutup")
-                        && !chatMessageType.get(position).isSpeakFinish()) {
+                        && !chatMessageType.get(position).isSpeakFinish()
+                        && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
                     chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(botMessage);
+                } else {
+                    chatMessageType.get(position).setSpeakFinish(true);
+                }
+
+                if (iBotObserver != null && !chatMessageType.get(position).isMessageAdded()) {
+                    chatMessageType.get(position).setMessageAdded(true);
+                    chatMessageType.get(position).setShortMessage(chatMessageType.get(position).getMessage());
+                    iBotObserver.setChatMessage(chatMessageType.get(position));
+
                 }
 
                 if (chatMessageType.get(position).getAction() != null &&
@@ -111,11 +122,10 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case ChatViewTypes.CHAT_VIEW_LOADING:
                 SpawnChatLoadingViewHolder spawnChatLoadingViewHolder = (SpawnChatLoadingViewHolder) holder;
                 spawnChatLoadingViewHolder.loading.setVisibility(View.VISIBLE);
-                //spawnChatLoadingViewHolder.loading.playAnimation();
                 break;
 
             case ChatViewTypes.CHAT_VIEW_CARD:
-                SpawnChatCardViewHolder spawnChatCardViewHolder = (SpawnChatCardViewHolder) holder;
+                final SpawnChatCardViewHolder spawnChatCardViewHolder = (SpawnChatCardViewHolder) holder;
                 spawnChatCardViewHolder.spawn_card_text.setText(chatMessageType.get(position).getMessage());
                 spawnChatCardViewHolder.card_button.setText(chatMessageType.get(position).getButtonText());
                 final int pos = position;
@@ -128,15 +138,26 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     }
                 });
 
-                if (iBotObserver != null && !chatMessageType.get(position).isSpeakFinish()) {
+                if (iBotObserver != null
+                        && !chatMessageType.get(position).isSpeakFinish()
+                        && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
                     chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(chatMessageType.get(position).getMessage());
+                } else {
+                    chatMessageType.get(position).setSpeakFinish(true);
+                }
+
+                if (iBotObserver != null && !chatMessageType.get(position).isMessageAdded()) {
+                    chatMessageType.get(position).setMessageAdded(true);
+                    chatMessageType.get(position).setShortMessage(chatMessageType.get(position).getMessage());
+                    iBotObserver.setChatMessage(chatMessageType.get(position));
+
                 }
 
                 break;
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
-                SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
+                final SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
                 final SpawnWikiModel spawnWikiModel = chatMessageType.get(position).getSpawnWikiModel();
                 spawnWikiViewHolder.wikiTitle.setText(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
 
@@ -174,13 +195,26 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 spawnWikiViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        iBotObserver.notifyBotError();
+                        chatMessageType.get(position).setActionCompleted(true);
+                        iBotObserver.setAction("web_action", spawnWikiModel);
                     }
                 });
-                if (iBotObserver != null && !chatMessageType.get(position).isSpeakFinish()) {
+
+                if (iBotObserver != null
+                        && !chatMessageType.get(position).isSpeakFinish()
+                        && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
                     chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "speak"));
+                } else {
+                    chatMessageType.get(position).setSpeakFinish(true);
                 }
+
+                if (iBotObserver != null && !chatMessageType.get(position).isMessageAdded()) {
+                    chatMessageType.get(position).setMessageAdded(true);
+                    chatMessageType.get(position).setShortMessage(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
+                    iBotObserver.setChatMessage(chatMessageType.get(position));
+                }
+
                 break;
         }
 

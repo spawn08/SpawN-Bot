@@ -40,23 +40,29 @@
                 android:src="@drawable/thumbnail_not_found" />
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/wiki_paragraph"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="5dp"
-            android:text="hello"
-            android:textColor="@color/colorPrimary"
-            android:textSize="20sp"
+            android:layout_height="wrap_content">
 
-            />
+            <TextView
+                android:id="@+id/wiki_paragraph"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:text="Hello  "
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp" />
 
-        <View
-            android:id="@+id/divider2"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:textColor="@color/colorPrimary" />
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:textColor="@color/colorPrimary" />
+        </RelativeLayout>
+
 
         <TextView
             android:id="@+id/wiki_title"

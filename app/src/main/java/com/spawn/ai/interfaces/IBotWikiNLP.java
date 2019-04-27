@@ -7,6 +7,4 @@ public interface IBotWikiNLP {
 
     public void showUI(ChatCardModel chatCardModel);
 
-    public void showNotFound(SpawnWikiModel spawnWikiModel);
-
 }
