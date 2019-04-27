@@ -150,12 +150,12 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/mic"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_width="100dp"
+                android:layout_height="70dp"
                 android:layout_centerHorizontal="true"
                 android:background="@android:color/transparent"
                 android:visibility="gone"
-                app:lottie_rawRes="@raw/loading" />
+                app:lottie_rawRes="@raw/voice_loading" />
 
             <ImageView
                 android:id="@+id/mic_image"
