@@ -565,8 +565,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
                 activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
                 SharedPreferenceUtility.getInstance(this).storePreference("speak", true);
-                if (chatMessage != null)
-                    speakBot(chatMessage.getShortMessage());
+                /*if (chatMessage != null)
+                    speakBot(chatMessage.getShortMessage());*/
 
             }
         } else {
@@ -581,8 +581,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
                 activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
                 SharedPreferenceUtility.getInstance(this).storePreference("speak", true);
-                if (chatMessage != null)
-                    speakBot(chatMessage.getShortMessage());
+                /*if (chatMessage != null)
+                    speakBot(chatMessage.getShortMessage());*/
 
             }
         }
