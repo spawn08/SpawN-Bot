@@ -73,7 +73,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (JsonFileReader.getInstance().getValueFromJson("force_update").equalsIgnoreCase("true")) {
+        if (BuildConfig.VERSION_CODE != Integer.parseInt(JsonFileReader.getInstance().getValueFromJson("app_version"))
+                && JsonFileReader.getInstance().getValueFromJson("force_update").equalsIgnoreCase("true")) {
             setUpAlertDialog();
         }
         context = this;
@@ -704,6 +705,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 result = textToSpeech.setLanguage(new Locale("en", "US"));
                 Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("ttsLanguage", "Others - en_US"));
             }
+            textToSpeech.setPitch(0.80f);
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
 
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {

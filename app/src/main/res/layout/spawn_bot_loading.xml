@@ -5,12 +5,12 @@
     android:layout_height="wrap_content">
 
     <RelativeLayout
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="@dimen/layout_100"
+        android:layout_height="@dimen/layout_50"
+        android:layout_marginBottom="@dimen/margin_8"
+        android:layout_marginEnd="@dimen/layout_40"
+        android:layout_marginStart="@dimen/margin_8"
+        android:layout_marginTop="@dimen/margin_8"
         android:gravity="start">
 
         <com.spawn.ai.utils.DotProgressBar

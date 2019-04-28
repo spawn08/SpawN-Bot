@@ -9,11 +9,11 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/spawn_logo"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="@dimen/layout_150"
+        android:layout_height="@dimen/layout_150"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="170dp"
+        android:layout_marginTop="@dimen/margin_170"
         app:lottie_autoPlay="true"
         app:lottie_rawRes="@raw/spawnlogo" />
 

@@ -7,10 +7,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="@dimen/margin_8"
+        android:layout_marginEnd="@dimen/layout_40"
+        android:layout_marginStart="@dimen/margin_8"
+        android:layout_marginTop="@dimen/margin_8"
         android:orientation="vertical"
         android:gravity="start"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,10 +25,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:paddingLeft="10dp"
+            android:paddingLeft="@dimen/margin_10"
             android:text="hello"
             android:textColor="@android:color/black"
-            android:textSize="18dp" />
+            android:textSize="@dimen/textsize_18" />
 
         <TextView
             android:id="@+id/bot_time"
@@ -39,7 +39,7 @@
             android:text="8:12"
             android:visibility="gone"
             android:textColor="@android:color/black"
-            android:textSize="14dp" />
+            android:textSize="@dimen/textsize_16" />
 
     </LinearLayout>
 

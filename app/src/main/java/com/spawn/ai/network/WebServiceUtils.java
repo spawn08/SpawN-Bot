@@ -155,8 +155,9 @@ public class WebServiceUtils {
                                     chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
                                     iBotObserver.notifyBotResponse(chatCardModel);
                                 } else {
-                                    ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
-                                    iBotObserver.notifyBotResponse(fallbackModel);
+                                    /*ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                                    iBotObserver.notifyBotResponse(fallbackModel);*/
+                                    callWikiAPI(botResponse.getText());
                                 }
                             }
                         }

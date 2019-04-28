@@ -21,7 +21,7 @@
         <com.spawn.ai.utils.DotProgressBar
             android:id="@+id/web_loading"
             android:layout_width="wrap_content"
-            android:layout_height="25dp"
+            android:layout_height="@dimen/margin_25"
             android:layout_gravity="start"
             app:amount="3"
             android:layout_centerInParent="true"

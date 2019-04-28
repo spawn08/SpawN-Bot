@@ -6,4 +6,5 @@
     <string name="header_text">Here are somethings you can ask me:</string>
     <string name="update_app">Kindly update the app from the playstore for latest update.</string>
     <string name="google_search">https://google.com/search?q=</string>
+    <string name="update">Update</string>
 </resources>

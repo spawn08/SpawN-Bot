@@ -1,2 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+
+    <dimen name="margin_5">10dp</dimen>
+    <dimen name="margin_8">12dp</dimen>
+    <dimen name="margin_10">15dp</dimen>
+    <dimen name="margin_15">18dp</dimen>
+    <dimen name="margin_20">25dp</dimen>
+    <dimen name="margin_25">30dp</dimen>
+    <dimen name="margin_170">180dp</dimen>
+
+    <dimen name="textsize_18">22sp</dimen>
+    <dimen name="textsize_16">20sp</dimen>
+    <dimen name="textsize_20">24sp</dimen>
+    <dimen name="textsize_22">26sp</dimen>
+
+    <dimen name="title_bar_height">60dp</dimen>
+    <dimen name="mic_image_width">70dp</dimen>
+    <dimen name="layout_45">55dp</dimen>
+    <dimen name="speech_anim_width">140dp</dimen>
+    <dimen name="speech_anim_height">80dp</dimen>
+    <dimen name="layout_150">160dp</dimen>
+    <dimen name="layout_90">100dp</dimen>
+    <dimen name="layout_40">50dp</dimen>
+    <dimen name="layout_50">60dp</dimen>
+    <dimen name="layout_100">110dp</dimen>
+    <dimen name="layout_180">190dp</dimen>
+
+</resources>
