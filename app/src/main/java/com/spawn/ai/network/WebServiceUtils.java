@@ -142,7 +142,10 @@ public class WebServiceUtils {
                         ChatCardModel chatCardModel = null;
                         BotMLResponse botResponse = response.body();
                         FireCalls.exec(new DumpTask(botResponse));
-                        if (botResponse.getIntent().getName() != null &&
+
+                        if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getEntity() != null && !botResponse.getEntities().get(0).getEntity().isEmpty()) {
+                            callWikiAPI(botResponse.getEntities().get(0).getEntity());
+                        } else if (botResponse.getIntent().getName() != null &&
                                 !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.80) {
                             chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
                             iBotObserver.notifyBotResponse(chatCardModel);
@@ -151,13 +154,19 @@ public class WebServiceUtils {
                                 callWikiAPI(botResponse.getEntities().get(0).getValue().get(0));
                             else {
                                 if (botResponse.getIntent().getName() != null &&
-                                        !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.60) {
+                                        !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.65) {
                                     chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
                                     iBotObserver.notifyBotResponse(chatCardModel);
                                 } else {
                                     /*ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
                                     iBotObserver.notifyBotResponse(fallbackModel);*/
-                                    callWikiAPI(botResponse.getText());
+                                    String[] splitQuery = botResponse.getText().split(" ");
+                                    if (splitQuery.length < 3)
+                                        callWikiAPI(botResponse.getText());
+                                    else {
+                                        ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                                        iBotObserver.notifyBotResponse(fallbackModel);
+                                    }
                                 }
                             }
                         }

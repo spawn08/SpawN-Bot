@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Entities {
 
     private String tag;
+    private String entity;
     private ArrayList<String> value;
 
     //private ArrayList<Intent> intent;
@@ -31,5 +32,13 @@ public class Entities {
 
     public void setValue(ArrayList<String> value) {
         this.value = value;
+    }
+
+    public String getEntity() {
+        return entity;
+    }
+
+    public void setEntity(String entity) {
+        this.entity = entity;
     }
 }
