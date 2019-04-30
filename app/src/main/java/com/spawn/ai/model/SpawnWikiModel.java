@@ -12,9 +12,11 @@ public class SpawnWikiModel {
     public String description;
     public String extract;
     public String lang;
+    public String query;
     public Thumbnail thumbnail;
     public String type;
     public Content_Urls content_urls;
+
 
     public String getTitle() {
         return title;
@@ -78,6 +80,15 @@ public class SpawnWikiModel {
 
     public void setLang(String lang) {
         this.lang = lang;
+    }
+
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     @Override

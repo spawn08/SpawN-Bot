@@ -1,145 +1,296 @@
 {
-  "questions_title": "Questions you can ask me:",
-  "questions": [
+  "questions_title_en": "Questions you can ask me:",
+  "questions_title_hi": "प्रश्न आप मुझसे पूछ सकते हैं:",
+  "app_version": "9",
+  "force_update": "true",
+  "api_url_en": "https://en.wikipedia.org/api/rest_v1/page/summary/",
+  "api_url_hi": "https://hi.wikipedia.org/api/rest_v1/page/summary/",
+  "questions_en": [
     "Who is Narendra Modi",
     "Tell me about Mumbai",
     "I don't know about Carlos Slim",
-    "Where is Mumbai located?",
-    "I can answer single word query like- 'mathematics', 'fourier transform'",
+    "Where is Sikkim located?",
+    "I can answer single word query like- 'Artificial intelligence', 'fourier transform'",
     "Tell me something about Barack Obama",
     "tell me about World War 2"
   ],
+  "questions_hi": [
+    "नरेंद्र मोदी",
+    "मुंबई",
+    "कार्लोस स्लिम",
+    "सिक्किम",
+    "अब्दुल कलाम",
+    "बराक ओबामा",
+    "विश्व युद्ध"
+  ],
   "bot_hi": {
     "type": 1,
-    "message": [
+    "message_en": [
       "Hey Hi!!. How can I help you.?"
     ],
-    "button_text": "",
+    "message_hi": [
+      "नमस्कार!!। में आपकी कैसे मदद कर सकता हूं ?"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": "speak"
   },
   "bot_like": {
     "type": 1,
-    "message": [
+    "message_en": [
       "Thank you.",
       "I like you too!!"
     ],
-    "button_text": "",
+    "message_hi": [
+      "धन्यवाद ",
+      "मैं भी आपको पसंद करता हूँ !!"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": ""
   },
   "bot_bye": {
     "type": 1,
-    "message": [
+    "message_en": [
       "See you soon!!",
       "Bye bye!!",
       "Good bye, see you soon."
     ],
-    "button_text": "",
+    "message_hi": [
+      "जल्द ही फिर मिलेंगे !!",
+      "अलविदा!!",
+      "अलविदा आपसे जल्दी ही मिलते हैं।"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": "finish"
   },
   "bot_shutup": {
     "type": 1,
-    "message": [
+    "message_en": [
       "I was just trying to help you.!!",
-      "Sorry, I wanted to help you.."
+      "Sorry, I wanted to help you..",
+      "Ok.. :(",
+      "We can talk later.... if you want.!!"
     ],
-    "button_text": "",
+    "message_hi": [
+      "मैं सिर्फ तुम्हारी मदद करने की कोशिश कर रहा था। !!",
+      "क्षमा करें, मैं आपकी मदद करना चाहता था ..",
+      "ठीक.. :(",
+      "हम बाद में बात कर सकते हैं .... अगर तुम चाहो तो। !!"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": "shutup"
   },
   "morning": {
     "type": 1,
-    "message": [
+    "message_en": [
       "Good Morning. How are you doing?",
       "Hey, Good Morning. How are you doing?"
     ],
-    "button_text": "",
+    "message_hi": [
+      "शुभ प्रभात। आप कैसे हैं?",
+      "गुड मॉर्निंग। आप कैसे हैं?"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": ""
   },
   "bot_greet_reply": {
     "type": 1,
-    "message": [
+    "message_en": [
       "Glad to hear that.",
       "Glad to hear that. Have a great day ahead."
     ],
-    "button_text": "",
+    "message_hi": [
+      "जानकर ख़ुशी हुई की।",
+      "जानकर ख़ुशी हुई की। आगे एक महान दिन हो।"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": ""
   },
   "bot_quotes": {
     "type": 1,
-    "message": [
+    "message_en": [
       "Life is 10% what happens to you and 90% how you react to it.",
       "Don’t let yesterday take up too much of today.",
       "You don't chose your passion. Your passion chose you.",
       "May your love never end and if you need a friend, there's a seat here along side me.",
       "Do or do not. There is no try."
     ],
-    "button_text": "",
+    "message_hi": [
+      "दुसरो की मदत करते हुए यदि दिल में ख़ुशी हो, तो वही सेवा है बाकी सब दिखाबा है।",
+      "ज़िंदेगी मे इतनी तेज़ी से आगे दौड्रोड़ की लोगो के बुराई के धागे आपके पैरो मे ही आकर टूट जाए।",
+      "लोग आपके आइडिया को ग़लत बताते है तो आपकी ज़िम्मेदारी है की इसे सही साबित करके दिखाए!",
+      "अगर जिंदगी में सुकून चाहते हो तो लोगो की बातो को दिल से लगाना छोर दो।",
+      "कुछ भी असंभव नहीं . जो सोच सकते है, वो कर सकते है, और वो भी सोच सकते है जो आज तक नहीं किया।"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": ""
   },
   "bot_love": {
     "type": 1,
-    "message": [
+    "message_en": [
       "Thank you. Anything I can help you with?",
       "I can't believe this moment finally came. You should know I think you're the best."
     ],
-    "button_text": "",
+    "message_hi": [
+      "धन्यवाद। मैं आपकी और कुछ मदद कर सकता हूँ?"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": ""
   },
   "evening": {
     "type": 1,
-    "message": [
+    "message_en": [
       "Good Evening. How are you doing?"
     ],
-    "button_text": "",
+    "message_hi": [
+      "सुसंध्या। आप कैसे हैं?"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": ""
   },
   "bot_skills": {
     "type": 1,
-    "message": [
+    "message_en": [
       "I can help you with finding information about person, place, organization, monuments, or any entity you can think of."
     ],
-    "button_text": "",
+    "message_hi": [
+      "मैं व्यक्ति, स्थान, संगठन, स्मारकों, या किसी भी इकाई के बारे में जानकारी प्राप्त करने में आपकी मदद कर सकता हूं !"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": ""
   },
   "spawn_name": {
     "type": 1,
-    "message": [
+    "message_en": [
       "I am Professor SpawN. Happy and ready to help."
     ],
-    "button_text": "",
+    "message_hi": [
+      "मैं प्रोफेसर स्पॉन हूं। खुश और मदद के लिए तैयार।"
+    ],
+    "button_text_en": "",
+    "button_text_hi": "",
     "action": ""
   },
   "greet": {
     "type": 1,
-    "message": [
+    "message_en": [
       "I am doing great. How can I help you?"
     ],
-    "button_text": "",
+    "message_hi": [
+      "मैं अच्छा हूँ। में आपकी कैसे मदद कर सकता हूं?"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": "speak"
   },
   "bot_identity": {
     "type": 1,
-    "message": [
+    "message_en": [
       "I am your Professor SpawN. How can I help you?"
     ],
-    "button_text": "",
+    "message_hi": [
+      "मैं आपका प्रोफेसर स्पॉन हूं। में आपकी कैसे मदद कर सकता हूं?"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
     "action": "speak"
+  },
+  "bot_thanks": {
+    "type": 1,
+    "message_en": [
+      "Happy to help",
+      "No problem",
+      "You're welcome"
+    ],
+    "message_hi": [
+      "मदद करने के लिए खुश",
+      "कोई बात नहीं",
+      "आपका स्वागत है"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
+    "action": ""
+  },
+  "bot_negative": {
+    "type": 1,
+    "message_en": [
+      "Sorry to disappoint you :(",
+      "No problem",
+      "No problem, we can talk later. :)"
+    ],
+    "message_hi": [
+      "आप को निराश करने के लिए क्षमा कीजिए :(",
+      "कोई बात नहीं",
+      "कोई बात नहीं, हम बाद में बात कर सकते हैं। :)"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
+    "action": ""
+  },
+  "bot_affirmation": {
+    "type": 1,
+    "message_en": [
+      "Noted.",
+      "Ok.",
+      "Cool."
+    ],
+    "message_hi": [
+      "विख्यात",
+      "ठीक",
+      "अच्छा ठीक है"
+    ],
+    "button_text_en": "",
+    "button_text_hi": "",
+    "action": ""
+  },
+  "bot_negation": {
+    "type": 1,
+    "message_hi": [
+      "ठीक",
+      "अच्छा ठीक है"
+    ],
+    "message_en": [
+      "Ok.",
+      "Cool."
+    ],
+    "button_text_en": "",
+    "button_text_hi": "",
+    "action": ""
   },
   "default": {
     "type": 1,
-    "message": [
+    "message_en": [
       "Sorry, I could not understand what you just said.",
       "I don't have an answer for this at the moment."
+    ],
+    "message_hi": [
+      "क्षमा करें, मैं समझ नहीं पाया कि आपने अभी क्या कहा।",
+      "मेरे पास फिलहाल इसका कोई जवाब नहीं है"
     ],
     "button_text": "",
     "action": ""
   },
   "default_wiki": {
     "type": 3,
-    "message": [
+    "message_en": [
       "I could not find any information.",
       "I don't have an answer for this at the moment."
     ],
-    "button_text": "Google Search",
+    "message_hi": [
+      "मुझे कोई जानकारी नहीं मिली।",
+      "मेरे पास फिलहाल इसका कोई जवाब नहीं है।"
+    ],
+    "button_text_en": "Google Search",
+    "button_text_hi": "गूगल खोज",
     "action": "google_search"
   }
 }

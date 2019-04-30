@@ -27,6 +27,9 @@ public interface ISpawnAPI {
     @GET("https://en.wikipedia.org/api/rest_v1/page/summary/{entity}")
     Call<SpawnWikiModel> getWiki(@Path("entity") String entity);
 
+    @GET("https://hi.wikipedia.org/api/rest_v1/page/summary/{entity}")
+    Call<SpawnWikiModel> getWikiHI(@Path("entity") String entity);
+
     @GET("entity?")
     Call<List<SpawnEntityModel>> getEntity(@Query("q") String query);
 
@@ -43,6 +46,6 @@ public interface ISpawnAPI {
     Call<BotMLResponse> getIntentTensor(@Query("model") String model, @Query("project") String project, @Query("q") String q);
 
     @GET("entity_extract")
-    Call<BotMLResponse> getEntityExtract(@Query("q") String q);
+    Call<BotMLResponse> getEntityExtract(@Query("q") String q, @Query("model") String model, @Query("lang") String lang);
 
 }

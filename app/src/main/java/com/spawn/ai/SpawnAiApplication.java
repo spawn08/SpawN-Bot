@@ -9,7 +9,7 @@ import io.fabric.sdk.android.Fabric;
 
 public class SpawnAiApplication extends Application {
 
-    private Context context;
+    private static Context context;
     private static SpawnAiApplication spawnAiApplication;
 
     public static SpawnAiApplication getInstance() {
@@ -23,12 +23,12 @@ public class SpawnAiApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        context = this;
+        context = getApplicationContext();
         Fabric.with(this, new Crashlytics());
 
     }
 
-    public Context getContext() {
+    public static Context getContext() {
         return context;
     }
 }

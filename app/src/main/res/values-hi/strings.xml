@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">प्रोफेसर स्पॉन</string>
+    <string name="update_app">नवीनतम अपडेट के लिए कृपया playstore से ऐप को अपडेट करें।</string>
+    <string name="update">अपडेट</string>
+    <string name="language_initials">अ</string>
+
+</resources>

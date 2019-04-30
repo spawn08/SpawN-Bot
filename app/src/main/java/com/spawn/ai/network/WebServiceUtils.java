@@ -18,7 +18,9 @@ import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.utils.AppUtils;
 import com.spawn.ai.utils.JsonFileReader;
+import com.spawn.ai.utils.SharedPreferenceUtility;
 import com.spawn.ai.utils.async.DumpTask;
 import com.spawn.ai.utils.async.FireCalls;
 
@@ -41,7 +43,8 @@ public class WebServiceUtils {
     public static String SPAWN_API = "https://spawnai.com/";
     private static IBotObserver iBotObserver;
     private IBotWikiNLP iBotWikiNLP;
-    String token;
+    private String token;
+    private String language;
 
     @SerializedName("serverFileContents")
     private JsonElement serverFileContents;
@@ -75,6 +78,14 @@ public class WebServiceUtils {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public void getBotResponse(String q) {
@@ -133,7 +144,7 @@ public class WebServiceUtils {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-            Call<BotMLResponse> data = spawnAPI.getEntityExtract(q);
+            Call<BotMLResponse> data = spawnAPI.getEntityExtract(q, AppConstants.MODEL, language);
 
             data.enqueue(new Callback<BotMLResponse>() {
                 @Override
@@ -141,30 +152,31 @@ public class WebServiceUtils {
                     if (response.isSuccessful()) {
                         ChatCardModel chatCardModel = null;
                         BotMLResponse botResponse = response.body();
+                        botResponse.setLang(language);
                         FireCalls.exec(new DumpTask(botResponse));
 
                         if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getEntity() != null && !botResponse.getEntities().get(0).getEntity().isEmpty()) {
-                            callWikiAPI(botResponse.getEntities().get(0).getEntity());
+                            callWikiAPI(botResponse.getEntities().get(0).getEntity(), q);
                         } else if (botResponse.getIntent().getName() != null &&
                                 !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.80) {
-                            chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
+                            chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4, language);
                             iBotObserver.notifyBotResponse(chatCardModel);
                         } else {
                             if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getValue() != null)
-                                callWikiAPI(botResponse.getEntities().get(0).getValue().get(0));
+                                callWikiAPI(botResponse.getEntities().get(0).getValue().get(0), q);
                             else {
                                 if (botResponse.getIntent().getName() != null &&
                                         !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.65) {
-                                    chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4);
+                                    chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4, language);
                                     iBotObserver.notifyBotResponse(chatCardModel);
                                 } else {
                                     /*ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
                                     iBotObserver.notifyBotResponse(fallbackModel);*/
                                     String[] splitQuery = botResponse.getText().split(" ");
                                     if (splitQuery.length < 3)
-                                        callWikiAPI(botResponse.getText());
+                                        callWikiAPI(botResponse.getText(), q);
                                     else {
-                                        ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                                        ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                                         iBotObserver.notifyBotResponse(fallbackModel);
                                     }
                                 }
@@ -178,7 +190,7 @@ public class WebServiceUtils {
 
                 @Override
                 public void onFailure(Call<BotMLResponse> call, Throwable t) {
-                    callSpawnAPI(q);
+                    callWikiAPI(q, q);
                 }
             });
         } catch (Exception e) {
@@ -188,7 +200,7 @@ public class WebServiceUtils {
     }
 
 
-    public void callSpawnAPI(String query) {
+    public void callSpawnAPI(final String query) {
         iBotObserver.loading();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
@@ -208,9 +220,9 @@ public class WebServiceUtils {
                 try {
                     if (response.isSuccessful()) {
                         List<SpawnEntityModel> model = response.body();
-                        callWikiAPI(model.get(0).getValue());
+                        callWikiAPI(model.get(0).getValue(), query);
                     } else {
-                        ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                        ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                         iBotObserver.notifyBotResponse(chatCardModel);
                     }
 
@@ -223,25 +235,33 @@ public class WebServiceUtils {
             @Override
             public void onFailure(Call<List<SpawnEntityModel>> call, Throwable t) {
                 Log.e("ERROR: ", t.getMessage());
-                ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                 iBotObserver.notifyBotResponse(chatCardModel);
 
             }
         });
     }
 
-    public void callWikiAPI(final String entity) {
+    public void callWikiAPI(final String entity, final String query) {
         iBotObserver.loading();
         final String cloneEntity = entity.trim().replace(" ", "_");
+
         Log.d("ENTITY: ", cloneEntity);
+        String urlKey = "api_url_" + language;
+        API_URL = JsonFileReader.getInstance().getValueFromJson(urlKey);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
+        Call<SpawnWikiModel> data = null;
         final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-        Call<SpawnWikiModel> data = spawnAPI.getWiki(cloneEntity);
+
+        if (language.equalsIgnoreCase("en"))
+            data = spawnAPI.getWiki(cloneEntity);
+        else
+            data = spawnAPI.getWikiHI(cloneEntity);
+
         data.enqueue(new Callback<SpawnWikiModel>() {
             @Override
             public void onResponse(Call<SpawnWikiModel> call, Response<SpawnWikiModel> response) {
@@ -249,6 +269,7 @@ public class WebServiceUtils {
                     ChatCardModel chatCardModel = null;
                     Log.d("API CONTENT: ", response.body().toString());
                     SpawnWikiModel spawnWikiModel = response.body();
+                    spawnWikiModel.setQuery(query);
                     FireCalls.exec(new DumpTask(spawnWikiModel));
                     if (spawnWikiModel.getType().equals("disambiguation")) {
                         //Handle case for page not found
@@ -258,7 +279,7 @@ public class WebServiceUtils {
                             chatCardModel = new ChatCardModel(spawnWikiModel, 5);
                             iBotWikiNLP.showUI(chatCardModel);
                         } else {
-                            chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                            chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                             iBotObserver.notifyBotResponse(chatCardModel);
                         }
                     } else {
@@ -268,7 +289,7 @@ public class WebServiceUtils {
 
                 } else {
                     //Handle case for page not found
-                    ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4);
+                    ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                     iBotObserver.notifyBotResponse(fallBack);
                 }
             }
@@ -307,7 +328,7 @@ public class WebServiceUtils {
                             if (file != null) {
                                 JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
                                 JsonFileReader.getInstance().readFile(context, file);
-                                JsonFileReader.getInstance().setQuestions();
+                                JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(context).getStringPreference("lang"));
                             }
                         }
                     } catch (Exception e) {

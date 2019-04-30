@@ -9,6 +9,7 @@ public class BotMLResponse {
     private String text;
     private String project;
     private String model;
+    private String lang;
 
     public Intent getIntent() {
         return intent;
@@ -48,6 +49,14 @@ public class BotMLResponse {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 }
 

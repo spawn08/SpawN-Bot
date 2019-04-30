@@ -13,6 +13,7 @@ import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.JsonFileReader;
+import com.spawn.ai.utils.SharedPreferenceUtility;
 
 import constants.AppConstants;
 import io.fabric.sdk.android.Fabric;
@@ -31,6 +32,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
         try {
             WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
             WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER, context);
+            WebServiceUtils.getInstance(this).setLanguage(SharedPreferenceUtility.getInstance(this).getStringPreference(AppConstants.LANG));
         } catch (Exception e) {
             e.printStackTrace();
             Crashlytics.logException(e);

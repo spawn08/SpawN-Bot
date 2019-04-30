@@ -26,4 +26,14 @@ public class SharedPreferenceUtility {
     public boolean getPreference(String key) {
         return sharedPreferences.getBoolean(key, true);
     }
+
+    public void storeStringPreference(String key, String value) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(key, value);
+        editor.apply();
+    }
+
+    public String getStringPreference(String key) {
+        return sharedPreferences.getString(key, "en");
+    }
 }

@@ -7,5 +7,7 @@ public class AppConstants {
     public static final String NLP_USERNAME = "spawnai";
     public static final String NLP_PASSWORD = "spawn1992";
     public static final String FALL_BACK = "default_wiki";
+    public static final String LANG = "lang";
+    public static final String MODEL = "spawn";
 
 }

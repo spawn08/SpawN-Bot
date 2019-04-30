@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 
@@ -23,7 +24,8 @@ public class JsonFileReader {
     private static String fileContents;
     private String fileName = "bot_data.json";
     private ChatCardModel cardModel;
-    ArrayList<String> questions = new ArrayList<String>();
+    private ArrayList<String> questions = new ArrayList<String>();
+    private HashMap<String, ArrayList<String>> questionsMap = new HashMap<String, ArrayList<String>>();
 
     public static JsonFileReader getInstance() {
         if (jsonFileReader == null) {
@@ -78,19 +80,19 @@ public class JsonFileReader {
         return jsonObject;
     }
 
-    public ChatCardModel getJsonFromKey(String key, int i) {
+    public ChatCardModel getJsonFromKey(String key, int i, String lang) {
         String message = "";
-        ChatCardModel chatCardModel = new ChatCardModel("", getDefaultAnswer(), 1, "");
+        ChatCardModel chatCardModel = new ChatCardModel("", getDefaultAnswer(lang), 1, "");
         try {
             switch (i) {
                 case ChatViewTypes.CHAT_VIEW_BOT:
                     if (fileContents != null) {
                         JSONObject data = new JSONObject(fileContents);
                         JSONObject body = (data.has(key)) ? data.getJSONObject(key) : data.getJSONObject("default");
-                        JSONArray jsonArray = body.getJSONArray("message");
+                        JSONArray jsonArray = body.getJSONArray("message_" + lang);
                         int index = new Random().nextInt(jsonArray.length());
                         message = jsonArray.get(index).toString();
-                        chatCardModel = new ChatCardModel(body.getString("button_text"),
+                        chatCardModel = new ChatCardModel(body.getString("button_text_" + lang),
                                 message,
                                 body.getInt("type"), body.getString("action"));
                         setCardModel(chatCardModel);
@@ -101,10 +103,10 @@ public class JsonFileReader {
                     if (fileContents != null) {
                         JSONObject data = new JSONObject(fileContents);
                         JSONObject body = (data.has(key)) ? data.getJSONObject(key) : data.getJSONObject("default");
-                        JSONArray jsonArray = body.getJSONArray("message");
+                        JSONArray jsonArray = body.getJSONArray("message_" + lang);
                         int index = new Random().nextInt(jsonArray.length());
                         message = jsonArray.get(index).toString();
-                        chatCardModel = new ChatCardModel(body.getString("button_text"),
+                        chatCardModel = new ChatCardModel(body.getString("button_text_" + lang),
                                 message,
                                 body.getInt("type"), body.getString("action"));
                         setCardModel(chatCardModel);
@@ -115,10 +117,10 @@ public class JsonFileReader {
                     if (fileContents != null) {
                         JSONObject data = new JSONObject(fileContents);
                         JSONObject body = (data.has(key)) ? data.getJSONObject(key) : data.getJSONObject("default");
-                        JSONArray jsonArray = body.getJSONArray("message");
+                        JSONArray jsonArray = body.getJSONArray("message_" + lang);
                         int index = new Random().nextInt(jsonArray.length());
                         message = jsonArray.get(index).toString();
-                        chatCardModel = new ChatCardModel(body.getString("button_text"),
+                        chatCardModel = new ChatCardModel(body.getString("button_text_" + lang),
                                 message,
                                 body.getInt("type"), body.getString("action"));
                         setCardModel(chatCardModel);
@@ -142,14 +144,14 @@ public class JsonFileReader {
         return this.cardModel;
     }
 
-    public String getDefaultAnswer() {
+    public String getDefaultAnswer(String lang) {
         String message = "";
         if (fileContents != null) {
             try {
                 JSONObject data = new JSONObject(fileContents);
                 if (data.has("default")) {
                     JSONObject body = data.getJSONObject("default");
-                    JSONArray jsonArray = body.getJSONArray("message");
+                    JSONArray jsonArray = body.getJSONArray("message_" + lang);
                     int index = new Random().nextInt(jsonArray.length());
                     message = jsonArray.get(index).toString();
                 } else {
@@ -165,11 +167,12 @@ public class JsonFileReader {
         return message;
     }
 
-    public void setQuestions() {
+    public void setQuestions(String lang) {
         if (fileContents != null) {
+            questions = new ArrayList<>();
             try {
                 JSONObject jsonObject = new JSONObject(fileContents);
-                JSONArray jsonArray = jsonObject.getJSONArray("questions");
+                JSONArray jsonArray = jsonObject.getJSONArray("questions_" + lang);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     questions.add(jsonArray.getString(i));
                 }
@@ -199,12 +202,17 @@ public class JsonFileReader {
         return value;
     }
 
-    public ArrayList<String> getQuestions() {
-        if (questions != null)
+    public ArrayList<String> getQuestions(String lang) {
+        if (questionsMap.get(lang) == null) {
+            setQuestions(lang);
+            questionsMap.put(lang, questions);
+        }
+
+        /*if (questions != null)
             return questions;
         else
-            setQuestions();
-        return questions;
+            setQuestions(lang);*/
+        return questionsMap.get(lang);
     }
 
     public String getFileContents() {
