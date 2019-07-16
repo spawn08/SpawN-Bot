@@ -27,10 +27,11 @@ public class SpawnWebActivity extends AppCompatActivity {
         WebSettings webSettings = infoWebview.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
+        webSettings.setAppCacheEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         android.content.Intent intent = getIntent();
         String url = intent.getStringExtra("url");
-
+        infoWebview.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         infoWebview.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {

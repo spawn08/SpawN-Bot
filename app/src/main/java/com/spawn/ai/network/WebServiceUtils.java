@@ -1,27 +1,38 @@
 package com.spawn.ai.network;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
+import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWikiNLP;
 import com.spawn.ai.interfaces.ISpawnAPI;
 import com.spawn.ai.model.BotMLResponse;
+import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.utils.AppUtils;
 import com.spawn.ai.utils.JsonFileReader;
 import com.spawn.ai.utils.SharedPreferenceUtility;
 import com.spawn.ai.utils.async.DumpTask;
 import com.spawn.ai.utils.async.FireCalls;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import constants.AppConstants;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,6 +45,7 @@ public class WebServiceUtils {
     private Retrofit retrofit;
     private static final String BOT_URL = "https://api.wit.ai";
     public static String API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+    public static String NEWS_URL = "https://api.spawnai.com/spawnai_file/news/news_data/";
     public static String SPAWN_API = "https://spawnai.com/";
     private static IBotObserver iBotObserver;
     private IBotWikiNLP iBotWikiNLP;
@@ -152,6 +164,12 @@ public class WebServiceUtils {
                         if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getEntity() != null && !botResponse.getEntities().get(0).getEntity().isEmpty()) {
                             callWikiAPI(botResponse.getEntities().get(0).getEntity(), q);
                         } else if (botResponse.getIntent().getName() != null &&
+                                !botResponse.getIntent().getName().isEmpty() &&
+                                botResponse.getIntent().getName().equalsIgnoreCase("bot_news")
+                                && botResponse.getIntent().getConfidence() > 0.80) {
+                            callNewsAPI(botResponse);
+
+                        } else if (botResponse.getIntent().getName() != null &&
                                 !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.80) {
                             chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4, language);
                             iBotObserver.notifyBotResponse(chatCardModel);
@@ -191,6 +209,45 @@ public class WebServiceUtils {
             e.printStackTrace();
             Crashlytics.logException(e);
         }
+    }
+
+    private void callNewsAPI(final BotMLResponse botResponse) {
+        iBotObserver.loading();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new NLPInterceptor(AppConstants.NEWS_USERNAME, AppConstants.NEWS_PASS))
+                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(NEWS_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        final ISpawnAPI iSpawnAPI = retrofit.create(ISpawnAPI.class);
+        Call<JsonElement> data = iSpawnAPI.getNewsData();
+
+        data.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                try {
+
+                    JsonObject resp = response.body().getAsJsonObject();
+                    JSONObject source = new JSONObject(resp.toString());
+                    JSONArray jsonArray = source.getJSONObject("_source").getJSONArray("result");
+                    AppUtils.getInstance().setNewsJSON(jsonArray);
+                    ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getIntent().getName(), 4, language);
+                    iBotObserver.notifyBotResponse(chatCardModel);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.d(WebServiceUtils.class.getSimpleName(), t.getMessage());
+            }
+        });
+
+
     }
 
 
@@ -263,7 +320,7 @@ public class WebServiceUtils {
                     ChatCardModel chatCardModel = null;
                     Log.d("API CONTENT: ", response.body().toString());
                     SpawnWikiModel spawnWikiModel = response.body();
-                    spawnWikiModel.setQuery(query);
+                    //spawnWikiModel.setQuery(query);
                     FireCalls.exec(new DumpTask(spawnWikiModel));
                     if (spawnWikiModel.getType().equals("disambiguation")) {
                         //Handle case for page not found
@@ -298,7 +355,7 @@ public class WebServiceUtils {
 
     }
 
-    public void getFile(String fileName, final Context context) {
+    public void getFile(String fileName, final Activity activity) {
         try {
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
@@ -321,9 +378,13 @@ public class WebServiceUtils {
                             setFileContents(file);
                             if (file != null) {
                                 JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
-                                JsonFileReader.getInstance().readFile(context, file);
-                                JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(context).getStringPreference("lang"));
+                                JsonFileReader.getInstance().readFile(activity, file);
+                                JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(activity).getStringPreference("lang"));
                             }
+                            Intent intent = new Intent(activity, SpawnBotActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            activity.startActivity(intent);
+                            activity.finish();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -335,7 +396,11 @@ public class WebServiceUtils {
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Log.e("ERROR: ", t.getMessage());
                     Crashlytics.log(1, "Webservice Request Error -->", t.getMessage());
-
+                    JsonFileReader.getInstance().readFile(activity, null);
+                    Intent intent = new Intent(activity, SpawnBotActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    activity.startActivity(intent);
+                    activity.finish();
                 }
             });
         } catch (Exception e) {

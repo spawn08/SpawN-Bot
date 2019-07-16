@@ -28,16 +28,6 @@ public class SpawnSplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spawn_splash_screen);
         context = this;
-        //JsonFileReader.getInstance().readFile(this);
-        try {
-            WebServiceUtils.getInstance(this).setToken(getResources().getString(R.string.wit_token));
-            WebServiceUtils.getInstance(this).getFile(AppConstants.DATA_FILE_SERVER, context);
-            WebServiceUtils.getInstance(this).setLanguage(SharedPreferenceUtility.getInstance(this).getStringPreference(AppConstants.LANG));
-        } catch (Exception e) {
-            e.printStackTrace();
-            Crashlytics.logException(e);
-        }
-
         spawnLogo = (LottieAnimationView) findViewById(R.id.spawn_logo);
         spawnLogo.setRepeatMode(-1);
         spawnLogo.playAnimation();
@@ -67,9 +57,19 @@ public class SpawnSplashScreen extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(context, SpawnBotActivity.class);
-                startActivity(intent);
-                finish();
+                try {
+                    WebServiceUtils.getInstance(SpawnSplashScreen.this)
+                            .setToken(getResources().getString(R.string.wit_token));
+                    WebServiceUtils.getInstance(SpawnSplashScreen.this)
+                            .getFile(AppConstants.DATA_FILE_SERVER, SpawnSplashScreen.this);
+                    WebServiceUtils.getInstance(SpawnSplashScreen.this)
+                            .setLanguage(SharedPreferenceUtility
+                                    .getInstance(SpawnSplashScreen.this)
+                                    .getStringPreference(AppConstants.LANG));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Crashlytics.logException(e);
+                }
             }
         }, 2000);
     }

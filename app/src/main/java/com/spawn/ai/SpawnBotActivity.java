@@ -148,6 +148,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     }
 
     private void setUpQuestionsView(String lang) {
+
+        activitySpawnBotBinding.langChange.setText(AppUtils.getStringRes(R.string.language_initials, this, lang));
+
         final ArrayList<String> questions = JsonFileReader.getInstance().getQuestions(lang);
         activitySpawnBotBinding.headerText.setText(JsonFileReader.getInstance().getValueFromJson("questions_title_" + lang));
 
@@ -493,6 +496,21 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 break;
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
+                if (chatCardModel != null) {
+                    ChatMessageType wikiType = new ChatMessageType();
+                    wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
+                    wikiType.setViewType(chatCardModel.getType());
+                    botResponses.remove(botResponses.size() - 1);
+                    botResponses.add(wikiType);
+                    chatbotAdapter.setAdapter(botResponses);
+                    chatbotAdapter.notifyDataSetChanged();
+                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
+                }
+
+                break;
+
+            case ChatViewTypes.CHAT_VIEW_NEWS:
+
                 if (chatCardModel != null) {
                     ChatMessageType wikiType = new ChatMessageType();
                     wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());

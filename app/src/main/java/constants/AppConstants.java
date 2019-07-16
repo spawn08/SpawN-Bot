@@ -9,5 +9,7 @@ public class AppConstants {
     public static final String FALL_BACK = "default_wiki";
     public static final String LANG = "lang";
     public static final String MODEL = "spawn";
+    public static final String NEWS_USERNAME = "elastic";
+    public static final String NEWS_PASS = "Spawn@#32";
 
 }

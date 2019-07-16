@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -26,6 +27,9 @@ public interface ISpawnAPI {
 
     @GET("https://en.wikipedia.org/api/rest_v1/page/summary/{entity}")
     Call<SpawnWikiModel> getWiki(@Path("entity") String entity);
+
+    @GET("https://api.spawnai.com/spawnai_file/news/news_data")
+    Call<JsonElement> getNewsData();
 
     @GET("https://hi.wikipedia.org/api/rest_v1/page/summary/{entity}")
     Call<SpawnWikiModel> getWikiHI(@Path("entity") String entity);

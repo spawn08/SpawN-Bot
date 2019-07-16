@@ -40,7 +40,9 @@ public class JsonFileReader {
 
     public void readFile(Context context, JsonElement file) {
         try {
-            fileContents = file.toString();
+            if (file != null)
+                fileContents = file.toString();
+            else fileContents = null;
             Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
             loadLocalFile(context);
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package com.spawn.ai.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +16,12 @@ import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.utils.AppUtils;
 import com.spawn.ai.utils.SharedPreferenceUtility;
 import com.spawn.ai.viewholders.SpawnChatBotViewHolder;
 import com.spawn.ai.viewholders.SpawnChatCardViewHolder;
 import com.spawn.ai.viewholders.SpawnChatLoadingViewHolder;
+import com.spawn.ai.viewholders.SpawnChatNewsHolder;
 import com.spawn.ai.viewholders.SpawnChatUserViewHolder;
 import com.spawn.ai.viewholders.SpawnWikiViewHolder;
 
@@ -69,6 +72,11 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 View wikiView = LayoutInflater.from(context).inflate(R.layout.spawn_wiki_view, parent, false);
                 SpawnWikiViewHolder wikiViewHolder = new SpawnWikiViewHolder(wikiView);
                 return wikiViewHolder;
+
+            case ChatViewTypes.CHAT_VIEW_NEWS:
+                View newsView = LayoutInflater.from(context).inflate(R.layout.spawn_news_layout, parent, false);
+                SpawnChatNewsHolder spawnChatNewsHolder = new SpawnChatNewsHolder(newsView);
+                return spawnChatNewsHolder;
         }
 
         return null;
@@ -214,6 +222,16 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     chatMessageType.get(position).setShortMessage(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
                     iBotObserver.setChatMessage(chatMessageType.get(position));
                 }
+
+                break;
+
+            case ChatViewTypes.CHAT_VIEW_NEWS:
+                final SpawnChatNewsHolder spawnChatNewsHolder = (SpawnChatNewsHolder) holder;
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+                spawnChatNewsHolder.newRecycler.setLayoutManager(linearLayoutManager);
+                SpawnNewsAdapter spawnNewsAdapter = new SpawnNewsAdapter(context, AppUtils.getInstance().getJsonArray());
+                spawnChatNewsHolder.newRecycler.setAdapter(spawnNewsAdapter);
+                spawnNewsAdapter.notifyDataSetChanged();
 
                 break;
         }

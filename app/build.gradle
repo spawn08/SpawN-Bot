@@ -22,7 +22,7 @@ android {
         applicationId "com.spawn.ai"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 10
+        versionCode 13
         versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

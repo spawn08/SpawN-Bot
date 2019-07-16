@@ -5,11 +5,14 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 
+import org.json.JSONArray;
+
 import java.util.Locale;
 
 public class AppUtils {
 
     private static AppUtils appUtils;
+    private JSONArray jsonArray;
 
     public static AppUtils getInstance() {
         if (appUtils == null) {
@@ -33,4 +36,12 @@ public class AppUtils {
         return result;
     }
 
+    public void setNewsJSON(JSONArray jsonArray) {
+        this.jsonArray = jsonArray;
+
+    }
+
+    public JSONArray getJsonArray() {
+        return jsonArray;
+    }
 }

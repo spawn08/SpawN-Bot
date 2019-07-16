@@ -1,8 +1,8 @@
 {
   "questions_title_en": "Questions you can ask me:",
   "questions_title_hi": "प्रश्न आप मुझसे पूछ सकते हैं:",
-  "app_version": "9",
-  "force_update": "true",
+  "app_version": "12",
+  "force_update": "false",
   "api_url_en": "https://en.wikipedia.org/api/rest_v1/page/summary/",
   "api_url_hi": "https://hi.wikipedia.org/api/rest_v1/page/summary/",
   "questions_en": [
@@ -15,11 +15,9 @@
     "tell me about World War 2"
   ],
   "questions_hi": [
-    "नरेंद्र मोदी",
-    "मुंबई",
-    "कार्लोस स्लिम",
-    "सिक्किम",
-    "अब्दुल कलाम",
+    "नरेंद्र मोदी के बारे में बताओ",
+    "मुंबई कहां पर है",
+    "राहुल गांधी के बारे में बताओ",
     "बराक ओबामा",
     "विश्व युद्ध"
   ],
@@ -230,7 +228,7 @@
     "message_hi": [
       "आप को निराश करने के लिए क्षमा कीजिए :(",
       "कोई बात नहीं",
-      "कोई बात नहीं, हम बाद में बात कर सकते हैं। :)"
+      "में खुश हूँ"
     ],
     "button_text_hi": "",
     "button_text_en": "",
