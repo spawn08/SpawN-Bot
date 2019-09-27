@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.airbnb.lottie.LottieDrawable;
 import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
@@ -29,7 +30,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_spawn_splash_screen);
         context = this;
         spawnLogo = (LottieAnimationView) findViewById(R.id.spawn_logo);
-        spawnLogo.setRepeatMode(-1);
+        spawnLogo.setRepeatMode(LottieDrawable.INFINITE);
         spawnLogo.playAnimation();
         spawnLogo.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
@@ -58,14 +59,23 @@ public class SpawnSplashScreen extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    WebServiceUtils.getInstance(SpawnSplashScreen.this)
-                            .setToken(getResources().getString(R.string.wit_token));
-                    WebServiceUtils.getInstance(SpawnSplashScreen.this)
-                            .getFile(AppConstants.DATA_FILE_SERVER, SpawnSplashScreen.this);
+
+                   /* WebServiceUtils.getInstance(SpawnSplashScreen.this)
+                            .getFile(AppConstants.DATA_FILE_SERVER, SpawnSplashScreen.this);*/
+
+                    JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
+                    JsonFileReader.getInstance().readFile(SpawnSplashScreen.this, null);
+                    JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(SpawnSplashScreen.this).getStringPreference("lang"));
+
                     WebServiceUtils.getInstance(SpawnSplashScreen.this)
                             .setLanguage(SharedPreferenceUtility
                                     .getInstance(SpawnSplashScreen.this)
                                     .getStringPreference(AppConstants.LANG));
+
+                    Intent intent = new Intent(SpawnSplashScreen.this, SpawnBotActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Crashlytics.logException(e);

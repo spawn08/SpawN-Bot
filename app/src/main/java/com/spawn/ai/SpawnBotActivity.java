@@ -150,7 +150,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private void setUpQuestionsView(String lang) {
 
         activitySpawnBotBinding.langChange.setText(AppUtils.getStringRes(R.string.language_initials, this, lang));
-
+        if (lang.equalsIgnoreCase("en")) {
+            WebServiceUtils.getInstance(this).setToken(getString(R.string.wit_token_en));
+        } else {
+            WebServiceUtils.getInstance(this).setToken(getString(R.string.wit_token_hi));
+        }
         final ArrayList<String> questions = JsonFileReader.getInstance().getQuestions(lang);
         activitySpawnBotBinding.headerText.setText(JsonFileReader.getInstance().getValueFromJson("questions_title_" + lang));
 
@@ -606,7 +610,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding
                         .titleText
                         .setText(AppUtils.getStringRes(R.string.app_name, this, "hi"));
-
+                WebServiceUtils.getInstance(this).setToken(getString(R.string.wit_token_hi));
                 botResponses.clear();
                 chatbotAdapter.setAdapter(botResponses);
                 chatbotAdapter.notifyDataSetChanged();
@@ -623,7 +627,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 textToSpeech.stop();
                 textToSpeech = null;
                 textToSpeech = new TextToSpeech(this, this);
-
+                WebServiceUtils.getInstance(this).setToken(getString(R.string.wit_token_en));
                 activitySpawnBotBinding.langChange
                         .setText(AppUtils.getStringRes(R.string.language_initials, this, "en"));
                 activitySpawnBotBinding

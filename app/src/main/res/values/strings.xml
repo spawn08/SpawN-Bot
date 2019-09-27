@@ -2,7 +2,8 @@
     <string name="app_name">Professor SpawN</string>
 
     <string name="defalt_answer">Sorry I could not understand what you just said.</string>
-    <string name="wit_token">LAVGTLGKQQ7LRXSZHOTYDKWEOXRCBQ2Y</string>
+    <string name="wit_token_en">2LZ63YBJ3J6H5FWDIES7MGHEIR6NDQ3P</string>
+    <string name="wit_token_hi">GI5NOSNIZ4B5OR5LEEHNVYKGJFAM62W6</string>
     <string name="header_text">Here are somethings you can ask me:</string>
     <string name="update_app">Kindly update the app from the playstore for latest update.</string>
     <string name="google_search">https://google.com/search?q=</string>

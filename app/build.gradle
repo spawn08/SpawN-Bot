@@ -22,7 +22,7 @@ android {
         applicationId "com.spawn.ai"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 13
+        versionCode 14
         versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -40,8 +40,8 @@ android {
         }
         debug {
             debuggable true
-            shrinkResources true
-            minifyEnabled true
+            shrinkResources false
+            minifyEnabled false
             testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.interfaces.IBotObserver;
+import com.spawn.ai.interfaces.IBotWebService;
 import com.spawn.ai.interfaces.IBotWikiNLP;
 import com.spawn.ai.interfaces.ISpawnAPI;
 import com.spawn.ai.model.BotMLResponse;
@@ -68,17 +69,17 @@ public class WebServiceUtils {
     }
 
     public Retrofit getRetrofitClient() {
-        if (retrofit == null) {
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new BotInterceptor(token))
-                    .build();
+        //  if (retrofit == null) {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new BotInterceptor(token))
+                .build();
 
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(BOT_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(okHttpClient)
-                    .build();
-        }
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BOT_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+        //  }
         return retrofit;
     }
 
@@ -98,18 +99,21 @@ public class WebServiceUtils {
 
         if (retrofit != null) {
             //  if (q.split(" ").length > 2)
-            callSpawnML(q);
+            //callSpawnML(q); // Uncomment this method server setup
             // else callWikiAPI(q);
+            callWitService(q);
 
         } else {
             retrofit = getRetrofitClient();
             // if (q.split(" ").length > 2)
-            callSpawnML(q);
+            // callSpawnML(q); // Uncomment this method server setup
             // else callWikiAPI(q);
+
+            callWitService(q);
         }
     }
 
-    /*public void callWebservice(String q) {
+    public void callWitService(final String q) {
         iBotObserver.loading();
         final IBotWebService iBotWebService = retrofit.create(IBotWebService.class);
         final Call<BotResponse> botIntentsCall = iBotWebService.getBotResponse(q);
@@ -120,12 +124,29 @@ public class WebServiceUtils {
                     ChatCardModel chatCardModel = null;
                     BotResponse botResponse = response.body();
                     if (botResponse.getEntities().getBotIntents() != null &&
+                            botResponse.getEntities().getBotIntents().size() > 0
+                            && botResponse.getEntities().getBotIntents().get(0).getConfidence() > 0.90)
+                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue(), 4, language);
+                    else if (botResponse.getEntities().getNotable_person() != null
+                            && botResponse.getEntities().getNotable_person().get(0).getValue().getName() != null) {
+                        callWikiAPI(botResponse.getEntities().getNotable_person().get(0).getValue().getName(), q);
+                    } else if (botResponse.getEntities().getLocation() != null
+                            && botResponse.getEntities().getLocation().get(0).getValue() != null) {
+                        callWikiAPI(botResponse.getEntities().getLocation().get(0).getValue(), q);
+                    } else if (botResponse.getEntities().getBotIntents() != null &&
                             botResponse.getEntities().getBotIntents().size() > 0)
-                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getName(), 4);
-                    else {
-                        chatCardModel = new ChatCardModel("", JsonFileReader.getInstance().getDefaultAnswer(), 1, "");
+                        chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue(), 4, language);
+
+                    else if (botResponse.getEntities() == null
+                            || botResponse.getEntities().getNotable_person() == null
+                            || botResponse.getEntities().getLocation() == null) {
+                        callWikiAPI(q, q);
+                    } else {
+                        chatCardModel = new ChatCardModel("", JsonFileReader.getInstance().getDefaultAnswer(language), 1, "");
                     }
-                    iBotObserver.notifyBotResponse(chatCardModel);
+
+                    if (chatCardModel != null)
+                        iBotObserver.notifyBotResponse(chatCardModel);
                 } else {
                     iBotObserver.notifyBotError();
                 }
@@ -136,7 +157,7 @@ public class WebServiceUtils {
                 iBotObserver.notifyBotError();
             }
         });
-    }*/
+    }
 
     public void callSpawnML(final String q) {
         try {
