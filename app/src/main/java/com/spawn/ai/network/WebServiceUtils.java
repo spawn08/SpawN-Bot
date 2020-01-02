@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
@@ -33,7 +32,6 @@ import java.util.List;
 
 import constants.AppConstants;
 import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,10 +43,10 @@ public class WebServiceUtils {
     private static WebServiceUtils webServiceUtils;
     private Retrofit retrofit;
     private static final String BOT_URL = "https://api.wit.ai";
-    public static String API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-    public static String NEWS_URL = "https://api.spawnai.com/spawnai_file/news/news_data/";
-    public static String SPAWN_API = "https://spawnai.com/";
-    private static IBotObserver iBotObserver;
+    private static String API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+    private static String NEWS_URL = "https://api.spawnai.com/spawnai_file/news/news_data/";
+    private static String SPAWN_API = "https://api.bifisheries.co.in/";
+    private IBotObserver iBotObserver;
     private IBotWikiNLP iBotWikiNLP;
     private String token;
     private String language;
@@ -75,7 +73,7 @@ public class WebServiceUtils {
                 .build();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl(BOT_URL)
+                .baseUrl(SPAWN_API)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
@@ -99,17 +97,17 @@ public class WebServiceUtils {
 
         if (retrofit != null) {
             //  if (q.split(" ").length > 2)
-            //callSpawnML(q); // Uncomment this method server setup
+            callSpawnML(q); // Uncomment this method server setup
             // else callWikiAPI(q);
-            callWitService(q);
+            //callWitService(q);
 
         } else {
             retrofit = getRetrofitClient();
             // if (q.split(" ").length > 2)
-            // callSpawnML(q); // Uncomment this method server setup
+            callSpawnML(q); // Uncomment this method server setup
             // else callWikiAPI(q);
 
-            callWitService(q);
+            //callWitService(q);
         }
     }
 
@@ -123,18 +121,22 @@ public class WebServiceUtils {
                 if (response.isSuccessful()) {
                     ChatCardModel chatCardModel = null;
                     BotResponse botResponse = response.body();
-                    if (botResponse.getEntities().getBotIntents() != null &&
-                            botResponse.getEntities().getBotIntents().size() > 0
+                    if (botResponse != null
+                            && botResponse.getEntities().getBotIntents() != null
+                            && botResponse.getEntities().getBotIntents().size() > 0
                             && botResponse.getEntities().getBotIntents().get(0).getConfidence() > 0.90)
                         chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue(), 4, language);
-                    else if (botResponse.getEntities().getNotable_person() != null
+                    else if (botResponse != null
+                            && botResponse.getEntities().getNotable_person() != null
                             && botResponse.getEntities().getNotable_person().get(0).getValue().getName() != null) {
                         callWikiAPI(botResponse.getEntities().getNotable_person().get(0).getValue().getName(), q);
-                    } else if (botResponse.getEntities().getLocation() != null
+                    } else if (botResponse != null
+                            && botResponse.getEntities().getLocation() != null
                             && botResponse.getEntities().getLocation().get(0).getValue() != null) {
                         callWikiAPI(botResponse.getEntities().getLocation().get(0).getValue(), q);
-                    } else if (botResponse.getEntities().getBotIntents() != null &&
-                            botResponse.getEntities().getBotIntents().size() > 0)
+                    } else if (botResponse != null
+                            && botResponse.getEntities().getBotIntents() != null
+                            && botResponse.getEntities().getBotIntents().size() > 0)
                         chatCardModel = JsonFileReader.getInstance().getJsonFromKey(botResponse.getEntities().getBotIntents().get(0).getValue(), 4, language);
 
                     else if (botResponse.getEntities() == null
@@ -159,7 +161,7 @@ public class WebServiceUtils {
         });
     }
 
-    public void callSpawnML(final String q) {
+    private void callSpawnML(final String q) {
         try {
             iBotObserver.loading();
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -177,7 +179,7 @@ public class WebServiceUtils {
                 @Override
                 public void onResponse(Call<BotMLResponse> call, Response<BotMLResponse> response) {
                     if (response.isSuccessful()) {
-                        ChatCardModel chatCardModel = null;
+                        ChatCardModel chatCardModel;
                         BotMLResponse botResponse = response.body();
                         botResponse.setLang(language);
                         FireCalls.exec(new DumpTask(botResponse));
@@ -272,7 +274,7 @@ public class WebServiceUtils {
     }
 
 
-    public void callSpawnAPI(final String query) {
+    private void callSpawnAPI(final String query) {
         iBotObserver.loading();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
@@ -292,7 +294,8 @@ public class WebServiceUtils {
                 try {
                     if (response.isSuccessful()) {
                         List<SpawnEntityModel> model = response.body();
-                        callWikiAPI(model.get(0).getValue(), query);
+                        if (model != null && model.get(0) != null)
+                            callWikiAPI(model.get(0).getValue(), query);
                     } else {
                         ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                         iBotObserver.notifyBotResponse(chatCardModel);
@@ -314,7 +317,7 @@ public class WebServiceUtils {
         });
     }
 
-    public void callWikiAPI(final String entity, final String query) {
+    private void callWikiAPI(final String entity, final String query) {
         iBotObserver.loading();
         final String cloneEntity = entity.trim().replace(" ", "_");
 
@@ -326,7 +329,7 @@ public class WebServiceUtils {
                 .baseUrl(API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        Call<SpawnWikiModel> data = null;
+        Call<SpawnWikiModel> data;
         final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
 
         if (language.equalsIgnoreCase("en"))
@@ -337,8 +340,8 @@ public class WebServiceUtils {
         data.enqueue(new Callback<SpawnWikiModel>() {
             @Override
             public void onResponse(Call<SpawnWikiModel> call, Response<SpawnWikiModel> response) {
-                if (response.isSuccessful()) {
-                    ChatCardModel chatCardModel = null;
+                if (response.isSuccessful() & response != null) {
+                    ChatCardModel chatCardModel;
                     Log.d("API CONTENT: ", response.body().toString());
                     SpawnWikiModel spawnWikiModel = response.body();
                     //spawnWikiModel.setQuery(query);
@@ -434,7 +437,7 @@ public class WebServiceUtils {
         return serverFileContents;
     }
 
-    public void setFileContents(JsonElement fileContents) {
+    private void setFileContents(JsonElement fileContents) {
         this.serverFileContents = fileContents;
     }
 }

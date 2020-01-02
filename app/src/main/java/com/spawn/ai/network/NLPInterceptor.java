@@ -22,6 +22,7 @@ public class NLPInterceptor implements Interceptor {
         Request request = chain.request();
         Request authenticate = request.newBuilder()
                 .addHeader("Authorization", Credentials.basic(username, password))
+                .addHeader("Content-Type", "application/json")
                 .build();
         return chain.proceed(authenticate);
     }

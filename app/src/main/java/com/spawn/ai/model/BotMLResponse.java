@@ -56,7 +56,9 @@ public class BotMLResponse {
     }
 
     public void setLang(String lang) {
-        this.lang = lang;
+        if (lang != null)
+            this.lang = lang;
+        else this.lang = "en";
     }
 }
 
