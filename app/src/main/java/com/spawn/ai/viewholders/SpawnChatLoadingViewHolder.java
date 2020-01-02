@@ -1,9 +1,8 @@
 package com.spawn.ai.viewholders;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.spawn.ai.R;
 import com.spawn.ai.utils.DotProgressBar;
 

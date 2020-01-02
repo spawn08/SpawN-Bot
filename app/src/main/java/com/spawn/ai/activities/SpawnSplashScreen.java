@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
@@ -17,7 +17,6 @@ import com.spawn.ai.utils.JsonFileReader;
 import com.spawn.ai.utils.SharedPreferenceUtility;
 
 import constants.AppConstants;
-import io.fabric.sdk.android.Fabric;
 
 public class SpawnSplashScreen extends AppCompatActivity {
 
