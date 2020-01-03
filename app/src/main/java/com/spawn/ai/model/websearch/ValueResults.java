@@ -1,5 +1,7 @@
 package com.spawn.ai.model.websearch;
 
+import java.util.ArrayList;
+
 public class ValueResults {
 
     private String name;
@@ -7,6 +9,7 @@ public class ValueResults {
     private String snippet;
     private String thumbnailUrl;
     private String language;
+    private ArrayList<DeepLinks> deepLinks;
 
     public String getName() {
         return name;
@@ -46,5 +49,13 @@ public class ValueResults {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public ArrayList<DeepLinks> getDeepLinks() {
+        return deepLinks;
+    }
+
+    public void setDeepLinks(ArrayList<DeepLinks> deepLinks) {
+        this.deepLinks = deepLinks;
     }
 }

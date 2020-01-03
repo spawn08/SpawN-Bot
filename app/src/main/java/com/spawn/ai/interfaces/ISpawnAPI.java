@@ -6,6 +6,7 @@ import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.model.websearch.WebPages;
+import com.spawn.ai.model.websearch.WebSearchResults;
 
 import org.json.JSONObject;
 
@@ -54,5 +55,5 @@ public interface ISpawnAPI {
     Call<BotMLResponse> getEntityExtract(@Query("q") String q, @Query("model") String model, @Query("lang") String lang);
 
     @GET("websearch")
-    Call<WebPages> getWebResults(@Query("q") String q, @Query("count") String count);
+    Call<WebSearchResults> getWebResults(@Header("Authorization") String auth, @Query("q") String q, @Query("count") String count);
 }

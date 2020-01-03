@@ -13,7 +13,7 @@
         android:layout_marginTop="@dimen/margin_8"
         android:gravity="start">
 
-        <com.spawn.ai.utils.DotProgressBar
+        <com.spawn.ai.utils.views.DotProgressBar
             android:id="@+id/bot_loading"
             android:layout_width="wrap_content"
             android:layout_height="18dp"

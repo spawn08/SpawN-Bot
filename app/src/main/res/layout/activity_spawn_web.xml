@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -18,19 +18,19 @@
 
         </WebView>
 
-        <com.spawn.ai.utils.DotProgressBar
+        <com.spawn.ai.utils.views.DotProgressBar
             android:id="@+id/web_loading"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/margin_25"
-            android:layout_gravity="start"
-            app:amount="3"
             android:layout_centerInParent="true"
+            android:layout_gravity="start"
+            android:visibility="visible"
+            app:amount="3"
             app:animationDirection="right"
             app:durations="200"
             app:endColor="@color/colorPrimary"
-            app:startColor="@color/sky_blue"
-            android:visibility="visible" />
+            app:startColor="@color/sky_blue" />
 
     </RelativeLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

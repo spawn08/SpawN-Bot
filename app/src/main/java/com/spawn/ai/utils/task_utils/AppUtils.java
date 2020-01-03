@@ -1,4 +1,4 @@
-package com.spawn.ai.utils;
+package com.spawn.ai.utils.task_utils;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;

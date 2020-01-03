@@ -11,5 +11,6 @@ public class AppConstants {
     public static final String MODEL = "spawn";
     public static final String NEWS_USERNAME = "elastic";
     public static final String NEWS_PASS = "Spawn@#32";
+    public static final String AUTH = "Basic b25lYm90c29sdXRpb246T25lQm90RmluYW5jaWFsU2VydmljZXM=";
 
 }

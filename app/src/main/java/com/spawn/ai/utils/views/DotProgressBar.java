@@ -1,4 +1,4 @@
-package com.spawn.ai.utils;
+package com.spawn.ai.utils.views;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;

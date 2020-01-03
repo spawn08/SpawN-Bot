@@ -9,7 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.spawn.ai.R;
-import com.spawn.ai.utils.DotProgressBar;
+import com.spawn.ai.utils.views.DotProgressBar;
 
 public class SpawnWebActivity extends AppCompatActivity {
 

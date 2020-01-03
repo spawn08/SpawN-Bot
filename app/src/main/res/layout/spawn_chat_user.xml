@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -39,9 +37,9 @@
             android:gravity="end"
             android:paddingRight="@dimen/margin_10"
             android:text="8:12"
-            android:visibility="gone"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="@dimen/textsize_16" />
+            android:textSize="@dimen/textsize_16"
+            android:visibility="gone" />
 
 
     </LinearLayout>

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import androidx.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,10 +15,6 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -39,14 +34,20 @@ import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.network.WebServiceUtils;
-import com.spawn.ai.utils.AlertUpdateDialog;
-import com.spawn.ai.utils.AppUtils;
-import com.spawn.ai.utils.DateTimeUtils;
-import com.spawn.ai.utils.JsonFileReader;
-import com.spawn.ai.utils.SharedPreferenceUtility;
+import com.spawn.ai.utils.views.AlertUpdateDialog;
+import com.spawn.ai.utils.task_utils.AppUtils;
+import com.spawn.ai.utils.task_utils.DateTimeUtils;
+import com.spawn.ai.utils.task_utils.JsonFileReader;
+import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
 

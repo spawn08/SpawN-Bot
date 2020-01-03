@@ -19,10 +19,10 @@ import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
-import com.spawn.ai.model.websearch.WebPages;
-import com.spawn.ai.utils.AppUtils;
-import com.spawn.ai.utils.JsonFileReader;
-import com.spawn.ai.utils.SharedPreferenceUtility;
+import com.spawn.ai.model.websearch.WebSearchResults;
+import com.spawn.ai.utils.task_utils.AppUtils;
+import com.spawn.ai.utils.task_utils.JsonFileReader;
+import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 import com.spawn.ai.utils.async.DumpTask;
 import com.spawn.ai.utils.async.FireCalls;
 
@@ -98,14 +98,14 @@ public class WebServiceUtils {
 
         if (retrofit != null) {
             //  if (q.split(" ").length > 2)
-            callSpawnML(q); // Uncomment this method server setup
+            callWebsearchService(q); // Uncomment this method server setup
             // else callWikiAPI(q);
             //callWitService(q);
 
         } else {
             retrofit = getRetrofitClient();
             // if (q.split(" ").length > 2)
-            callSpawnML(q); // Uncomment this method server setup
+            callWebsearchService(q); // Uncomment this method server setup
             // else callWikiAPI(q);
 
             //callWitService(q);
@@ -115,7 +115,7 @@ public class WebServiceUtils {
     private void callWebsearchService(final String q) {
         iBotObserver.loading();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                // .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(SPAWN_API)
@@ -123,17 +123,17 @@ public class WebServiceUtils {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-        Call<WebPages> data = spawnAPI.getWebResults(q, "5");
-        data.enqueue(new Callback<WebPages>() {
+        Call<WebSearchResults> data = spawnAPI.getWebResults(AppConstants.AUTH, q, "5");
+        data.enqueue(new Callback<WebSearchResults>() {
             @Override
-            public void onResponse(Call<WebPages> call, Response<WebPages> response) {
+            public void onResponse(Call<WebSearchResults> call, Response<WebSearchResults> response) {
                 if (response.isSuccessful()) {
                     Log.e("RESULT-->", response.body().toString());
                 }
             }
 
             @Override
-            public void onFailure(Call<WebPages> call, Throwable t) {
+            public void onFailure(Call<WebSearchResults> call, Throwable t) {
                 callWikiAPI(q, q);
             }
         });

@@ -250,6 +250,34 @@
     "button_text_hi": "",
     "action": ""
   },
+  "block_card": {
+    "type": 1,
+    "message_en": [
+      "Surely Mr. Amar will do that immediately. Would you like me to place a request for new card?."
+    ],
+    "message_hi": [
+      "विख्यात",
+      "ठीक",
+      "अच्छा ठीक है"
+    ],
+    "button_text_en": "",
+    "button_text_hi": "",
+    "action": ""
+  },
+  "affirmative": {
+    "type": 1,
+    "message_en": [
+      "Request placed with the concerned authority. The new card will be delivered to the registered address."
+    ],
+    "message_hi": [
+      "विख्यात",
+      "ठीक",
+      "अच्छा ठीक है"
+    ],
+    "button_text_en": "",
+    "button_text_hi": "",
+    "action": ""
+  },
   "bot_negation": {
     "type": 1,
     "message_hi": [

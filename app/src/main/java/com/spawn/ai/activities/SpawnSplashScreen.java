@@ -13,8 +13,8 @@ import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.network.WebServiceUtils;
-import com.spawn.ai.utils.JsonFileReader;
-import com.spawn.ai.utils.SharedPreferenceUtility;
+import com.spawn.ai.utils.task_utils.JsonFileReader;
+import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 
 import constants.AppConstants;
 
