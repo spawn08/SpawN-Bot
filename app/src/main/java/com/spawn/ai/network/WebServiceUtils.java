@@ -19,6 +19,7 @@ import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.model.websearch.WebPages;
 import com.spawn.ai.utils.AppUtils;
 import com.spawn.ai.utils.JsonFileReader;
 import com.spawn.ai.utils.SharedPreferenceUtility;
@@ -111,7 +112,34 @@ public class WebServiceUtils {
         }
     }
 
-    public void callWitService(final String q) {
+    private void callWebsearchService(final String q) {
+        iBotObserver.loading();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(SPAWN_API)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        Call<WebPages> data = spawnAPI.getWebResults(q, "5");
+        data.enqueue(new Callback<WebPages>() {
+            @Override
+            public void onResponse(Call<WebPages> call, Response<WebPages> response) {
+                if (response.isSuccessful()) {
+                    Log.e("RESULT-->", response.body().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<WebPages> call, Throwable t) {
+                callWikiAPI(q, q);
+            }
+        });
+    }
+
+    private void callWitService(final String q) {
         iBotObserver.loading();
         final IBotWebService iBotWebService = retrofit.create(IBotWebService.class);
         final Call<BotResponse> botIntentsCall = iBotWebService.getBotResponse(q);
@@ -340,7 +368,7 @@ public class WebServiceUtils {
         data.enqueue(new Callback<SpawnWikiModel>() {
             @Override
             public void onResponse(Call<SpawnWikiModel> call, Response<SpawnWikiModel> response) {
-                if (response.isSuccessful() & response != null) {
+                if (response != null && response.isSuccessful()) {
                     ChatCardModel chatCardModel;
                     Log.d("API CONTENT: ", response.body().toString());
                     SpawnWikiModel spawnWikiModel = response.body();
