@@ -14,6 +14,7 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
+import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
 
@@ -96,5 +97,26 @@ public class AppUtils {
 
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+    }
+
+    public String getInfoFromExtract(String extract, String type) {
+        String text = "";
+        try {
+            String[] splitExtract = extract.split("\\.");
+            if (type.equals("speak")) {
+                text = splitExtract[0];
+            } else {
+                if (splitExtract.length > 1) {
+                    text = splitExtract[0] + ". " + splitExtract[1] + "..";
+                } else {
+                    text = splitExtract[0];
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Crashlytics.logException(e);
+        }
+        return text + ".";
     }
 }

@@ -4,9 +4,10 @@
     android:layout_height="wrap_content">
 
     <RelativeLayout
+        android:id="@+id/containerNews"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/containerNews">
+        android:background="@drawable/chat_bot_background">
 
         <ImageView
             android:id="@+id/newsImage"
@@ -22,9 +23,10 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/newsImage"
+            android:maxLines="3"
             android:padding="@dimen/margin_5"
             android:text="A hello and what are you doing"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/white"
             android:textSize="@dimen/textsize_16" />
 
     </RelativeLayout>
@@ -33,7 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/containerNews"
-        android:background="@color/colorPrimary"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="@dimen/margin_10"
         android:layout_marginRight="@dimen/margin_10"
-        android:layout_marginLeft="@dimen/margin_10" />
+        android:background="@color/colorPrimary" />
 </RelativeLayout>

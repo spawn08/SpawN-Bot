@@ -18,6 +18,7 @@ public class ChatMessageType {
     private boolean messageAdded = false;
     private SpawnWikiModel spawnWikiModel;
     private String shortMessage;
+    private ChatCardModel chatCardModel;
 
     public String getMessage() {
         return message;
@@ -105,5 +106,13 @@ public class ChatMessageType {
 
     public void setMessageAdded(boolean messageAdded) {
         this.messageAdded = messageAdded;
+    }
+
+    public ChatCardModel getChatCardModel() {
+        return chatCardModel;
+    }
+
+    public void setChatCardModel(ChatCardModel chatCardModel) {
+        this.chatCardModel = chatCardModel;
     }
 }

@@ -2,8 +2,10 @@ package com.spawn.ai.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,18 +14,23 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.spawn.ai.R;
 import com.spawn.ai.activities.SpawnWebActivity;
+import com.spawn.ai.model.websearch.NewsValue;
 import com.spawn.ai.viewholders.SpawnNewsViewHolder;
 
 import org.json.JSONArray;
 
+import java.util.ArrayList;
+
 public class SpawnNewsAdapter extends RecyclerView.Adapter<SpawnNewsViewHolder> {
 
     private Context context;
-    private JSONArray jsonArray;
+    //  private JSONArray jsonArray;
+    private ArrayList<NewsValue> newsValues;
 
-    public SpawnNewsAdapter(Context context, JSONArray jsonArray) {
+    public SpawnNewsAdapter(Context context, /*JSONArray jsonArray,*/ ArrayList<NewsValue> newsValues) {
         this.context = context;
-        this.jsonArray = jsonArray;
+        // this.jsonArray = jsonArray;
+        this.newsValues = newsValues;
     }
 
     @NonNull
@@ -39,17 +46,17 @@ public class SpawnNewsAdapter extends RecyclerView.Adapter<SpawnNewsViewHolder> 
         try {
             Glide.with(context)
                     .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.thumbnail_not_found).error(R.drawable.thumbnail_not_found))
-                    .load(jsonArray.getJSONObject(i).getString("image"))
+                    .load(newsValues.get(i).getImage().getThumbnail().getContentUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(spawnNewsViewHolder.newsImage);
-            spawnNewsViewHolder.newsDesc.setText(jsonArray.getJSONObject(i).getString("title"));
+            spawnNewsViewHolder.newsDesc.setText(newsValues.get(i).getDescription());
 
             spawnNewsViewHolder.containerNews.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     try {
                         Intent intent = new Intent(context, SpawnWebActivity.class);
-                        intent.putExtra("url", jsonArray.getJSONObject(i).getString("link"));
+                        intent.putExtra("url", newsValues.get(i).getUrl());
                         context.startActivity(intent);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -64,6 +71,6 @@ public class SpawnNewsAdapter extends RecyclerView.Adapter<SpawnNewsViewHolder> 
 
     @Override
     public int getItemCount() {
-        return jsonArray.length();
+        return newsValues.size();
     }
 }

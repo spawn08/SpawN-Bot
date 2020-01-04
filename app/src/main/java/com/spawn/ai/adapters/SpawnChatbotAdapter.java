@@ -1,9 +1,6 @@
 package com.spawn.ai.adapters;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +13,10 @@ import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.model.websearch.News;
+import com.spawn.ai.model.websearch.NewsValue;
+import com.spawn.ai.model.websearch.ValueResults;
+import com.spawn.ai.model.websearch.WebSearchResults;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 import com.spawn.ai.viewholders.SpawnChatBotViewHolder;
@@ -24,8 +25,13 @@ import com.spawn.ai.viewholders.SpawnChatLoadingViewHolder;
 import com.spawn.ai.viewholders.SpawnChatNewsHolder;
 import com.spawn.ai.viewholders.SpawnChatUserViewHolder;
 import com.spawn.ai.viewholders.SpawnWikiViewHolder;
+import com.spawn.ai.viewholders.websearch_holders.SpawnWebSearchHolder;
 
 import java.util.ArrayList;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -77,6 +83,11 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 View newsView = LayoutInflater.from(context).inflate(R.layout.spawn_news_layout, parent, false);
                 SpawnChatNewsHolder spawnChatNewsHolder = new SpawnChatNewsHolder(newsView);
                 return spawnChatNewsHolder;
+
+            case ChatViewTypes.CHAT_VIEW_WEB:
+                View webView = LayoutInflater.from(context).inflate(R.layout.spawn_web_view, parent, false);
+                SpawnWebSearchHolder spawnWebSearchHolder = new SpawnWebSearchHolder(webView);
+                return spawnWebSearchHolder;
         }
 
         return null;
@@ -167,7 +178,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 final SpawnWikiViewHolder spawnWikiViewHolder = (SpawnWikiViewHolder) holder;
                 final SpawnWikiModel spawnWikiModel = chatMessageType.get(position).getSpawnWikiModel();
-                spawnWikiViewHolder.wikiTitle.setText(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
+                spawnWikiViewHolder.wikiTitle.setText(AppUtils.getInstance().getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
 
                 if (chatMessageType.get(position).getSpawnWikiModel().getThumbnail() != null) {
                     Glide.with(context)
@@ -212,24 +223,45 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         && !chatMessageType.get(position).isSpeakFinish()
                         && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
                     chatMessageType.get(position).setSpeakFinish(true);
-                    iBotObserver.speakBot(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "speak"));
+                    iBotObserver.speakBot(AppUtils.getInstance().getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "speak"));
                 } else {
                     chatMessageType.get(position).setSpeakFinish(true);
                 }
 
                 if (iBotObserver != null && !chatMessageType.get(position).isMessageAdded()) {
                     chatMessageType.get(position).setMessageAdded(true);
-                    chatMessageType.get(position).setShortMessage(getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
+                    chatMessageType.get(position).setShortMessage(AppUtils.getInstance().getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "info"));
                     iBotObserver.setChatMessage(chatMessageType.get(position));
                 }
 
                 break;
 
+            case ChatViewTypes.CHAT_VIEW_WEB:
+                final SpawnWebSearchHolder spawnWebSearchHolder = (SpawnWebSearchHolder) holder;
+                WebSearchResults webSearchResults = chatMessageType.get(position).getChatCardModel().getWebSearchResults();
+                final ArrayList<ValueResults> valueResults = webSearchResults.getWebPages().getValue();
+
+                if (iBotObserver != null
+                        && !chatMessageType.get(position).isSpeakFinish()
+                        && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
+                    chatMessageType.get(position).setSpeakFinish(true);
+                    iBotObserver.speakBot(chatMessageType.get(position).getMessage());
+                } else {
+                    chatMessageType.get(position).setSpeakFinish(true);
+                }
+                spawnWebSearchHolder.webRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+                SpawnWebSearchAdapter spawnWebSearchAdapter = new SpawnWebSearchAdapter(context, valueResults);
+                spawnWebSearchHolder.webRecycler.setAdapter(spawnWebSearchAdapter);
+                spawnWebSearchAdapter.notifyDataSetChanged();
+
+                break;
+
             case ChatViewTypes.CHAT_VIEW_NEWS:
                 final SpawnChatNewsHolder spawnChatNewsHolder = (SpawnChatNewsHolder) holder;
+                ArrayList<NewsValue> news = chatMessageType.get(position).getChatCardModel().getNews().getValue();
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
                 spawnChatNewsHolder.newRecycler.setLayoutManager(linearLayoutManager);
-                SpawnNewsAdapter spawnNewsAdapter = new SpawnNewsAdapter(context, AppUtils.getInstance().getJsonArray());
+                SpawnNewsAdapter spawnNewsAdapter = new SpawnNewsAdapter(context, news);
                 spawnChatNewsHolder.newRecycler.setAdapter(spawnNewsAdapter);
                 spawnNewsAdapter.notifyDataSetChanged();
 
@@ -248,24 +280,4 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return chatMessageType.get(position).getViewType();
     }
 
-    public String getInfoFromExtract(String extract, String type) {
-        String text = "";
-        try {
-            String[] splitExtract = extract.split("\\.");
-            if (type.equals("speak")) {
-                text = splitExtract[0];
-            } else {
-                if (splitExtract.length > 1) {
-                    text = splitExtract[0] + ". " + splitExtract[1] + "..";
-                } else {
-                    text = splitExtract[0];
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Crashlytics.logException(e);
-        }
-        return text + ".";
-    }
 }

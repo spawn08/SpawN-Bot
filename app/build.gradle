@@ -21,8 +21,8 @@ android {
         applicationId "com.spawn.ai"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 14
-        versionName "1.0.3"
+        versionCode 15
+        versionName "1.0.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

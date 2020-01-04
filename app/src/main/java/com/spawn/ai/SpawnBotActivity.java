@@ -33,12 +33,14 @@ import com.spawn.ai.interfaces.IBotWikiNLP;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.model.websearch.ValueResults;
+import com.spawn.ai.model.websearch.WebSearchResults;
 import com.spawn.ai.network.WebServiceUtils;
-import com.spawn.ai.utils.views.AlertUpdateDialog;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.DateTimeUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
+import com.spawn.ai.utils.views.AlertUpdateDialog;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -389,12 +391,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             Log.d(getClass().getCanonicalName(), "Speech :" + speechString);
             onEndOfSpeech();
             chatViews(speechString, 0, null);
-            callWitService(speechString);
+            callService(speechString);
 
         }
     }
 
-    private void callWitService(String speechString) {
+    private void callService(String speechString) {
         WebServiceUtils.getInstance(this).setUpObserver(this);
         WebServiceUtils.getInstance(this).getRetrofitClient();
         WebServiceUtils.getInstance(this).getBotResponse(speechString);
@@ -481,6 +483,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 chatMessageLoading.setViewType(2);
                 botResponses.add(chatMessageLoading);
                 chatbotAdapter.setAdapter(botResponses);
+                chatbotAdapter.notifyDataSetChanged();
                 break;
 
             case ChatViewTypes.CHAT_VIEW_CARD:
@@ -492,7 +495,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     chatMessageType1.setViewType(chatCardModel.getType());
                     chatMessageType1.setAction(chatCardModel.getAction());
                     chatMessageType1.setBotResponse(null);
-                    botResponses.remove(botResponses.size() - 1);
+                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                        botResponses.remove(botResponses.size() - 1);
                     botResponses.add(chatMessageType1);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
@@ -505,11 +509,34 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     ChatMessageType wikiType = new ChatMessageType();
                     wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
                     wikiType.setViewType(chatCardModel.getType());
-                    botResponses.remove(botResponses.size() - 1);
+                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                        botResponses.remove(botResponses.size() - 1);
                     botResponses.add(wikiType);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
                     activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
+                } else {
+                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                        botResponses.remove(botResponses.size() - 1);
+
+                }
+
+                break;
+
+            case ChatViewTypes.CHAT_VIEW_WEB:
+                if (chatCardModel != null) {
+                    ChatMessageType webSearch = new ChatMessageType();
+                    webSearch.setChatCardModel(chatCardModel);
+                    webSearch.setViewType(chatCardModel.getType());
+                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                        botResponses.remove(botResponses.size() - 1);
+                    botResponses.add(webSearch);
+                    chatbotAdapter.setAdapter(botResponses);
+                    chatbotAdapter.notifyDataSetChanged();
+                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
+                } else {
+                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                        botResponses.remove(botResponses.size() - 1);
                 }
 
                 break;
@@ -517,11 +544,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             case ChatViewTypes.CHAT_VIEW_NEWS:
 
                 if (chatCardModel != null) {
-                    ChatMessageType wikiType = new ChatMessageType();
-                    wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
-                    wikiType.setViewType(chatCardModel.getType());
-                    botResponses.remove(botResponses.size() - 1);
-                    botResponses.add(wikiType);
+                    ChatMessageType newsType = new ChatMessageType();
+//                    wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
+//                    wikiType.setViewType(chatCardModel.getType());
+                    newsType.setChatCardModel(chatCardModel);
+                    newsType.setViewType(chatCardModel.getType());
+                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+                        botResponses.remove(botResponses.size() - 1);
+                    botResponses.add(newsType);
                     chatbotAdapter.setAdapter(botResponses);
                     chatbotAdapter.notifyDataSetChanged();
                     activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
@@ -752,12 +782,15 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     }
 
     @Override
-    public void setAction(String action, SpawnWikiModel spawnWikiModel) {
+    public void setAction(String action, Object object) {
         Handler handler = new Handler();
         if (action.equals("web_action")) {
             Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Web Open"));
             Intent intent = new Intent(this, SpawnWebActivity.class);
-            intent.putExtra("url", spawnWikiModel.getContent_urls().getMobile().getPage());
+            if (object instanceof SpawnWikiModel)
+                intent.putExtra("url", ((SpawnWikiModel) object).getContent_urls().getMobile().getPage());
+            else if (object instanceof ValueResults)
+                intent.putExtra("url", ((ValueResults) object).getUrl());
             startActivity(intent);
         } else if (action.equals("finish")) {
             handler.postDelayed(new Runnable() {

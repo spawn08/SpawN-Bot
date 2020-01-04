@@ -9,7 +9,9 @@ public class ValueResults {
     private String snippet;
     private String thumbnailUrl;
     private String language;
+    private String url;
     private ArrayList<DeepLinks> deepLinks;
+
 
     public String getName() {
         return name;
@@ -57,5 +59,13 @@ public class ValueResults {
 
     public void setDeepLinks(ArrayList<DeepLinks> deepLinks) {
         this.deepLinks = deepLinks;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

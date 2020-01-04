@@ -1,12 +1,18 @@
 package com.spawn.ai.model;
 
+import com.spawn.ai.model.websearch.News;
+import com.spawn.ai.model.websearch.WebSearchResults;
+
 public class ChatCardModel {
 
-    String button_text;
-    String message;
-    int type;
-    String action;
-    SpawnWikiModel spawnWikiModel;
+    private String button_text;
+    private String message;
+    private int type;
+    private String action;
+    private SpawnWikiModel spawnWikiModel;
+    private WebSearchResults webSearchResults;
+    private News news;
+    private String lang;
 
     public ChatCardModel(String text, String message, int type, String action) {
         this.button_text = text;
@@ -17,6 +23,16 @@ public class ChatCardModel {
 
     public ChatCardModel(SpawnWikiModel spawnWikiModel, int type) {
         this.spawnWikiModel = spawnWikiModel;
+        this.type = type;
+    }
+
+    public ChatCardModel(WebSearchResults webSearchResults, int type) {
+        this.webSearchResults = webSearchResults;
+        this.type = type;
+    }
+
+    public ChatCardModel(News news, int type) {
+        this.news = news;
         this.type = type;
     }
 
@@ -38,5 +54,45 @@ public class ChatCardModel {
 
     public SpawnWikiModel getSpawnWikiModel() {
         return spawnWikiModel;
+    }
+
+    public WebSearchResults getWebSearchResults() {
+        return webSearchResults;
+    }
+
+    public void setWebSearchResults(WebSearchResults webSearchResults) {
+        this.webSearchResults = webSearchResults;
+    }
+
+    public News getNews() {
+        return news;
+    }
+
+    public void setNews(News news) {
+        this.news = news;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setButton_text(String button_text) {
+        this.button_text = button_text;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 }

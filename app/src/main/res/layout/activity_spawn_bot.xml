@@ -7,7 +7,7 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@drawable/chat_activity_background"
         tools:context=".SpawnBotActivity">
 
         <LinearLayout
@@ -25,9 +25,8 @@
                 android:id="@+id/chat_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clickable="true"
-
-                />
+                android:background="@drawable/chat_activity_background"
+                android:clickable="true" />
 
 
         </LinearLayout>
@@ -84,7 +83,7 @@
                 android:background="@drawable/text_circle"
                 android:gravity="center"
                 android:text="E"
-                android:textColor="@color/white"
+                android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/textsize_16" />
 
             <TextView
@@ -118,7 +117,7 @@
                 android:layout_marginTop="@dimen/margin_10"
                 android:gravity="center"
                 android:text="@string/header_text"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="@dimen/textsize_18" />
 
             <TextView
@@ -188,6 +187,12 @@
             android:visibility="gone">
 
         </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/title_bar"
+            android:background="@color/colorPrimary" />
 
     </RelativeLayout>
 

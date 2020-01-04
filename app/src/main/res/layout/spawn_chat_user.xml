@@ -6,12 +6,13 @@
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_8"
-        android:layout_marginEnd="@dimen/margin_8"
-        android:layout_marginStart="@dimen/layout_40"
+        android:layout_marginRight="@dimen/margin_8"
+        android:layout_marginLeft="@dimen/layout_40"
         android:layout_marginTop="@dimen/margin_8"
+        android:background="@drawable/chat_user_background"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,23 +23,23 @@
 
         <TextView
             android:id="@+id/user_message"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:paddingRight="@dimen/margin_10"
+            android:padding="@dimen/margin_15"
             android:text="hello"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="18dp" />
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/textsize_16" />
 
         <TextView
             android:id="@+id/user_time"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
             android:paddingRight="@dimen/margin_10"
             android:text="8:12"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="@dimen/textsize_16"
+            android:textSize="@dimen/textsize_12"
             android:visibility="gone" />
 
 

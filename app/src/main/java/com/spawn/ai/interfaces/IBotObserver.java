@@ -14,7 +14,7 @@ public interface IBotObserver {
 
     public void speakBot(String message);
 
-    public void setAction(String action, SpawnWikiModel spawnWikiModel);
+    public void setAction(String action, Object object);
 
     public void setChatMessage(ChatMessageType chatMessage);
 }

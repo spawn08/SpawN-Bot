@@ -9,4 +9,6 @@
     <string name="google_search">https://google.com/search?q=</string>
     <string name="update">Update</string>
     <string name="language_initials">E</string>
+    <string name="result_text">Here are the results: </string>
+    <string name="info">More Info</string>
 </resources>

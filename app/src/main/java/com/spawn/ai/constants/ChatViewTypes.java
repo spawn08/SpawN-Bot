@@ -9,5 +9,6 @@ public class ChatViewTypes {
     public static final int CHAT_VIEW_DEFAULT = 4;
     public static final int CHAT_VIEW_WIKI = 5;
     public static final int CHAT_VIEW_NEWS = 6;
+    public static final int CHAT_VIEW_WEB = 7;
 
 }

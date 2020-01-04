@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import com.spawn.ai.SpawnBotActivity;
+import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.interfaces.IBotWebService;
 import com.spawn.ai.interfaces.IBotWikiNLP;
@@ -19,12 +20,11 @@ import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnEntityModel;
 import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.model.websearch.News;
 import com.spawn.ai.model.websearch.WebSearchResults;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
-import com.spawn.ai.utils.async.DumpTask;
-import com.spawn.ai.utils.async.FireCalls;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -98,24 +98,24 @@ public class WebServiceUtils {
 
         if (retrofit != null) {
             //  if (q.split(" ").length > 2)
-            callWebsearchService(q); // Uncomment this method server setup
+            callSpawnML(q); // Uncomment this method server setup
             // else callWikiAPI(q);
             //callWitService(q);
 
         } else {
             retrofit = getRetrofitClient();
             // if (q.split(" ").length > 2)
-            callWebsearchService(q); // Uncomment this method server setup
+            callSpawnML(q); // Uncomment this method server setup
             // else callWikiAPI(q);
 
             //callWitService(q);
         }
     }
 
-    private void callWebsearchService(final String q) {
+    private void callWebsearchService(final String q, final String type) {
         iBotObserver.loading();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                // .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(SPAWN_API)
@@ -123,20 +123,63 @@ public class WebServiceUtils {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-        Call<WebSearchResults> data = spawnAPI.getWebResults(AppConstants.AUTH, q, "5");
-        data.enqueue(new Callback<WebSearchResults>() {
-            @Override
-            public void onResponse(Call<WebSearchResults> call, Response<WebSearchResults> response) {
-                if (response.isSuccessful()) {
-                    Log.e("RESULT-->", response.body().toString());
+        if (type.equalsIgnoreCase("search")) {
+            Call<WebSearchResults> data = spawnAPI.getWebResults(q, "5", type);
+            data.enqueue(new Callback<WebSearchResults>() {
+                @Override
+                public void onResponse(Call<WebSearchResults> call, Response<WebSearchResults> response) {
+                    if (response.isSuccessful()) {
+                        Log.e("RESULT-->", response.body().toString());
+                        ChatCardModel chatCardModel = new ChatCardModel(response.body(), ChatViewTypes.CHAT_VIEW_WEB);
+                        chatCardModel.setMessage("Here are some results: ");
+                        chatCardModel.setLang(language);
+                        iBotObserver.notifyBotResponse(chatCardModel);
+                    } else {
+                        ChatCardModel fallBack = JsonFileReader
+                                .getInstance()
+                                .getJsonFromKey(AppConstants.FALL_BACK,
+                                        ChatViewTypes.CHAT_VIEW_DEFAULT,
+                                        language);
+                        iBotObserver.notifyBotResponse(fallBack);
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<WebSearchResults> call, Throwable t) {
-                callWikiAPI(q, q);
-            }
-        });
+                @Override
+                public void onFailure(Call<WebSearchResults> call, Throwable t) {
+                    ChatCardModel fallBack = JsonFileReader
+                            .getInstance()
+                            .getJsonFromKey(AppConstants.FALL_BACK,
+                                    ChatViewTypes.CHAT_VIEW_DEFAULT,
+                                    language);
+                    iBotObserver.notifyBotResponse(fallBack);
+                }
+            });
+        } else if (type.equalsIgnoreCase("news")) {
+            Call<News> data = spawnAPI.getNewsResult(q, "5", type);
+            data.enqueue(new Callback<News>() {
+                @Override
+                public void onResponse(Call<News> call, Response<News> response) {
+                    if (response.isSuccessful()) {
+                        Log.e("RESULT-->", response.body().toString());
+                        ChatCardModel chatCardModel = new ChatCardModel(response.body(), ChatViewTypes.CHAT_VIEW_NEWS);
+                        chatCardModel.setMessage("Here are the latest news: ");
+                        chatCardModel.setLang(language);
+                        iBotObserver.notifyBotResponse(chatCardModel);
+                    } else {
+                        ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK,
+                                ChatViewTypes.CHAT_VIEW_DEFAULT,
+                                language);
+                        iBotObserver.notifyBotResponse(fallBack);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<News> call, Throwable t) {
+                    ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
+                    iBotObserver.notifyBotResponse(fallBack);
+                }
+            });
+        }
     }
 
     private void callWitService(final String q) {
@@ -210,15 +253,19 @@ public class WebServiceUtils {
                         ChatCardModel chatCardModel;
                         BotMLResponse botResponse = response.body();
                         botResponse.setLang(language);
-                        FireCalls.exec(new DumpTask(botResponse));
+                        // FireCalls.exec(new DumpTask(botResponse));
 
-                        if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getEntity() != null && !botResponse.getEntities().get(0).getEntity().isEmpty()) {
+                        if (botResponse.getEntities().size() > 0
+                                && botResponse.getEntities().get(0).getEntity() != null
+                                && !botResponse.getEntities().get(0).getEntity().isEmpty()
+                                && botResponse.getIntent().getName() != null
+                                && !botResponse.getIntent().getName().equalsIgnoreCase("bot_news")) {
                             callWikiAPI(botResponse.getEntities().get(0).getEntity(), q);
                         } else if (botResponse.getIntent().getName() != null &&
                                 !botResponse.getIntent().getName().isEmpty() &&
                                 botResponse.getIntent().getName().equalsIgnoreCase("bot_news")
                                 && botResponse.getIntent().getConfidence() > 0.80) {
-                            callNewsAPI(botResponse);
+                            callWebsearchService(q, AppConstants.RESULT_TYPE_NEWS);
 
                         } else if (botResponse.getIntent().getName() != null &&
                                 !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.80) {
@@ -226,7 +273,8 @@ public class WebServiceUtils {
                             iBotObserver.notifyBotResponse(chatCardModel);
                         } else {
                             if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getValue() != null)
-                                callWikiAPI(botResponse.getEntities().get(0).getValue().get(0), q);
+                                //callWikiAPI(botResponse.getEntities().get(0).getEntity(), q);
+                                callWebsearchService(q, AppConstants.RESULT_TYPE_SEARCH);
                             else {
                                 if (botResponse.getIntent().getName() != null &&
                                         !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.65) {
@@ -237,17 +285,19 @@ public class WebServiceUtils {
                                     iBotObserver.notifyBotResponse(fallbackModel);*/
                                     String[] splitQuery = botResponse.getText().split(" ");
                                     if (splitQuery.length < 3)
-                                        callWikiAPI(botResponse.getText(), q);
+                                        callWebsearchService(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH);
                                     else {
-                                        ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
-                                        iBotObserver.notifyBotResponse(fallbackModel);
+                                        callWebsearchService(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH);
+//                                        ChatCardModel fallbackModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
+//                                        iBotObserver.notifyBotResponse(fallbackModel);
                                     }
                                 }
                             }
                         }
 
                     } else {
-                        callSpawnAPI(q);
+                        //callSpawnAPI(q);
+                        callWebsearchService(q, AppConstants.RESULT_TYPE_SEARCH);
                     }
                 }
 
@@ -373,7 +423,7 @@ public class WebServiceUtils {
                     Log.d("API CONTENT: ", response.body().toString());
                     SpawnWikiModel spawnWikiModel = response.body();
                     //spawnWikiModel.setQuery(query);
-                    FireCalls.exec(new DumpTask(spawnWikiModel));
+                    //FireCalls.exec(new DumpTask(spawnWikiModel));
                     if (spawnWikiModel.getType().equals("disambiguation")) {
                         //Handle case for page not found
                         String[] disambiguationSplit = spawnWikiModel.getExtract().split(":");
@@ -382,8 +432,14 @@ public class WebServiceUtils {
                             chatCardModel = new ChatCardModel(spawnWikiModel, 5);
                             iBotWikiNLP.showUI(chatCardModel);
                         } else {
-                            chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
-                            iBotObserver.notifyBotResponse(chatCardModel);
+//                            chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
+//                            iBotObserver.notifyBotResponse(chatCardModel);
+                            if (language.equalsIgnoreCase("en"))
+                                callWebsearchService(query, AppConstants.RESULT_TYPE_SEARCH);
+                            else {
+                                chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
+                                iBotObserver.notifyBotResponse(chatCardModel);
+                            }
                         }
                     } else {
                         chatCardModel = new ChatCardModel(spawnWikiModel, 5);
@@ -392,8 +448,10 @@ public class WebServiceUtils {
 
                 } else {
                     //Handle case for page not found
-                    ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
-                    iBotObserver.notifyBotResponse(fallBack);
+//                    ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
+////                    iBotObserver.notifyBotResponse(fallBack);
+                    iBotObserver.loading();
+                    callWebsearchService(query, AppConstants.RESULT_TYPE_SEARCH);
                 }
             }
 

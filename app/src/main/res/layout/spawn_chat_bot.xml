@@ -5,12 +5,13 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_8"
         android:layout_marginEnd="@dimen/layout_40"
         android:layout_marginStart="@dimen/margin_8"
         android:layout_marginTop="@dimen/margin_8"
+        android:background="@drawable/chat_bot_background"
         android:gravity="start"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -22,22 +23,22 @@
 
         <TextView
             android:id="@+id/bot_message"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:paddingLeft="@dimen/margin_10"
+            android:padding="@dimen/margin_15"
             android:text="hello"
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/textsize_18" />
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/textsize_16" />
 
         <TextView
             android:id="@+id/bot_time"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="start"
             android:paddingLeft="10dp"
             android:text="8:12"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/textsize_16"
             android:visibility="gone" />
 
