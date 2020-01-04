@@ -18,15 +18,13 @@
             android:layout_below="@+id/title_bar"
             android:layout_marginBottom="3dp"
             android:layout_marginTop="8dp"
-            android:clickable="true"
             android:visibility="gone">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chat_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/chat_activity_background"
-                android:clickable="true" />
+                android:background="@drawable/chat_activity_background" />
 
 
         </LinearLayout>
@@ -82,7 +80,7 @@
                 android:layout_toRightOf="@+id/title_text"
                 android:background="@drawable/text_circle"
                 android:gravity="center"
-                android:text="E"
+                android:text="@string/language_initials"
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/textsize_16" />
 

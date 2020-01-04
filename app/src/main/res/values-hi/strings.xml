@@ -8,4 +8,5 @@
     <string name="defalt_answer">क्षमा करें मैं समझ नहीं पाया कि आपने अभी क्या कहा।</string>
     <string name="header_text">यहाँ कुछ आप मुझसे पूछ सकते हैं:</string>
     <string name="info">और जानकारी</string>
+    <string name="result_text">यहाँ कुछ परिणाम मिले हैं</string>
 </resources>

@@ -7,13 +7,11 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
-import com.spawn.ai.model.websearch.News;
 import com.spawn.ai.model.websearch.NewsValue;
 import com.spawn.ai.model.websearch.ValueResults;
 import com.spawn.ai.model.websearch.WebSearchResults;
@@ -264,7 +262,6 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 SpawnNewsAdapter spawnNewsAdapter = new SpawnNewsAdapter(context, news);
                 spawnChatNewsHolder.newRecycler.setAdapter(spawnNewsAdapter);
                 spawnNewsAdapter.notifyDataSetChanged();
-
                 break;
         }
 

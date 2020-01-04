@@ -113,7 +113,7 @@ public class WebServiceUtils {
     }
 
     private void callWebsearchService(final String q, final String type) {
-        iBotObserver.loading();
+        // iBotObserver.loading();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
                 .build();
@@ -155,7 +155,7 @@ public class WebServiceUtils {
                 }
             });
         } else if (type.equalsIgnoreCase("news")) {
-            Call<News> data = spawnAPI.getNewsResult(q, "5", type);
+            Call<News> data = spawnAPI.getNewsResult(q, "10", type);
             data.enqueue(new Callback<News>() {
                 @Override
                 public void onResponse(Call<News> call, Response<News> response) {
@@ -234,7 +234,7 @@ public class WebServiceUtils {
 
     private void callSpawnML(final String q) {
         try {
-            iBotObserver.loading();
+            //iBotObserver.loading();
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
                     .build();
@@ -396,7 +396,7 @@ public class WebServiceUtils {
     }
 
     private void callWikiAPI(final String entity, final String query) {
-        iBotObserver.loading();
+        //iBotObserver.loading();
         final String cloneEntity = entity.trim().replace(" ", "_");
 
         Log.d("ENTITY: ", cloneEntity);
@@ -450,7 +450,7 @@ public class WebServiceUtils {
                     //Handle case for page not found
 //                    ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
 ////                    iBotObserver.notifyBotResponse(fallBack);
-                    iBotObserver.loading();
+                    // iBotObserver.loading();
                     callWebsearchService(query, AppConstants.RESULT_TYPE_SEARCH);
                 }
             }

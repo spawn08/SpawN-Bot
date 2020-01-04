@@ -44,19 +44,20 @@ public class SpawnNewsAdapter extends RecyclerView.Adapter<SpawnNewsViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull SpawnNewsViewHolder spawnNewsViewHolder, final int i) {
         try {
+            final int pos = spawnNewsViewHolder.getAdapterPosition();
             Glide.with(context)
                     .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.thumbnail_not_found).error(R.drawable.thumbnail_not_found))
-                    .load(newsValues.get(i).getImage().getThumbnail().getContentUrl())
+                    .load(newsValues.get(pos).getImage().getThumbnail().getContentUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(spawnNewsViewHolder.newsImage);
-            spawnNewsViewHolder.newsDesc.setText(newsValues.get(i).getDescription());
+            spawnNewsViewHolder.newsDesc.setText(newsValues.get(pos).getDescription());
 
             spawnNewsViewHolder.containerNews.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     try {
                         Intent intent = new Intent(context, SpawnWebActivity.class);
-                        intent.putExtra("url", newsValues.get(i).getUrl());
+                        intent.putExtra("url", newsValues.get(pos).getUrl());
                         context.startActivity(intent);
                     } catch (Exception e) {
                         e.printStackTrace();

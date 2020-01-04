@@ -25,6 +25,8 @@
 
 -keep class com.spawn.ai.model.content_urls.* {*;}
 
+-keep class com.spawn.ai.model.websearch.* {*;}
+
 -keep class com.spawn.ai.activities.SpawnWebActivity {*;}
 
 -keep class com.spawn.ai.interfaces.* {*;}

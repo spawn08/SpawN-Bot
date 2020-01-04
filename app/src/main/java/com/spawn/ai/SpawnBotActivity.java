@@ -397,6 +397,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     }
 
     private void callService(String speechString) {
+        loading();
         WebServiceUtils.getInstance(this).setUpObserver(this);
         WebServiceUtils.getInstance(this).getRetrofitClient();
         WebServiceUtils.getInstance(this).getBotResponse(speechString);
@@ -528,6 +529,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     ChatMessageType webSearch = new ChatMessageType();
                     webSearch.setChatCardModel(chatCardModel);
                     webSearch.setViewType(chatCardModel.getType());
+                    webSearch.setMessage(AppUtils.getStringRes(R.string.result_text, context, SharedPreferenceUtility.getInstance(this).getStringPreference("lang")));
                     if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
                         botResponses.remove(botResponses.size() - 1);
                     botResponses.add(webSearch);

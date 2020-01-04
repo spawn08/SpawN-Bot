@@ -43,7 +43,11 @@ public class SpawnWebSearchAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         WebResultHolder webResultHolder = (WebResultHolder) holder;
         if (valueResults.get(position).getName().contains("Wikipedia")) {
-            webResultHolder.webButton.setText(valueResults.get(position).getName());
+            if (valueResults.get(position).getName() != null
+                    && !valueResults.get(position).getName().isEmpty())
+                webResultHolder.webButton.setText(valueResults.get(position).getName());
+            else
+                webResultHolder.webButton.setText(AppUtils.getStringRes(R.string.info, context, SharedPreferenceUtility.getInstance(context).getStringPreference("lang")));
             if (valueResults.get(position).getThumbnailUrl() != null)
                 Glide.with(context)
                         .applyDefaultRequestOptions(new RequestOptions()
