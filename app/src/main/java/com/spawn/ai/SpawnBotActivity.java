@@ -106,7 +106,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
         activitySpawnBotBinding.langChange.setOnClickListener(this);
 
-        botResponses = new ArrayList<ChatMessageType>();
+        botResponses = new ArrayList<>();
         chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(false);
@@ -243,7 +243,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void initSpeech() {
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        String lang = "en";
+        String lang = "";
 
         if (SharedPreferenceUtility.getInstance(this).getStringPreference("lang").equalsIgnoreCase("hi")) {
             lang = "hi";
@@ -337,12 +337,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             case SpeechRecognizer.ERROR_NETWORK:
                 activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                 onEndOfSpeech();
-                Toast.makeText(this, "No Network", Toast.LENGTH_LONG);
+                Toast.makeText(this, "No Network", Toast.LENGTH_LONG).show();
                 break;
             case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
                 activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                 onEndOfSpeech();
-                Toast.makeText(this, "No permission to perform the action", Toast.LENGTH_LONG);
+                Toast.makeText(this, "No permission to perform the action", Toast.LENGTH_LONG).show();
                 break;
 
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
@@ -685,16 +685,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private void updateLanguageConfig(String lang) {
         Locale locale = new Locale(lang);
         Configuration overrideConfiguration = SpawnAiApplication.getContext().getResources().getConfiguration();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            overrideConfiguration.setLocale(locale);
-        } else {
-            overrideConfiguration.locale = locale;
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            createConfigurationContext(overrideConfiguration);
-        } else {
-            getResources().updateConfiguration(overrideConfiguration, SpawnAiApplication.getContext().getResources().getDisplayMetrics());
-        }
+        overrideConfiguration.setLocale(locale);
+        createConfigurationContext(overrideConfiguration);
     }
 
     public void setUpVolumeButton(boolean setup) {
@@ -774,13 +766,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     @Override
     public void speakBot(String message) {
-        if (Build.VERSION.SDK_INT < 21) {
-            textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null);
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App Speaking"));
-        } else {
-            textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App Speaking"));
-        }
+        textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
+        Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App Speaking"));
     }
 
     @Override
@@ -792,7 +779,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             if (object instanceof SpawnWikiModel)
                 intent.putExtra("url", ((SpawnWikiModel) object).getContent_urls().getMobile().getPage());
             else if (object instanceof ValueResults)
-                intent.putExtra("url", ((ValueResults) object).getUrl());
+                if (((ValueResults) object).getAmpUrl() != null)
+                    intent.putExtra("url", ((ValueResults) object).getAmpUrl());
+                else intent.putExtra("url", ((ValueResults) object).getUrl());
             startActivity(intent);
         } else if (action.equals("finish")) {
             handler.postDelayed(new Runnable() {

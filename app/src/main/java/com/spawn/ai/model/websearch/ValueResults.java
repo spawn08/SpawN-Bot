@@ -10,6 +10,7 @@ public class ValueResults {
     private String thumbnailUrl;
     private String language;
     private String url;
+    private String ampUrl;
     private ArrayList<DeepLinks> deepLinks;
 
 
@@ -67,5 +68,13 @@ public class ValueResults {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getAmpUrl() {
+        return ampUrl;
+    }
+
+    public void setAmpUrl(String ampUrl) {
+        this.ampUrl = ampUrl;
     }
 }

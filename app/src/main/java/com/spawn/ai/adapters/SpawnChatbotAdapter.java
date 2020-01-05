@@ -86,9 +86,12 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 View webView = LayoutInflater.from(context).inflate(R.layout.spawn_web_view, parent, false);
                 SpawnWebSearchHolder spawnWebSearchHolder = new SpawnWebSearchHolder(webView);
                 return spawnWebSearchHolder;
-        }
 
-        return null;
+            default:
+                View viewDefault = LayoutInflater.from(context).inflate(R.layout.spawn_chat_bot, parent, false);
+                SpawnChatBotViewHolder spawnDefaultView = new SpawnChatBotViewHolder(viewDefault);
+                return spawnDefaultView;
+        }
     }
 
     @Override
@@ -145,12 +148,11 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 final SpawnChatCardViewHolder spawnChatCardViewHolder = (SpawnChatCardViewHolder) holder;
                 spawnChatCardViewHolder.spawn_card_text.setText(chatMessageType.get(position).getMessage());
                 spawnChatCardViewHolder.card_button.setText(chatMessageType.get(position).getButtonText());
-                final int pos = position;
                 spawnChatCardViewHolder.card_button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         chatMessageType.get(position).setActionCompleted(true);
-                        iBotObserver.setAction(chatMessageType.get(pos).getAction(), null);
+                        iBotObserver.setAction(chatMessageType.get(position).getAction(), null);
 
                     }
                 });
@@ -247,7 +249,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 } else {
                     chatMessageType.get(position).setSpeakFinish(true);
                 }
-                spawnWebSearchHolder.webRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+                spawnWebSearchHolder.webRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
                 SpawnWebSearchAdapter spawnWebSearchAdapter = new SpawnWebSearchAdapter(context, valueResults);
                 spawnWebSearchHolder.webRecycler.setAdapter(spawnWebSearchAdapter);
                 spawnWebSearchAdapter.notifyDataSetChanged();

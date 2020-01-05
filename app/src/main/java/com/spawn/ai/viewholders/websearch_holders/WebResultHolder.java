@@ -14,20 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class WebResultHolder extends RecyclerView.ViewHolder {
 
-    public CardView webCardView;
-    public ImageView webImage;
-    public TextView webDescription, webTile;
-    public Button webButton;
+    //public CardView webCardView;
+    // public ImageView webImage;
+    public TextView webDisplayUrl, webTile, webDescription;
+    // public Button webButton;
     //  public RelativeLayout imageRel;
 
     public WebResultHolder(@NonNull View itemView) {
         super(itemView);
 
-        webCardView = itemView.findViewById(R.id.cardViewWeb);
-        webImage = itemView.findViewById(R.id.web_image);
-        webDescription = itemView.findViewById(R.id.web_description);
-        webTile = itemView.findViewById(R.id.web_title);
-        webButton = itemView.findViewById(R.id.web_button);
+        //  webCardView = itemView.findViewById(R.id.cardViewWeb);
+        // webImage = itemView.findViewById(R.id.web_image);
+        webDisplayUrl = itemView.findViewById(R.id.webDisplayUrl);
+        webTile = itemView.findViewById(R.id.webTile);
+        webDescription = itemView.findViewById(R.id.webDescription);
         //  imageRel = itemView.findViewById(R.id.imageRel);
     }
 }

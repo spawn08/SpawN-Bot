@@ -47,7 +47,8 @@ public class SpawnNewsAdapter extends RecyclerView.Adapter<SpawnNewsViewHolder> 
             final int pos = spawnNewsViewHolder.getAdapterPosition();
             Glide.with(context)
                     .applyDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.thumbnail_not_found).error(R.drawable.thumbnail_not_found))
-                    .load(newsValues.get(pos).getImage().getThumbnail().getContentUrl())
+                    .load(newsValues.get(pos).getImage() != null ? newsValues.get(pos).getImage().getThumbnail().getContentUrl() : ""
+                    )
                     .apply(RequestOptions.circleCropTransform())
                     .into(spawnNewsViewHolder.newsImage);
             spawnNewsViewHolder.newsDesc.setText(newsValues.get(pos).getDescription());
