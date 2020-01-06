@@ -46,7 +46,7 @@ public class WebServiceUtils {
     private static final String BOT_URL = "https://api.wit.ai";
     private static String API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
     private static String NEWS_URL = "https://api.spawnai.com/spawnai_file/news/news_data/";
-    private static String SPAWN_API = "https://api.bifisheries.co.in/";
+    private static String SPAWN_API = "https://api.spawnai.com/";
     private IBotObserver iBotObserver;
     private IBotWikiNLP iBotWikiNLP;
     private String token;
