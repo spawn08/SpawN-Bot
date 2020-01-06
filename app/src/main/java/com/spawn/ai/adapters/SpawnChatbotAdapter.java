@@ -241,6 +241,8 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 WebSearchResults webSearchResults = chatMessageType.get(position).getChatCardModel().getWebSearchResults();
                 final ArrayList<ValueResults> valueResults = webSearchResults.getWebPages().getValue();
 
+                ArrayList<NewsValue> newsResult =
+                        webSearchResults.getNews() != null ? webSearchResults.getNews().getValue() : null;
                 if (iBotObserver != null
                         && !chatMessageType.get(position).isSpeakFinish()
                         && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
@@ -249,10 +251,47 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 } else {
                     chatMessageType.get(position).setSpeakFinish(true);
                 }
+
                 spawnWebSearchHolder.webRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+                // Web
                 SpawnWebSearchAdapter spawnWebSearchAdapter = new SpawnWebSearchAdapter(context, valueResults);
                 spawnWebSearchHolder.webRecycler.setAdapter(spawnWebSearchAdapter);
                 spawnWebSearchAdapter.notifyDataSetChanged();
+
+                //News
+                if (newsResult != null) {
+                    spawnWebSearchHolder.newsList.setLayoutManager(new LinearLayoutManager(context));
+                    SpawnNewsSearchAdapter spawnNewsListAdapter = new SpawnNewsSearchAdapter(context, newsResult);
+                    spawnWebSearchHolder.newsList.setAdapter(spawnNewsListAdapter);
+                    spawnNewsListAdapter.notifyDataSetChanged();
+                } else {
+                    spawnWebSearchHolder.newsList.setVisibility(View.GONE);
+                    spawnWebSearchHolder.newsText.setVisibility(View.GONE);
+                }
+
+                //Images
+                if (webSearchResults.getImage() != null
+                        && webSearchResults.getImage().getValue() != null) {
+                    spawnWebSearchHolder.imageList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+                    SpawnImageResultAdapter spawnImageResultAdapter = new SpawnImageResultAdapter(context, webSearchResults.getImage().getValue());
+                    spawnWebSearchHolder.imageList.setAdapter(spawnImageResultAdapter);
+                    spawnImageResultAdapter.notifyDataSetChanged();
+                } else {
+                    spawnWebSearchHolder.imageList.setVisibility(View.GONE);
+                    spawnWebSearchHolder.imageText.setVisibility(View.GONE);
+                }
+
+                //Video
+                if (webSearchResults.getVideos() != null
+                        && webSearchResults.getVideos().getValue() != null) {
+                    spawnWebSearchHolder.videoList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+                    SpawnVideoResultAdapter spawnVideoResultAdapter = new SpawnVideoResultAdapter(context, webSearchResults.getVideos().getValue());
+                    spawnWebSearchHolder.videoList.setAdapter(spawnVideoResultAdapter);
+                    spawnVideoResultAdapter.notifyDataSetChanged();
+                } else {
+                    spawnWebSearchHolder.videoList.setVisibility(View.GONE);
+                    spawnWebSearchHolder.videoText.setVisibility(View.GONE);
+                }
 
                 break;
 

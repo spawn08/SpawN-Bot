@@ -28,8 +28,8 @@
             app:amount="3"
             app:animationDirection="right"
             app:durations="200"
-            app:endColor="@color/colorPrimary"
-            app:startColor="@color/sky_blue" />
+            app:endColor="#636e72"
+            app:startColor="#dfe6e9" />
 
     </RelativeLayout>
 

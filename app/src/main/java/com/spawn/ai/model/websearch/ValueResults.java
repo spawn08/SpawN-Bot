@@ -12,6 +12,7 @@ public class ValueResults {
     private String url;
     private String ampUrl;
     private ArrayList<DeepLinks> deepLinks;
+    private int viewType;
 
 
     public String getName() {
@@ -76,5 +77,13 @@ public class ValueResults {
 
     public void setAmpUrl(String ampUrl) {
         this.ampUrl = ampUrl;
+    }
+
+    public int getViewType() {
+        return viewType;
+    }
+
+    public void setViewType(int viewType) {
+        this.viewType = viewType;
     }
 }

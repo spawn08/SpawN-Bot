@@ -9,12 +9,106 @@
     android:clickable="true"
     android:focusable="true">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/webRecycler"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_5"
-        android:orientation="vertical"
-        app:reverseLayout="false" />
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/webText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/margin_8"
+                android:gravity="center"
+                android:padding="@dimen/margin_8"
+                android:text="Web Results"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/textsize_16" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/webRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/webText"
+                android:layout_margin="@dimen/margin_5"
+                android:orientation="vertical"
+                app:reverseLayout="false" />
+
+            <TextView
+                android:id="@+id/newsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/webRecycler"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/margin_8"
+                android:gravity="center"
+                android:padding="@dimen/margin_8"
+                android:text="News"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/textsize_16" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/newsList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/newsText"
+                android:layout_margin="@dimen/margin_5"
+                android:orientation="vertical"
+                app:reverseLayout="false" />
+
+            <TextView
+                android:id="@+id/imageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/newsList"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/margin_8"
+                android:gravity="center"
+                android:padding="@dimen/margin_8"
+                android:text="Images"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/textsize_16" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/imageList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageText"
+                android:layout_margin="@dimen/margin_5"
+                android:orientation="horizontal"
+                app:reverseLayout="false" />
+
+            <TextView
+                android:id="@+id/videoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageList"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/margin_8"
+                android:gravity="center"
+                android:padding="@dimen/margin_8"
+                android:text="Videos"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/textsize_16" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/videoList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/videoText"
+                android:layout_margin="@dimen/margin_5"
+                android:orientation="vertical"
+                app:reverseLayout="false" />
+        </RelativeLayout>
+    </ScrollView>
 
 </RelativeLayout>

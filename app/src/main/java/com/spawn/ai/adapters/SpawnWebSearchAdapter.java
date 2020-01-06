@@ -130,4 +130,9 @@ public class SpawnWebSearchAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public int getItemCount() {
         return valueResults.size();
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        return valueResults.get(position).getViewType();
+    }
 }

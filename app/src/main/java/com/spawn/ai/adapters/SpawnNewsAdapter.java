@@ -58,7 +58,9 @@ public class SpawnNewsAdapter extends RecyclerView.Adapter<SpawnNewsViewHolder> 
                 public void onClick(View view) {
                     try {
                         Intent intent = new Intent(context, SpawnWebActivity.class);
-                        intent.putExtra("url", newsValues.get(pos).getUrl());
+                        if (newsValues.get(pos).getAmpUrl() != null)
+                            intent.putExtra("url", newsValues.get(pos).getAmpUrl());
+                        else intent.putExtra("url", newsValues.get(pos).getUrl());
                         context.startActivity(intent);
                     } catch (Exception e) {
                         e.printStackTrace();

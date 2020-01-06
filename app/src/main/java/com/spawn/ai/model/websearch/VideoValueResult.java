@@ -1,14 +1,13 @@
 package com.spawn.ai.model.websearch;
 
-public class NewsValue {
+public class VideoValueResult {
 
     private String name;
-    private String url;
+    private String hostPageUrl;
     private Image image;
     private String description;
-    private String category;
-    private String ampUrl;
     private String thumbnailUrl;
+    private String hostPageDisplayUrl;
 
     public String getName() {
         return name;
@@ -18,12 +17,12 @@ public class NewsValue {
         this.name = name;
     }
 
-    public String getUrl() {
-        return url;
+    public String getHostPageUrl() {
+        return hostPageUrl;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setHostPageUrl(String hostPageUrl) {
+        this.hostPageUrl = hostPageUrl;
     }
 
     public Image getImage() {
@@ -42,27 +41,19 @@ public class NewsValue {
         this.description = description;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getAmpUrl() {
-        return ampUrl;
-    }
-
-    public void setAmpUrl(String ampUrl) {
-        this.ampUrl = ampUrl;
-    }
-
     public String getThumbnailUrl() {
         return thumbnailUrl;
     }
 
     public void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public String getHostPageDisplayUrl() {
+        return hostPageDisplayUrl;
+    }
+
+    public void setHostPageDisplayUrl(String hostPageDisplayUrl) {
+        this.hostPageDisplayUrl = hostPageDisplayUrl;
     }
 }

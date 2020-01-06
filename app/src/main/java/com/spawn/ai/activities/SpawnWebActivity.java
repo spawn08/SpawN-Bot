@@ -37,8 +37,6 @@ public class SpawnWebActivity extends AppCompatActivity {
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setAllowFileAccess(true);
-        webSettings.setPluginState(WebSettings.PluginState.ON);
-        webSettings.setPluginState(WebSettings.PluginState.ON_DEMAND);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setAppCacheEnabled(false);
         infoWebview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -48,7 +46,8 @@ public class SpawnWebActivity extends AppCompatActivity {
         infoWebview.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                if (request.getUrl().toString().contains("youtube.com")) {
+                if (request.getUrl().toString().contains("youtube.com") ||
+                        request.getUrl().toString().contains("m.youtube.com")) {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(request.getUrl().toString())));
                     finish();
                     return true;
