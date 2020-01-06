@@ -70,7 +70,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private Animation slideOut;
     int textCount;
     private ChatMessageType chatMessage;
-    private String lang;
 
     private static String spokenString = "";
 
@@ -243,7 +242,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void initSpeech() {
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        String lang = "";
+        String lang;
 
         if (SharedPreferenceUtility.getInstance(this).getStringPreference("lang").equalsIgnoreCase("hi")) {
             lang = "hi";
@@ -414,10 +413,15 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 && bundle.containsKey(SpeechRecognizer.RESULTS_RECOGNITION)
                 && bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).size() > 0) {
             ArrayList<String> partialResults = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            String partialString = partialResults.get(0);
-            //if (partialString.length() % 2 == 0)
-            //   chatViews(partialString, 0, null);
-            Log.d(TAG, "partialString :" + partialString);
+
+            if (partialResults.get(0) != null) {
+                String partialString = partialResults.get(0);
+                //if (partialString.length() % 2 == 0)
+                //   chatViews(partialString, 0, null);
+                Log.d(TAG, "partialString :" + partialString);
+            } else {
+                Log.e(TAG, "Error Partial Results");
+            }
         }
 
         countDownTimer = new CountDownTimer(1000, 4000) {
@@ -485,6 +489,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 botResponses.add(chatMessageLoading);
                 chatbotAdapter.setAdapter(botResponses);
                 chatbotAdapter.notifyDataSetChanged();
+                activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
                 break;
 
             case ChatViewTypes.CHAT_VIEW_CARD:
@@ -834,18 +839,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void onInit(int i) {
         if (i == TextToSpeech.SUCCESS) {
-            int result = -1;
             String lang = SharedPreferenceUtility.getInstance(this).getStringPreference("lang");
             textToSpeech.setLanguage(new Locale(lang));
             Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("TTSLanguage", lang));
             textToSpeech.setPitch(0.80f);
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
-
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e(this.getClass().getName(), "This Language is not supported");
-            } else {
-                Log.d(this.getClass().getName(), "Initilization Success!");
-            }
         } else {
             Log.e(this.getClass().getName(), "Initilization Failed!");
             Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("ttsInitialization", "Failure"));

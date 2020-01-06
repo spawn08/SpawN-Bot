@@ -33,8 +33,7 @@ public class SpawnVideoResultAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.video_result_view, parent, false);
-        VideoResultHolder videoResultHolder = new VideoResultHolder(view);
-        return videoResultHolder;
+        return new VideoResultHolder(view);
     }
 
     @Override
@@ -75,7 +74,7 @@ public class SpawnVideoResultAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemCount() {
-        return 4;
+        return videoResult.size();
     }
 
 }

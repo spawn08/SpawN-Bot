@@ -34,8 +34,8 @@ import androidx.recyclerview.widget.RecyclerView;
 public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
-    private ArrayList<ChatMessageType> chatMessageType = new ArrayList<>();
-    IBotObserver iBotObserver;
+    private ArrayList<ChatMessageType> chatMessageType;
+    private IBotObserver iBotObserver;
 
     public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType) {
         this.context = context;
@@ -54,43 +54,35 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         switch (viewType) {
             case ChatViewTypes.CHAT_VIEW_USER:
                 View view = LayoutInflater.from(context).inflate(R.layout.spawn_chat_user, parent, false);
-                SpawnChatUserViewHolder spawnChatViewHolder = new SpawnChatUserViewHolder(view);
-                return spawnChatViewHolder;
+                return new SpawnChatUserViewHolder(view);
 
             case ChatViewTypes.CHAT_VIEW_BOT:
                 View viewBot = LayoutInflater.from(context).inflate(R.layout.spawn_chat_bot, parent, false);
-                SpawnChatBotViewHolder spawnChatBotViewHolder = new SpawnChatBotViewHolder(viewBot);
-                return spawnChatBotViewHolder;
+                return new SpawnChatBotViewHolder(viewBot);
 
             case ChatViewTypes.CHAT_VIEW_LOADING:
                 View viewLoading = LayoutInflater.from(context).inflate(R.layout.spawn_bot_loading, parent, false);
-                SpawnChatLoadingViewHolder spawnChatLoadingViewHolder = new SpawnChatLoadingViewHolder(viewLoading);
-                return spawnChatLoadingViewHolder;
+                return new SpawnChatLoadingViewHolder(viewLoading);
 
             case ChatViewTypes.CHAT_VIEW_CARD:
                 View cardView = LayoutInflater.from(context).inflate(R.layout.spawn_chat_card, parent, false);
-                SpawnChatCardViewHolder spawnChatCardViewHolder = new SpawnChatCardViewHolder(cardView);
-                return spawnChatCardViewHolder;
+                return new SpawnChatCardViewHolder(cardView);
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 View wikiView = LayoutInflater.from(context).inflate(R.layout.spawn_wiki_view, parent, false);
-                SpawnWikiViewHolder wikiViewHolder = new SpawnWikiViewHolder(wikiView);
-                return wikiViewHolder;
+                return new SpawnWikiViewHolder(wikiView);
 
             case ChatViewTypes.CHAT_VIEW_NEWS:
                 View newsView = LayoutInflater.from(context).inflate(R.layout.spawn_news_layout, parent, false);
-                SpawnChatNewsHolder spawnChatNewsHolder = new SpawnChatNewsHolder(newsView);
-                return spawnChatNewsHolder;
+                return new SpawnChatNewsHolder(newsView);
 
             case ChatViewTypes.CHAT_VIEW_WEB:
                 View webView = LayoutInflater.from(context).inflate(R.layout.spawn_web_view, parent, false);
-                SpawnWebSearchHolder spawnWebSearchHolder = new SpawnWebSearchHolder(webView);
-                return spawnWebSearchHolder;
+                return new SpawnWebSearchHolder(webView);
 
             default:
                 View viewDefault = LayoutInflater.from(context).inflate(R.layout.spawn_chat_bot, parent, false);
-                SpawnChatBotViewHolder spawnDefaultView = new SpawnChatBotViewHolder(viewDefault);
-                return spawnDefaultView;
+                return new SpawnChatBotViewHolder(viewDefault);
         }
     }
 
