@@ -45,15 +45,28 @@ public class WebServiceUtils {
     private Retrofit retrofit;
     private static final String BOT_URL = "https://api.wit.ai";
     private static String API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-    private static String NEWS_URL = "https://api.spawnai.com/spawnai_file/news/news_data/";
-    private static String SPAWN_API = "https://api.spawnai.com/";
     private IBotObserver iBotObserver;
     private IBotWikiNLP iBotWikiNLP;
     private String token;
     private String language;
+    private String[] creds = getAPICreds().split(":");
 
     @SerializedName("serverFileContents")
     private JsonElement serverFileContents;
+
+    static {
+        System.loadLibrary("native-lib");
+    }
+
+    public native String getAPICreds();
+
+    public native String getUrl();
+
+    public native String getESCreds();
+
+    public native String getDataFile();
+
+    public native String getNewsUrl();
 
     public static WebServiceUtils getInstance(Context context) {
         if (webServiceUtils == null) {
@@ -74,7 +87,7 @@ public class WebServiceUtils {
                 .build();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl(SPAWN_API)
+                .baseUrl(getUrl())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
@@ -114,11 +127,12 @@ public class WebServiceUtils {
 
     private void callWebsearchService(final String q, final String type) {
         // iBotObserver.loading();
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(SPAWN_API)
+                .baseUrl(getUrl())
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -236,10 +250,10 @@ public class WebServiceUtils {
         try {
             //iBotObserver.loading();
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                    .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                     .build();
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SPAWN_API)
+                    .baseUrl(getUrl())
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -314,11 +328,12 @@ public class WebServiceUtils {
 
     private void callNewsAPI(final BotMLResponse botResponse) {
         iBotObserver.loading();
+        String[] esCreds = getESCreds().split(":");
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new NLPInterceptor(AppConstants.NEWS_USERNAME, AppConstants.NEWS_PASS))
+                .addInterceptor(new NLPInterceptor(esCreds[0], esCreds[1]))
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(NEWS_URL)
+                .baseUrl(getNewsUrl())
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -355,10 +370,10 @@ public class WebServiceUtils {
     private void callSpawnAPI(final String query) {
         iBotObserver.loading();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(SPAWN_API)
+                .baseUrl(getUrl())
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -468,10 +483,10 @@ public class WebServiceUtils {
     public void getFile(String fileName, final Activity activity) {
         try {
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                    .addInterceptor(new NLPInterceptor(creds[0], creds[0]))
                     .build();
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SPAWN_API)
+                    .baseUrl(getUrl())
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -487,7 +502,7 @@ public class WebServiceUtils {
                             JsonElement file = response.body();
                             setFileContents(file);
                             if (file != null) {
-                                JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
+                                JsonFileReader.getInstance().fileName(getDataFile());
                                 JsonFileReader.getInstance().readFile(activity, file);
                                 JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(activity).getStringPreference("lang"));
                             }

@@ -16,11 +16,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DumpTask implements Runnable {
-    public static String SPAWN_API = "https://spawnai.com/";
     private Object object;
+    private String username, password, url;
 
-    public DumpTask(Object object) {
+    public DumpTask(Object object, String username, String password, String url) {
         this.object = object;
+        this.username = username;
+        this.password = password;
+        this.url = url;
     }
 
     @Override
@@ -28,10 +31,10 @@ public class DumpTask implements Runnable {
         //
         if (object instanceof SpawnWikiModel) {
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                    .addInterceptor(new NLPInterceptor(username, password))
                     .build();
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SPAWN_API)
+                    .baseUrl(url)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -53,10 +56,10 @@ public class DumpTask implements Runnable {
             });
         } else if (object instanceof BotMLResponse) {
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new NLPInterceptor(AppConstants.NLP_USERNAME, AppConstants.NLP_PASSWORD))
+                    .addInterceptor(new NLPInterceptor(username, password))
                     .build();
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SPAWN_API)
+                    .baseUrl(url)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();

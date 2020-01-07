@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -28,8 +29,9 @@ public class SpawnSplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spawn_splash_screen);
         context = this;
-        spawnLogo = (LottieAnimationView) findViewById(R.id.spawn_logo);
-        spawnLogo.setRepeatMode(LottieDrawable.INFINITE);
+        spawnLogo = findViewById(R.id.spawn_logo);
+        spawnLogo.setRepeatCount(LottieDrawable.INFINITE);
+        spawnLogo.setRepeatMode(LottieDrawable.RESTART);
         spawnLogo.playAnimation();
         spawnLogo.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
@@ -62,7 +64,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
                    /* WebServiceUtils.getInstance(SpawnSplashScreen.this)
                             .getFile(AppConstants.DATA_FILE_SERVER, SpawnSplashScreen.this);*/
 
-                    JsonFileReader.getInstance().fileName(AppConstants.DATA_FILE);
+                    JsonFileReader.getInstance().fileName(WebServiceUtils.getInstance(context).getDataFile());
                     JsonFileReader.getInstance().readFile(SpawnSplashScreen.this, null);
                     JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(SpawnSplashScreen.this).getStringPreference("lang"));
 
