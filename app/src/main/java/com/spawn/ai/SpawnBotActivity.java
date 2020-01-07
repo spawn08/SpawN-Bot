@@ -21,13 +21,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
@@ -41,7 +34,6 @@ import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.model.websearch.ValueResults;
-import com.spawn.ai.network.WebServiceUtils;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.DateTimeUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
@@ -51,6 +43,13 @@ import com.spawn.ai.viewmodels.WebSearchViewModel;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
 
@@ -157,11 +156,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private void setUpQuestionsView(String lang) {
 
         activitySpawnBotBinding.langChange.setText(AppUtils.getStringRes(R.string.language_initials, this, lang));
-        if (lang.equalsIgnoreCase("en")) {
+        /*if (lang.equalsIgnoreCase("en")) {
             WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_en));
         } else {
             WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_hi));
-        }
+        }*/
         final ArrayList<String> questions = JsonFileReader.getInstance().getQuestions(lang);
         activitySpawnBotBinding.headerText.setText(JsonFileReader.getInstance().getValueFromJson("questions_title_" + lang));
 
@@ -644,13 +643,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     textToSpeech.isSpeaking()) {
                 textToSpeech.stop();
             }
-        } /*else if (i == R.id.container_stop) {
-            activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
-            if (textToSpeech != null &&
-                    textToSpeech.isSpeaking()) {
-                textToSpeech.stop();
-            }
-        }*/ else if (i == R.id.arrow_back) {
+        } else if (i == R.id.arrow_back) {
             finish();
         } else if (i == R.id.lang_change) {
             if (SharedPreferenceUtility.getInstance(this).getStringPreference("lang").equalsIgnoreCase("en")) {
@@ -663,7 +656,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding
                         .titleText
                         .setText(AppUtils.getStringRes(R.string.app_name, this, "hi"));
-                WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_hi));
+                // WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_hi));
                 botResponses.clear();
                 chatbotAdapter.setAdapter(botResponses);
                 chatbotAdapter.notifyDataSetChanged();
@@ -672,7 +665,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding.textviewAnimation.setVisibility(View.VISIBLE);
 
                 updateLanguageConfig("hi");
-                WebServiceUtils.getInstance().setLanguage("hi");
+                // WebServiceUtils.getInstance().setLanguage("hi");
                 setUpQuestionsView("hi");
             } else {
                 SharedPreferenceUtility.getInstance(this).storeStringPreference("lang", "en");
@@ -680,7 +673,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 textToSpeech.stop();
                 textToSpeech = null;
                 textToSpeech = new TextToSpeech(this, this);
-                WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_en));
+                //WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_en));
                 activitySpawnBotBinding.langChange
                         .setText(AppUtils.getStringRes(R.string.language_initials, this, "en"));
                 activitySpawnBotBinding
@@ -695,7 +688,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding.textviewAnimation.setVisibility(View.VISIBLE);
 
                 updateLanguageConfig("en");
-                WebServiceUtils.getInstance().setLanguage("en");
+                // WebServiceUtils.getInstance().setLanguage("en");
                 setUpQuestionsView("en");
             }
         }

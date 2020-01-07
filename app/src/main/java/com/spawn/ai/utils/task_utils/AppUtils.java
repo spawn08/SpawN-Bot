@@ -12,8 +12,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 
-import androidx.core.app.NotificationCompat;
-
 import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
@@ -23,12 +21,28 @@ import org.json.JSONArray;
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.core.app.NotificationCompat;
+
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class AppUtils {
 
     private static AppUtils appUtils;
     private JSONArray jsonArray;
+
+    static {
+        System.loadLibrary("native-lib");
+    }
+
+    public native String getAPICreds();
+
+    public native String getUrl();
+
+    public native String getESCreds();
+
+    public native String getDataFile();
+
+    public native String getNewsUrl();
 
     private AppUtils() {
 
@@ -75,7 +89,7 @@ public class AppUtils {
         NotificationManager notificationManager = (NotificationManager) context
                 .getSystemService(NOTIFICATION_SERVICE);
         Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationChannel channel = null;
+        NotificationChannel channel;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
             AudioAttributes att = new AudioAttributes.Builder()

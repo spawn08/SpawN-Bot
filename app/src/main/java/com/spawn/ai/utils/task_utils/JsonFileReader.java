@@ -21,11 +21,11 @@ import java.util.Random;
 public class JsonFileReader {
 
     private static JsonFileReader jsonFileReader;
-    private static String fileContents;
-    private String fileName = "bot_data.json";
+    private String fileContents;
+    private String fileName = AppUtils.getInstance().getDataFile();
     private ChatCardModel cardModel;
-    private ArrayList<String> questions = new ArrayList<String>();
-    private HashMap<String, ArrayList<String>> questionsMap = new HashMap<String, ArrayList<String>>();
+    private ArrayList<String> questions = new ArrayList<>();
+    private HashMap<String, ArrayList<String>> questionsMap = new HashMap<>();
 
     private JsonFileReader() {
 
@@ -46,9 +46,11 @@ public class JsonFileReader {
         try {
             if (file != null)
                 fileContents = file.toString();
-            else fileContents = null;
-            Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
-            loadLocalFile(context);
+            else {
+                fileContents = null;
+                Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
+                loadLocalFile(context);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             loadLocalFile(context);
@@ -58,7 +60,7 @@ public class JsonFileReader {
 
     private void loadLocalFile(Context context) {
         if (fileContents == null || fileContents.isEmpty()) {
-            String json = null;
+            String json;
             try {
                 InputStream is = context.getAssets().open(fileName);
                 byte[] bytes = new byte[is.available()];
@@ -87,7 +89,7 @@ public class JsonFileReader {
     }
 
     public ChatCardModel getJsonFromKey(String key, int i, String lang) {
-        String message = "";
+        String message;
         ChatCardModel chatCardModel = new ChatCardModel("", getDefaultAnswer(lang), 1, "");
         try {
             switch (i) {
@@ -150,7 +152,7 @@ public class JsonFileReader {
         return this.cardModel;
     }
 
-    public String getDefaultAnswer(String lang) {
+    private String getDefaultAnswer(String lang) {
         String message = "";
         if (fileContents != null) {
             try {
@@ -221,8 +223,8 @@ public class JsonFileReader {
         return questionsMap.get(lang);
     }
 
-    public String getFileContents() {
-        return this.fileContents;
-    }
+//    public String getFileContents() {
+//        return this.fileContents;
+//    }
 
 }
