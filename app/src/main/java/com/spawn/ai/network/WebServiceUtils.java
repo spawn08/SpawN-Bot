@@ -41,18 +41,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WebServiceUtils {
 
-    private static WebServiceUtils webServiceUtils;
-    private Retrofit retrofit;
-    private static final String BOT_URL = "https://api.wit.ai";
-    private static String API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-    private IBotObserver iBotObserver;
-    private IBotWikiNLP iBotWikiNLP;
-    private String token;
-    private String language;
-    private String[] creds = getAPICreds().split(":");
-
-    @SerializedName("serverFileContents")
-    private JsonElement serverFileContents;
 
     static {
         System.loadLibrary("native-lib");
@@ -68,7 +56,28 @@ public class WebServiceUtils {
 
     public native String getNewsUrl();
 
-    public static WebServiceUtils getInstance(Context context) {
+    private static final String BOT_URL = "https://api.wit.ai";
+    private static String API_URL;
+    private static WebServiceUtils webServiceUtils;
+    private Retrofit retrofit;
+    private IBotObserver iBotObserver;
+    private IBotWikiNLP iBotWikiNLP;
+    private String[] creds = getAPICreds().split(":");
+    private String[] esCreds = getESCreds().split(":");
+    private String apiUrl = getUrl();
+    private String dataFile = getDataFile();
+    private String newsUrl = getNewsUrl();
+    private String token;
+    private String language;
+
+    @SerializedName("serverFileContents")
+    private JsonElement serverFileContents;
+
+    private WebServiceUtils() {
+
+    }
+
+    public static WebServiceUtils getInstance() {
         if (webServiceUtils == null) {
             webServiceUtils = new WebServiceUtils();
         }
@@ -87,7 +96,7 @@ public class WebServiceUtils {
                 .build();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl(getUrl())
+                .baseUrl(apiUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
@@ -132,7 +141,7 @@ public class WebServiceUtils {
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getUrl())
+                .baseUrl(apiUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -253,7 +262,7 @@ public class WebServiceUtils {
                     .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                     .build();
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(getUrl())
+                    .baseUrl(apiUrl)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -328,12 +337,12 @@ public class WebServiceUtils {
 
     private void callNewsAPI(final BotMLResponse botResponse) {
         iBotObserver.loading();
-        String[] esCreds = getESCreds().split(":");
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(esCreds[0], esCreds[1]))
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getNewsUrl())
+                .baseUrl(newsUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -373,7 +382,7 @@ public class WebServiceUtils {
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getUrl())
+                .baseUrl(apiUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -486,7 +495,7 @@ public class WebServiceUtils {
                     .addInterceptor(new NLPInterceptor(creds[0], creds[0]))
                     .build();
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(getUrl())
+                    .baseUrl(apiUrl)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -502,7 +511,7 @@ public class WebServiceUtils {
                             JsonElement file = response.body();
                             setFileContents(file);
                             if (file != null) {
-                                JsonFileReader.getInstance().fileName(getDataFile());
+                                JsonFileReader.getInstance().fileName(dataFile);
                                 JsonFileReader.getInstance().readFile(activity, file);
                                 JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(activity).getStringPreference("lang"));
                             }

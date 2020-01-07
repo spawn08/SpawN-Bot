@@ -30,6 +30,10 @@ public class AppUtils {
     private static AppUtils appUtils;
     private JSONArray jsonArray;
 
+    private AppUtils() {
+
+    }
+
     public static AppUtils getInstance() {
         if (appUtils == null) {
             appUtils = new AppUtils();

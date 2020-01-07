@@ -64,11 +64,11 @@ public class SpawnSplashScreen extends AppCompatActivity {
                    /* WebServiceUtils.getInstance(SpawnSplashScreen.this)
                             .getFile(AppConstants.DATA_FILE_SERVER, SpawnSplashScreen.this);*/
 
-                    JsonFileReader.getInstance().fileName(WebServiceUtils.getInstance(context).getDataFile());
+                    JsonFileReader.getInstance().fileName(WebServiceUtils.getInstance().getDataFile());
                     JsonFileReader.getInstance().readFile(SpawnSplashScreen.this, null);
                     JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(SpawnSplashScreen.this).getStringPreference("lang"));
 
-                    WebServiceUtils.getInstance(SpawnSplashScreen.this)
+                    WebServiceUtils.getInstance()
                             .setLanguage(SharedPreferenceUtility
                                     .getInstance(SpawnSplashScreen.this)
                                     .getStringPreference(AppConstants.LANG));

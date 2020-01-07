@@ -27,6 +27,10 @@ public class JsonFileReader {
     private ArrayList<String> questions = new ArrayList<String>();
     private HashMap<String, ArrayList<String>> questionsMap = new HashMap<String, ArrayList<String>>();
 
+    private JsonFileReader() {
+
+    }
+
     public static JsonFileReader getInstance() {
         if (jsonFileReader == null) {
             jsonFileReader = new JsonFileReader();

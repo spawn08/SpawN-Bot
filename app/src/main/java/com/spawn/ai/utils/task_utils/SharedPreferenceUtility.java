@@ -8,6 +8,10 @@ public class SharedPreferenceUtility {
     private static SharedPreferenceUtility sharedPreferenceUtility;
     private static Context mContext;
 
+    private SharedPreferenceUtility() {
+
+    }
+
     public static SharedPreferenceUtility getInstance(Context context) {
         if (sharedPreferenceUtility == null) {
             sharedPreferenceUtility = new SharedPreferenceUtility();
