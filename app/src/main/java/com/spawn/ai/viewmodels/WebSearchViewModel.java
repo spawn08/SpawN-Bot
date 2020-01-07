@@ -32,7 +32,7 @@ public class WebSearchViewModel extends ViewModel {
     private String[] creds = WebServiceUtils.getInstance().getAPICreds().split(":");
     private String apiUrl = WebServiceUtils.getInstance().getUrl();
 
-    public void getMLResponse(String q, String type, String language) {
+    private void getMLResponse(String q, String type, String language) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
@@ -102,7 +102,7 @@ public class WebSearchViewModel extends ViewModel {
         }
     }
 
-    public void getWikiResponse(String entity, final String query, String language) {
+    private void getWikiResponse(String entity, final String query, String language) {
         final String cloneEntity = entity.trim().replace(" ", "_");
 
         Log.d("ENTITY: ", cloneEntity);
