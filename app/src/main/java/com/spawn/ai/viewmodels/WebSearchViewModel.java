@@ -1,13 +1,9 @@
 package com.spawn.ai.viewmodels;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.SerializedName;
-import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.ISpawnAPI;
 import com.spawn.ai.model.BotMLResponse;
@@ -18,7 +14,6 @@ import com.spawn.ai.model.websearch.WebSearchResults;
 import com.spawn.ai.network.NLPInterceptor;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
-import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -37,8 +32,6 @@ public class WebSearchViewModel extends ViewModel {
     private MutableLiveData<JsonElement> jsonElementMutableLiveData;
     private String[] creds = AppUtils.getInstance().getAPICreds().split(":");
     private String apiUrl = AppUtils.getInstance().getUrl();
-    @SerializedName("serverFileContents")
-    private JsonElement serverFileContents;
 
     private void getMLResponse(String q, String type, String language) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -245,7 +238,7 @@ public class WebSearchViewModel extends ViewModel {
         return chatCardModelMutableLiveData;
     }
 
-    public LiveData<JsonElement> getFile(String fileName, final Activity activity) {
+    public LiveData<JsonElement> getFile(String fileName) {
         try {
             jsonElementMutableLiveData = new MutableLiveData<>();
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -267,17 +260,7 @@ public class WebSearchViewModel extends ViewModel {
                         if (response.isSuccessful()) {
                             JsonElement file = response.body();
                             jsonElementMutableLiveData.setValue(file);
-                            setFileContents(file);
-                            if (file != null) {
-                                JsonFileReader.getInstance().fileName(AppUtils.getInstance().getDataFile());
-                                JsonFileReader.getInstance().readFile(activity, file);
-                                JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(activity).getStringPreference("lang"));
-                            }
-                            Intent intent = new Intent(activity, SpawnBotActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            activity.startActivity(intent);
-                            activity.finish();
-                        }
+                        } else jsonElementMutableLiveData.setValue(null);
                     } catch (Exception e) {
                         e.printStackTrace();
                         jsonElementMutableLiveData.setValue(null);
@@ -290,11 +273,6 @@ public class WebSearchViewModel extends ViewModel {
                     Log.e("ERROR: ", t.getMessage());
                     Crashlytics.log(1, "Webservice Request Error -->", t.getMessage());
                     jsonElementMutableLiveData.setValue(null);
-                    JsonFileReader.getInstance().readFile(activity, null);
-                    Intent intent = new Intent(activity, SpawnBotActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    activity.startActivity(intent);
-                    activity.finish();
                 }
             });
         } catch (Exception e) {
@@ -303,10 +281,6 @@ public class WebSearchViewModel extends ViewModel {
             Crashlytics.log(1, "Webservice", e.getMessage());
         }
         return jsonElementMutableLiveData;
-    }
-
-    private void setFileContents(JsonElement fileContents) {
-        this.serverFileContents = fileContents;
     }
 
 }

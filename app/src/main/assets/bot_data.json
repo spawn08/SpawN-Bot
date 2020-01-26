@@ -166,6 +166,18 @@
     "button_text_en": "",
     "action": ""
   },
+  "bot_work": {
+    "type": 1,
+    "message_en": [
+      "I can help you with finding information about person, place, organization, monuments, or any entity you can think of."
+    ],
+    "message_hi": [
+      "मैं व्यक्ति, स्थान, संगठन, स्मारकों, या किसी भी इकाई के बारे में जानकारी प्राप्त करने में आपकी मदद कर सकता हूं !"
+    ],
+    "button_text_hi": "",
+    "button_text_en": "",
+    "action": ""
+  },
   "spawn_name": {
     "type": 1,
     "message_en": [

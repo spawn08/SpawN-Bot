@@ -223,8 +223,8 @@ public class JsonFileReader {
         return questionsMap.get(lang);
     }
 
-//    public String getFileContents() {
-//        return this.fileContents;
-//    }
+    public String getFileContents() {
+        return this.fileContents;
+    }
 
 }

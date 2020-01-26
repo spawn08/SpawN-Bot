@@ -14,6 +14,10 @@ public class ChatCardModel {
     private News news;
     private String lang;
 
+    public ChatCardModel() {
+
+    }
+
     public ChatCardModel(String text, String message, int type, String action) {
         this.button_text = text;
         this.message = message;

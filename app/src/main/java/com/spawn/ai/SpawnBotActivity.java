@@ -2,10 +2,16 @@ package com.spawn.ai;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -39,17 +45,23 @@ import com.spawn.ai.utils.task_utils.DateTimeUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 import com.spawn.ai.utils.views.AlertUpdateDialog;
+import com.spawn.ai.viewmodels.ClassifyViewModel;
 import com.spawn.ai.viewmodels.WebSearchViewModel;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import constants.AppConstants;
 
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
 
@@ -60,6 +72,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private Intent speechIntentDispatcher;
     private Locale locale;
     private boolean isSpeechEnd = false;
+    private boolean isConnected;
     private CountDownTimer countDownTimer;
     private boolean isSpeechEnabled = false;
     private ArrayList<ChatMessageType> botResponses;
@@ -71,8 +84,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     int textCount;
     private ChatMessageType chatMessage;
     private WebSearchViewModel webSearchViewModel;
+    private ClassifyViewModel classifyViewModel;
 
     private static String spokenString = "";
+    private String language;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +102,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.setListener(this);
         locale = new Locale("en");
         requestPermission();
-
+        registerConnectivityNetworkMonitorForAPI21AndUp();
         activitySpawnBotBinding
                 .titleText
                 .setText(AppUtils.getStringRes(R.string.app_name, this, SharedPreferenceUtility.getInstance(this).getStringPreference("lang")));
@@ -114,8 +129,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.chatRecycler.setAdapter(chatbotAdapter);
         textToSpeech = new TextToSpeech(this, this);
 
-        webSearchViewModel = ViewModelProviders.of(this).get(WebSearchViewModel.class);
-
+        webSearchViewModel = new ViewModelProvider(this).get(WebSearchViewModel.class);
+        classifyViewModel = new ViewModelProvider(this).get(ClassifyViewModel.class);
 
         initSpeech();
 
@@ -154,13 +169,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     }
 
     private void setUpQuestionsView(String lang) {
-
+        this.language = lang;
         activitySpawnBotBinding.langChange.setText(AppUtils.getStringRes(R.string.language_initials, this, lang));
-        /*if (lang.equalsIgnoreCase("en")) {
-            WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_en));
-        } else {
-            WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_hi));
-        }*/
         final ArrayList<String> questions = JsonFileReader.getInstance().getQuestions(lang);
         activitySpawnBotBinding.headerText.setText(JsonFileReader.getInstance().getValueFromJson("questions_title_" + lang));
 
@@ -246,21 +256,20 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void initSpeech() {
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        String lang;
 
         if (SharedPreferenceUtility.getInstance(this).getStringPreference("lang").equalsIgnoreCase("hi")) {
-            lang = "hi";
+            this.language = "hi";
         } else {
-            lang = "en";
+            this.language = "en";
         }
 
         speechIntentDispatcher = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
         speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang);
+        speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_LANGUAGE, language);
         speechIntentDispatcher.putExtra("android.speech.extra.DICTATION_MODE", true);
-        speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, lang);
-        speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, lang);
+        speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, language);
+        speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, language);
         speechIntentDispatcher.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -274,6 +283,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     protected void onResume() {
         super.onResume();
         initSpeech();
+        IntentFilter filter = new IntentFilter();
+
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        filter.addAction("com.spawn.ai.CONNECTIVITY_CHANGE");
+        registerReceiver(broadcastReceiver, filter);
     }
 
     @Override
@@ -328,8 +342,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.mic.cancelAnimation();
         activitySpawnBotBinding.micImage.setVisibility(View.VISIBLE);
         activitySpawnBotBinding.mic.setVisibility(View.GONE);
-
-
     }
 
     @Override
@@ -354,7 +366,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 break;
 
             case SpeechRecognizer.ERROR_NO_MATCH:
-                //activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                 new CountDownTimer(1000, 2500) {
                     @Override
                     public void onTick(long millisUntilFinished) {
@@ -366,15 +377,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                         activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                     }
                 }.start();
-               /* if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
-                    if (speechRecognizer == null)
-                        initSpeech();
-                    speechRecognizer.startListening(speechIntentDispatcher);
-                    activitySpawnBotBinding.micImage.setVisibility(View.GONE);
-                    activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
-                    activitySpawnBotBinding.mic.playAnimation();
-
-                }*/
                 break;
         }
     }
@@ -401,10 +403,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void callService(String speechString) {
         loading();
-        // WebServiceUtils.getInstance(this).setUpObserver(this);
-        //WebServiceUtils.getInstance().getRetrofitClient();
-        // WebServiceUtils.getInstance(this).getBotResponse(speechString);
-        webSearchViewModel
+
+        classifyViewModel.classify(speechString, language).observe(this, (jsonObject -> {
+            if (jsonObject != null)
+                onSuccess(jsonObject);
+            else onFailure();
+        }));
+
+       /* webSearchViewModel
                 .getSpawnAIResponse(speechString,
                         SharedPreferenceUtility
                                 .getInstance(this)
@@ -413,7 +419,38 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                         (chatCardModel ->
                                 chatViews(null,
                                         chatCardModel.getType(),
-                                        chatCardModel)));
+                                        chatCardModel)));*/
+    }
+
+    private void onFailure() {
+        try {
+            classifyViewModel
+                    .getWebSearch(spokenString,
+                            SharedPreferenceUtility.getInstance(this).getStringPreference("lang"),
+                            AppConstants.RESULT_TYPE_SEARCH)
+                    .observe(this,
+                            (chatCardModel ->
+                                    chatViews(null,
+                                            chatCardModel.getType(),
+                                            chatCardModel)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void onSuccess(JSONObject jsonObject) {
+        try {
+            JSONArray jsonArray = jsonObject.getJSONArray("message_" + language);
+            ChatCardModel chatBotResponseModel = new ChatCardModel();
+            int index = new Random().nextInt(jsonArray.length());
+            chatBotResponseModel.setMessage(jsonArray.get(index).toString());
+            chatBotResponseModel.setType(jsonObject.getInt("type"));
+            chatBotResponseModel.setLang(language);
+            chatBotResponseModel.setAction(jsonObject.getString("action"));
+            chatViews("", ChatViewTypes.CHAT_VIEW_BOT, chatBotResponseModel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -890,4 +927,54 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             });
         }
     };
+
+    @SuppressLint("NewApi")
+    private void registerConnectivityNetworkMonitorForAPI21AndUp() {
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+
+        connectivityManager.registerNetworkCallback(
+                builder.build(),
+                new ConnectivityManager.NetworkCallback() {
+                    @Override
+                    public void onAvailable(Network network) {
+                        sendBroadcast(getConnectivityIntent(false));
+                    }
+
+                    @Override
+                    public void onLost(Network network) {
+                        sendBroadcast(getConnectivityIntent(true));
+                    }
+                }
+        );
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case "com.spawn.ai.CONNECTIVITY_CHANGE":
+                    isConnected = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                    if (!isConnected) {
+                        activitySpawnBotBinding.micRl.setVisibility(View.VISIBLE);
+                    } else {
+                        activitySpawnBotBinding.micRl.setVisibility(View.GONE);
+                    }
+                    break;
+            }
+        }
+    };
+
+
+    private Intent getConnectivityIntent(boolean noConnection) {
+
+        Intent intent = new Intent();
+
+        intent.setAction("com.spawn.ai.CONNECTIVITY_CHANGE");
+        intent.putExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, noConnection);
+
+        return intent;
+
+    }
 }

@@ -16,6 +16,7 @@ import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 import com.spawn.ai.viewmodels.WebSearchViewModel;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 public class SpawnSplashScreen extends AppCompatActivity {
@@ -29,7 +30,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spawn_splash_screen);
         context = this;
-        webSearchViewModel = ViewModelProviders.of(this).get(WebSearchViewModel.class);
+        webSearchViewModel = new ViewModelProvider(this).get(WebSearchViewModel.class);
 
         spawnLogo = findViewById(R.id.spawn_logo);
         spawnLogo.setRepeatCount(LottieDrawable.INFINITE);
@@ -58,7 +59,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
         });
         Handler handler = new Handler();
         webSearchViewModel
-                .getFile(AppUtils.getInstance().getDataFile(), this)
+                .getFile(AppUtils.getInstance().getDataFile())
                 .observe(this, jsonElement -> {
                             if (jsonElement != null) {
                                 JsonFileReader.getInstance().fileName(AppUtils.getInstance().getDataFile());
