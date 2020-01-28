@@ -158,8 +158,7 @@ public class ClassifyViewModel extends AndroidViewModel {
 
                 } else {
 
-                    ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
-                    chatCardModelMutableLiveData.postValue(chatCardModel);
+                    chatCardModelMutableLiveData.postValue(null);
                 }
             }
 

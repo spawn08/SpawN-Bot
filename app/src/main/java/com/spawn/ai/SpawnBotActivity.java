@@ -414,12 +414,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                                             chatCardModel.getType(),
                                             chatCardModel);
                                 else
-                                    classifyViewModel.classify(speechString, language)
-                                            .observe(this, (jsonObject -> {
-                                                if (jsonObject != null)
-                                                    onSuccess(jsonObject);
-                                                else onFailure();
-                                            }));
+                                    onFailure();
+
                             }
                     ));
         } else {
