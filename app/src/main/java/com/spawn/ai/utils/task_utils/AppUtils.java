@@ -17,9 +17,12 @@ import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import androidx.core.app.NotificationCompat;
 
@@ -136,5 +139,25 @@ public class AppUtils {
             Crashlytics.logException(e);
         }
         return text + ".";
+    }
+
+    public String checkforRegex(String speechString, String language) {
+        try {
+            Pattern pattern;
+            JSONObject jsonObject = new JSONObject(JsonFileReader.getInstance().getFileContents());
+            JSONObject regex = jsonObject.getJSONObject("regex");
+            JSONArray jsonArray = regex.getJSONArray(language);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                pattern = Pattern.compile(jsonArray.getString(i));
+                Matcher matcher = pattern.matcher(speechString);
+                if (matcher.find()) {
+                    return matcher.group(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
     }
 }

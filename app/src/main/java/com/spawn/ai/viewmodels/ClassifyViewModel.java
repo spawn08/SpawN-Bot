@@ -1,10 +1,13 @@
 package com.spawn.ai.viewmodels;
 
 import android.app.Application;
+import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.ISpawnAPI;
 import com.spawn.ai.model.ChatCardModel;
+import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.model.websearch.News;
 import com.spawn.ai.model.websearch.WebSearchResults;
 import com.spawn.ai.network.NLPInterceptor;
@@ -17,6 +20,7 @@ import org.json.JSONObject;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
+
 import constants.AppConstants;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -112,6 +116,62 @@ public class ClassifyViewModel extends AndroidViewModel {
                 }
             });
         }
+        return chatCardModelMutableLiveData;
+    }
+
+    public MutableLiveData<ChatCardModel> getWikiResponse(String entity, final String query, String language) {
+        chatCardModelMutableLiveData = new MutableLiveData<>();
+        final String cloneEntity = entity.trim().replace(" ", "_");
+
+        Log.d("ENTITY: ", cloneEntity);
+        String urlKey = "api_url_" + language;
+        String API_URL = JsonFileReader.getInstance().getValueFromJson(urlKey);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        Call<SpawnWikiModel> data;
+        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+
+        if (language.equalsIgnoreCase("en"))
+            data = spawnAPI.getWiki(cloneEntity);
+        else
+            data = spawnAPI.getWikiHI(cloneEntity);
+
+        data.enqueue(new Callback<SpawnWikiModel>() {
+            @Override
+            public void onResponse(Call<SpawnWikiModel> call, Response<SpawnWikiModel> response) {
+                if (response.isSuccessful()) {
+                    ChatCardModel chatCardModel;
+                    Log.d("API CONTENT: ", response.body().toString());
+                    SpawnWikiModel spawnWikiModel = response.body();
+
+                    //FireCalls.exec(new DumpTask(spawnWikiModel));
+                    if (spawnWikiModel.getType().equals("disambiguation")) {
+                        //Handle case for page not found
+                        chatCardModelMutableLiveData.postValue(null);
+                    } else {
+                        chatCardModel = new ChatCardModel(spawnWikiModel, 5);
+                        chatCardModelMutableLiveData.postValue(chatCardModel);
+                    }
+
+                } else {
+
+                    ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
+                    chatCardModelMutableLiveData.postValue(chatCardModel);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SpawnWikiModel> call, Throwable t) {
+                //Handle case for failure
+                ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
+                chatCardModelMutableLiveData.postValue(chatCardModel);
+                Crashlytics.log(1, "Webservice Request Error -->", t.getMessage());
+
+            }
+        });
         return chatCardModelMutableLiveData;
     }
 }

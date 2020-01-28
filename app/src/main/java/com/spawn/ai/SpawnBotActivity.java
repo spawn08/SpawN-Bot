@@ -27,6 +27,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
@@ -55,12 +62,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import constants.AppConstants;
 
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
@@ -403,13 +404,31 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void callService(String speechString) {
         loading();
-
-        classifyViewModel.classify(speechString, language).observe(this, (jsonObject -> {
-            if (jsonObject != null)
-                onSuccess(jsonObject);
-            else onFailure();
-        }));
-
+        String entity = AppUtils.getInstance().checkforRegex(speechString, language);
+        if (entity != null) {
+            classifyViewModel.getWikiResponse(entity, speechString, language)
+                    .observe(this, (
+                            chatCardModel -> {
+                                if (chatCardModel != null)
+                                    chatViews(null,
+                                            chatCardModel.getType(),
+                                            chatCardModel);
+                                else
+                                    classifyViewModel.classify(speechString, language)
+                                            .observe(this, (jsonObject -> {
+                                                if (jsonObject != null)
+                                                    onSuccess(jsonObject);
+                                                else onFailure();
+                                            }));
+                            }
+                    ));
+        } else {
+            classifyViewModel.classify(speechString, language).observe(this, (jsonObject -> {
+                if (jsonObject != null)
+                    onSuccess(jsonObject);
+                else onFailure();
+            }));
+        }
        /* webSearchViewModel
                 .getSpawnAIResponse(speechString,
                         SharedPreferenceUtility
