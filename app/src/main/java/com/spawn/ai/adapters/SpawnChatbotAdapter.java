@@ -56,10 +56,6 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 View view = LayoutInflater.from(context).inflate(R.layout.spawn_chat_user, parent, false);
                 return new SpawnChatUserViewHolder(view);
 
-            case ChatViewTypes.CHAT_VIEW_BOT:
-                View viewBot = LayoutInflater.from(context).inflate(R.layout.spawn_chat_bot, parent, false);
-                return new SpawnChatBotViewHolder(viewBot);
-
             case ChatViewTypes.CHAT_VIEW_LOADING:
                 View viewLoading = LayoutInflater.from(context).inflate(R.layout.spawn_bot_loading, parent, false);
                 return new SpawnChatLoadingViewHolder(viewLoading);
@@ -140,13 +136,10 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 final SpawnChatCardViewHolder spawnChatCardViewHolder = (SpawnChatCardViewHolder) holder;
                 spawnChatCardViewHolder.spawn_card_text.setText(chatMessageType.get(position).getMessage());
                 spawnChatCardViewHolder.card_button.setText(chatMessageType.get(position).getButtonText());
-                spawnChatCardViewHolder.card_button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        chatMessageType.get(position).setActionCompleted(true);
-                        iBotObserver.setAction(chatMessageType.get(position).getAction(), null);
+                spawnChatCardViewHolder.card_button.setOnClickListener(view -> {
+                    chatMessageType.get(position).setActionCompleted(true);
+                    iBotObserver.setAction(chatMessageType.get(position).getAction(), null);
 
-                    }
                 });
 
                 if (iBotObserver != null
@@ -189,26 +182,19 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     spawnWikiViewHolder.wikiParagraph.setText(spawnWikiModel.getTitle());
                     spawnWikiViewHolder.wikiButton.setText(spawnWikiModel.getTitle());
                 } else {
-                    spawnWikiViewHolder.wikiParagraph.setText(spawnWikiModel.getTitle() + " - " +
-                            spawnWikiModel.getDescription()
+                    spawnWikiViewHolder.wikiParagraph.setText(String.format("%s - %s", spawnWikiModel.getTitle(), spawnWikiModel.getDescription())
                     );
-                    spawnWikiViewHolder.wikiButton.setText(spawnWikiModel.getTitle() + " - " + spawnWikiModel.getDescription());
+                    spawnWikiViewHolder.wikiButton.setText(String.format("%s - %s", spawnWikiModel.getTitle(), spawnWikiModel.getDescription()));
                 }
-                spawnWikiViewHolder.wikiButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        chatMessageType.get(position).setActionCompleted(true);
-                        iBotObserver.setAction("web_action", spawnWikiModel);
+                spawnWikiViewHolder.wikiButton.setOnClickListener(view -> {
+                    chatMessageType.get(position).setActionCompleted(true);
+                    iBotObserver.setAction("web_action", spawnWikiModel);
 
-                    }
                 });
 
-                spawnWikiViewHolder.cardView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        chatMessageType.get(position).setActionCompleted(true);
-                        iBotObserver.setAction("web_action", spawnWikiModel);
-                    }
+                spawnWikiViewHolder.cardView.setOnClickListener(view -> {
+                    chatMessageType.get(position).setActionCompleted(true);
+                    iBotObserver.setAction("web_action", spawnWikiModel);
                 });
 
                 if (iBotObserver != null
