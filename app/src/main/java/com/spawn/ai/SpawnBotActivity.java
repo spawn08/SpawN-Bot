@@ -27,6 +27,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
@@ -399,6 +406,17 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void callService(String speechString) {
         loading();
+        String entity = AppUtils.getInstance().checkforRegex(speechString, language);
+        if (entity != null) {
+            classifyViewModel.getWikiResponse(entity, speechString, language)
+                    .observe(this, (
+                            chatCardModel -> {
+                                if (chatCardModel != null)
+                                    chatViews(null,
+                                            chatCardModel.getType(),
+                                            chatCardModel);
+                                else
+                                    onFailure();
 
         classifyViewModel.classify(speechString, language).observe(this, (this::onChanged));
 
@@ -454,10 +472,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
         if (bundle != null
                 && bundle.containsKey(SpeechRecognizer.RESULTS_RECOGNITION)
-                && Objects.requireNonNull(bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)).size() > 0) {
+                && bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).size() > 0) {
             ArrayList<String> partialResults = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
-            if (Objects.requireNonNull(partialResults).get(0) != null) {
+            if (partialResults.get(0) != null) {
                 String partialString = partialResults.get(0);
                 //if (partialString.length() % 2 == 0)
                 //   chatViews(partialString, 0, null);
@@ -495,7 +513,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 chatMessageType.setDate(new DateTimeUtils().getDate());
                 chatMessageType.setBotResponse(null);
                 chatMessageType.setAction(null);
-                botResponses.add(chatMessageType);
+                if (botResponses.size() == 0)
+                    botResponses.add(chatMessageType);
+                else {
+                    // botResponses.remove(botResponses.size() - 1);
+                    botResponses.add(chatMessageType);
+                }
                 chatbotAdapter.setAdapter(botResponses);
 
                 break;
@@ -720,7 +743,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     }
 
     private void updateLanguageConfig(String lang) {
-        locale = new Locale(lang);
+        Locale locale = new Locale(lang);
         Configuration overrideConfiguration = SpawnAiApplication.getContext().getResources().getConfiguration();
         overrideConfiguration.setLocale(locale);
         createConfigurationContext(overrideConfiguration);
@@ -821,13 +844,23 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 else intent.putExtra("url", ((ValueResults) object).getUrl());
             startActivity(intent);
         } else if (action.equals("finish")) {
-            handler.postDelayed(this::finish, 1500);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    finish();
+                }
+            }, 1500);
 
         } else if (action.equals("speak")) {
             Answers.getInstance()
                     .logCustom(new CustomEvent(this.getClass().getSimpleName())
                             .putCustomAttribute("action", "Context conversation"));
-            handler.postDelayed(this::startListen, 2500);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startListen();
+                }
+            }, 2500);
 
         } else if (action.equalsIgnoreCase("google_search")) {
             Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Google Search"));
@@ -862,7 +895,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     public void onInit(int i) {
         if (i == TextToSpeech.SUCCESS) {
             String lang = SharedPreferenceUtility.getInstance(this).getStringPreference("lang");
-            textToSpeech.setLanguage(locale);
+            textToSpeech.setLanguage(new Locale(lang));
             Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("TTSLanguage", lang));
             textToSpeech.setPitch(0.80f);
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
@@ -877,7 +910,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         chatViews(null, chatCardModel.getType(), chatCardModel);
     }
 
-    private UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
+    UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
         @Override
         public void onStart(String s) {
 
@@ -885,13 +918,23 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
         @Override
         public void onDone(String s) {
-            runOnUiThread(() -> activitySpawnBotBinding.containerStop.setVisibility(View.GONE));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
+                }
+            });
 
         }
 
         @Override
         public void onError(String s) {
-            runOnUiThread(() -> activitySpawnBotBinding.containerStop.setVisibility(View.GONE));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
+                }
+            });
         }
     };
 
@@ -901,16 +944,16 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkRequest.Builder builder = new NetworkRequest.Builder();
 
-        Objects.requireNonNull(connectivityManager).registerNetworkCallback(
+        connectivityManager.registerNetworkCallback(
                 builder.build(),
                 new ConnectivityManager.NetworkCallback() {
                     @Override
-                    public void onAvailable(@NonNull Network network) {
+                    public void onAvailable(Network network) {
                         sendBroadcast(getConnectivityIntent(false));
                     }
 
                     @Override
-                    public void onLost(@NonNull Network network) {
+                    public void onLost(Network network) {
                         sendBroadcast(getConnectivityIntent(true));
                     }
                 }
@@ -920,13 +963,15 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ("com.spawn.ai.CONNECTIVITY_CHANGE".equals(Objects.requireNonNull(intent.getAction()))) {
-                boolean isConnected = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-                if (!isConnected) {
-                    activitySpawnBotBinding.micRl.setVisibility(View.VISIBLE);
-                } else {
-                    activitySpawnBotBinding.micRl.setVisibility(View.GONE);
-                }
+            switch (intent.getAction()) {
+                case "com.spawn.ai.CONNECTIVITY_CHANGE":
+                    isConnected = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                    if (!isConnected) {
+                        activitySpawnBotBinding.micRl.setVisibility(View.VISIBLE);
+                    } else {
+                        activitySpawnBotBinding.micRl.setVisibility(View.GONE);
+                    }
+                    break;
             }
         }
     };
@@ -941,11 +986,5 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
         return intent;
 
-    }
-
-    private void onChanged(JSONObject jsonObject) {
-        if (jsonObject != null) {
-            onSuccess(jsonObject);
-        } else onFailure();
     }
 }

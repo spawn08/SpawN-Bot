@@ -1,7 +1,7 @@
 {
   "questions_title_en": "Questions you can ask me:",
   "questions_title_hi": "प्रश्न आप मुझसे पूछ सकते हैं:",
-  "app_version": "12",
+  "app_version": "18",
   "force_update": "false",
   "api_url_en": "https://en.wikipedia.org/api/rest_v1/page/summary/",
   "api_url_hi": "https://hi.wikipedia.org/api/rest_v1/page/summary/",
@@ -21,6 +21,32 @@
     "बराक ओबामा",
     "विश्व युद्ध"
   ],
+  "regex": {
+    "en": [
+      "From (.*?) to (.*)",
+      "who is (.*)",
+      "tell me about (.*)",
+      "tell me about something (.*)",
+      "tell me something about (.*)",
+      "meaning of (.*)",
+      "define (.*)",
+      "Define (.*)",
+      "movie (.*)",
+      "what is (.*)",
+      "(.*?) meaning",
+      "(.*?) definition",
+      "(.*?) movie"
+    ],
+    "hi": [
+      "मुझे (.*?) के बारे में बताओ",
+      "(.*?) के बारे में बताओ",
+      "मुझे (.*?) के बारे में बताएं",
+      "(.*?) के बारे में बता",
+      "(.*?) के बारे में",
+      "कौन है (.*)",
+      "(.*?) कौन है"
+    ]
+  },
   "bot_hi": {
     "type": 1,
     "message_en": [
