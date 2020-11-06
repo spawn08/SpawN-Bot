@@ -891,7 +891,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         chatViews(null, chatCardModel.getType(), chatCardModel);
     }
 
-    private UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
+    private final UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
         @Override
         public void onStart(String s) {
 
