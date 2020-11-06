@@ -7,7 +7,6 @@ import com.spawn.ai.model.BotMLResponse;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.network.NLPInterceptor;
 
-import constants.AppConstants;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;

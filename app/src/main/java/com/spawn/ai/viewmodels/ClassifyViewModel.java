@@ -3,7 +3,7 @@ package com.spawn.ai.viewmodels;
 import android.app.Application;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.ISpawnAPI;
 import com.spawn.ai.model.ChatCardModel;
@@ -21,7 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import constants.AppConstants;
+import com.spawn.ai.constants.AppConstants;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -167,7 +167,7 @@ public class ClassifyViewModel extends AndroidViewModel {
                 //Handle case for failure
                 ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                 chatCardModelMutableLiveData.postValue(chatCardModel);
-                Crashlytics.log(1, "Webservice Request Error -->", t.getMessage());
+                FirebaseCrashlytics.getInstance().log("Webservice Request Error -->"+ t.getMessage());
 
             }
         });

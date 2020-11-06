@@ -12,7 +12,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.SpawnBotActivity;
 
@@ -136,7 +136,7 @@ public class AppUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Crashlytics.logException(e);
+            FirebaseCrashlytics.getInstance().log(e.toString());
         }
         return text + ".";
     }

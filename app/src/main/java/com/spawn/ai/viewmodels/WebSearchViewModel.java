@@ -2,7 +2,7 @@ package com.spawn.ai.viewmodels;
 
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.JsonElement;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.ISpawnAPI;
@@ -18,7 +18,9 @@ import com.spawn.ai.utils.task_utils.JsonFileReader;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import constants.AppConstants;
+
+import com.spawn.ai.constants.AppConstants;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,7 +33,7 @@ public class WebSearchViewModel extends ViewModel {
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
     private MutableLiveData<JsonElement> jsonElementMutableLiveData;
     private String[] creds = AppUtils.getInstance().getAPICreds().split(":");
-    private String apiUrl = AppUtils.getInstance().getUrl();
+    private final String apiUrl = AppUtils.getInstance().getUrl();
 
     private void getMLResponse(String q, String type, String language) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -158,7 +160,7 @@ public class WebSearchViewModel extends ViewModel {
                 //Handle case for failure
                 ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                 chatCardModelMutableLiveData.setValue(chatCardModel);
-                Crashlytics.log(1, "Webservice Request Error -->", t.getMessage());
+                FirebaseCrashlytics.getInstance().log("Webservice Request Error -->" + t.getMessage());
 
             }
         });
@@ -264,21 +266,21 @@ public class WebSearchViewModel extends ViewModel {
                     } catch (Exception e) {
                         e.printStackTrace();
                         jsonElementMutableLiveData.setValue(null);
-                        Crashlytics.log(1, "Webservice -->", e.getMessage());
+                        FirebaseCrashlytics.getInstance().log("Webservice -->"+ e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Log.e("ERROR: ", t.getMessage());
-                    Crashlytics.log(1, "Webservice Request Error -->", t.getMessage());
+                    FirebaseCrashlytics.getInstance().log("Webservice Request Error -->"+ t.getMessage());
                     jsonElementMutableLiveData.setValue(null);
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
             jsonElementMutableLiveData.setValue(null);
-            Crashlytics.log(1, "Webservice", e.getMessage());
+            FirebaseCrashlytics.getInstance().log("Webservice -> "+ e.getMessage());
         }
         return jsonElementMutableLiveData;
     }

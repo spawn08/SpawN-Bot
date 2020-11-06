@@ -3,7 +3,7 @@ package com.spawn.ai.utils.task_utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.JsonElement;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.model.ChatCardModel;
@@ -54,7 +54,7 @@ public class JsonFileReader {
         } catch (Exception e) {
             e.printStackTrace();
             loadLocalFile(context);
-            Crashlytics.logException(e);
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
         }
     }
 
@@ -82,7 +82,7 @@ public class JsonFileReader {
             jsonObject = new JSONObject(contents);
         } catch (Exception e) {
             e.printStackTrace();
-            Crashlytics.logException(e);
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
             return null;
         }
         return jsonObject;
@@ -138,7 +138,7 @@ public class JsonFileReader {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            Crashlytics.logException(e);
+            FirebaseCrashlytics.getInstance().log(e.getMessage());
             return chatCardModel;
         }
         return chatCardModel;
@@ -168,7 +168,7 @@ public class JsonFileReader {
                 return message;
             } catch (JSONException e) {
                 e.printStackTrace();
-                Crashlytics.logException(e);
+                FirebaseCrashlytics.getInstance().log(e.getMessage());
                 message = "Sorry, I could not understand what you just said";
             }
         }
@@ -187,7 +187,7 @@ public class JsonFileReader {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                Crashlytics.logException(e);
+                FirebaseCrashlytics.getInstance().log(e.getMessage());
             }
         }
     }
@@ -203,7 +203,7 @@ public class JsonFileReader {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                Crashlytics.logException(e);
+                FirebaseCrashlytics.getInstance().log(e.getMessage());
                 return value;
             }
         }

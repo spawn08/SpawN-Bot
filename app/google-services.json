@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "223118979484",
-    "firebase_url": "https://professor-spawn.firebaseio.com",
-    "project_id": "professor-spawn",
-    "storage_bucket": "professor-spawn.appspot.com"
+    "project_number": "362656826055",
+    "firebase_url": "https://verdant-axiom-172811.firebaseio.com",
+    "project_id": "verdant-axiom-172811",
+    "storage_bucket": "verdant-axiom-172811.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:223118979484:android:f863899531c985c4",
+        "mobilesdk_app_id": "1:362656826055:android:4414f0f266cab0b2cf74e2",
         "android_client_info": {
           "package_name": "com.spawn.ai"
         }
       },
       "oauth_client": [
         {
-          "client_id": "223118979484-2sl5eu5n3db4nugn6tbkr0ud3a9gbpbo.apps.googleusercontent.com",
+          "client_id": "362656826055-d7mjgim1ipfn1ijqfm2nj1v8lbsp74ta.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyACZfwTcdta1JSH4YjDFyy9K-0I_9Ppl90"
+          "current_key": "AIzaSyCKjb6n0aY0lMq8gnyJekT969KYg0hHpAw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "223118979484-2sl5eu5n3db4nugn6tbkr0ud3a9gbpbo.apps.googleusercontent.com",
+              "client_id": "362656826055-bmes9j59h3sa172lcm0oo1jin0b5hdi5.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

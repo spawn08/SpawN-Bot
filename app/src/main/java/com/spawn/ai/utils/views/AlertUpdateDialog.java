@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
 
 public class AlertUpdateDialog extends Dialog implements View.OnClickListener {
@@ -41,7 +41,7 @@ public class AlertUpdateDialog extends Dialog implements View.OnClickListener {
                 try {
                     activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + "com.spawn.ai")));
                 } catch (Exception e) {
-                    Crashlytics.logException(e);
+                    FirebaseCrashlytics.getInstance().log(e.getMessage());
                     activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + "com.spawn.ai")));
                 }
                 break;

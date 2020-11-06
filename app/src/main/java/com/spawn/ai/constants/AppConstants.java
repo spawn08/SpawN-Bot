@@ -1,4 +1,4 @@
-package constants;
+package com.spawn.ai.constants;
 
 public class AppConstants {
 

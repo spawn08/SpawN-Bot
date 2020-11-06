@@ -34,9 +34,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
+import com.google.firebase.BuildConfig;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.activities.SpawnWebActivity;
 import com.spawn.ai.adapters.SpawnChatbotAdapter;
 import com.spawn.ai.constants.ChatViewTypes;
@@ -62,7 +61,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
-import constants.AppConstants;
+import com.spawn.ai.constants.AppConstants;
 
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
 
@@ -107,7 +106,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 .titleText
                 .setText(AppUtils.getStringRes(R.string.app_name, this, SharedPreferenceUtility.getInstance(this).getStringPreference("lang")));
 
-        Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App open"));
+        FirebaseCrashlytics.getInstance().setCustomKey("action", "App open");
 
         setUpClickListener();
 
@@ -344,7 +343,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void onError(int i) {
         Log.d(TAG, "ERROR " + i);
-        Crashlytics.log(TAG + " Speech ERROR " + i);
+        FirebaseCrashlytics.getInstance().log(TAG + " Speech ERROR " + i);
         switch (i) {
             case SpeechRecognizer.ERROR_NETWORK:
                 activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
@@ -641,7 +640,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             activitySpawnBotBinding.micImage.setVisibility(View.GONE);
             activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
             activitySpawnBotBinding.mic.playAnimation();
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Mic Listening"));
+            FirebaseCrashlytics.getInstance().setCustomKey("action", "Mic Listening");
 
         } else if (i == R.id.mic_image) {
             if (activitySpawnBotBinding.recyclerContainer.getVisibility() == View.GONE)
@@ -665,7 +664,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
                 requestPermission();
             }
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Mic Listening"));
+            FirebaseCrashlytics.getInstance().setCustomKey("action", "Mic Listening");
 
         } else if (i == R.id.recycler_container) {
 
@@ -792,10 +791,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 textToSpeech.shutdown();
                 textToSpeech = null;
             }
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App close"));
+            FirebaseCrashlytics.getInstance().setCustomKey("action", "App close");
         } catch (Exception e) {
             e.printStackTrace();
-            Crashlytics.logException(e);
+            FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
         }
 
     }
@@ -821,14 +820,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void speakBot(String message) {
         textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
-        Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "App Speaking"));
+        FirebaseCrashlytics.getInstance().setCustomKey("action", "App Speaking");
     }
 
     @Override
     public void setAction(String action, Object object) {
         Handler handler = new Handler();
         if (action.equals("web_action")) {
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Web Open"));
+            FirebaseCrashlytics.getInstance().setCustomKey("action", "Web Open");
             Intent intent = new Intent(this, SpawnWebActivity.class);
             if (object instanceof SpawnWikiModel)
                 intent.putExtra("url", ((SpawnWikiModel) object).getContent_urls().getMobile().getPage());
@@ -841,13 +840,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             handler.postDelayed(this::finish, 1500);
 
         } else if (action.equals("speak")) {
-            Answers.getInstance()
-                    .logCustom(new CustomEvent(this.getClass().getSimpleName())
-                            .putCustomAttribute("action", "Context conversation"));
+            FirebaseCrashlytics.getInstance().setCustomKey("action", "Context conversation");
             handler.postDelayed(this::startListen, 2500);
 
         } else if (action.equalsIgnoreCase("google_search")) {
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("action", "Google Search"));
+            FirebaseCrashlytics.getInstance().setCustomKey("action", "Google Search");
             Intent intent = new Intent(this, SpawnWebActivity.class);
             intent.putExtra("url", getResources().getString(R.string.google_search) + spokenString);
             startActivity(intent);
@@ -880,12 +877,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         if (i == TextToSpeech.SUCCESS) {
             String lang = SharedPreferenceUtility.getInstance(this).getStringPreference("lang");
             textToSpeech.setLanguage(locale);
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("TTSLanguage", lang));
+            FirebaseCrashlytics.getInstance().setCustomKey("TTSLanguage", lang);
             textToSpeech.setPitch(0.80f);
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
         } else {
             Log.e(this.getClass().getName(), "Initilization Failed!");
-            Answers.getInstance().logCustom(new CustomEvent(this.getClass().getSimpleName()).putCustomAttribute("ttsInitialization", "Failure"));
+            FirebaseCrashlytics.getInstance().setCustomKey("ttsInitialization", "Failure");
         }
     }
 
