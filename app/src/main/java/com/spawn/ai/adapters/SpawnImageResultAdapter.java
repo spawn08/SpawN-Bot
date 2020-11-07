@@ -31,8 +31,7 @@ public class SpawnImageResultAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.image_result_view, parent, false);
-        ImageResultHolder imageResultHolder = new ImageResultHolder(view);
-        return imageResultHolder;
+        return new ImageResultHolder(view);
     }
 
     @Override

@@ -15,8 +15,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DumpTask implements Runnable {
-    private Object object;
-    private String username, password, url;
+    private final Object object;
+    private final String username;
+    private final String password;
+    private final String url;
 
     public DumpTask(Object object, String username, String password, String url) {
         this.object = object;

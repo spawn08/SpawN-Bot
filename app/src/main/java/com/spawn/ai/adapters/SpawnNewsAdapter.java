@@ -37,8 +37,7 @@ public class SpawnNewsAdapter extends RecyclerView.Adapter<SpawnNewsViewHolder> 
     @Override
     public SpawnNewsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(context).inflate(R.layout.spawn_chat_news, viewGroup, false);
-        SpawnNewsViewHolder spawnNewsViewHolder = new SpawnNewsViewHolder(view);
-        return spawnNewsViewHolder;
+        return new SpawnNewsViewHolder(view);
     }
 
     @Override

@@ -32,8 +32,7 @@ public class SpawnWebSearchAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.web_result_views, parent, false);
-        WebResultHolder webResultHolder = new WebResultHolder(view);
-        return webResultHolder;
+        return new WebResultHolder(view);
     }
 
     @Override

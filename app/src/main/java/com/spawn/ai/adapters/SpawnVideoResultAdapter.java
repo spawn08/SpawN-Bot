@@ -20,8 +20,8 @@ import java.util.ArrayList;
 
 public class SpawnVideoResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context context;
-    private ArrayList<VideoValueResult> videoResult;
+    private final Context context;
+    private final ArrayList<VideoValueResult> videoResult;
 
     public SpawnVideoResultAdapter(Context context, ArrayList<VideoValueResult> videoResult) {
         this.videoResult = videoResult;

@@ -33,9 +33,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context context;
+    private final Context context;
     private ArrayList<ChatMessageType> chatMessageType;
-    private IBotObserver iBotObserver;
+    private final IBotObserver iBotObserver;
 
     public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType) {
         this.context = context;
@@ -248,10 +248,10 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 }
 
                 //Images
-                if (webSearchResults.getImage() != null
-                        && webSearchResults.getImage().getValue() != null) {
+                if (webSearchResults.getImages() != null
+                        && webSearchResults.getImages().getValue() != null) {
                     spawnWebSearchHolder.imageList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-                    SpawnImageResultAdapter spawnImageResultAdapter = new SpawnImageResultAdapter(context, webSearchResults.getImage().getValue());
+                    SpawnImageResultAdapter spawnImageResultAdapter = new SpawnImageResultAdapter(context, webSearchResults.getImages().getValue());
                     spawnWebSearchHolder.imageList.setAdapter(spawnImageResultAdapter);
                     spawnImageResultAdapter.notifyDataSetChanged();
                 } else {

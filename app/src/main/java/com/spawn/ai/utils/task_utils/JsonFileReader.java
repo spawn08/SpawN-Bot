@@ -13,10 +13,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Random;
-
 
 public class JsonFileReader {
 
@@ -54,7 +55,7 @@ public class JsonFileReader {
         } catch (Exception e) {
             e.printStackTrace();
             loadLocalFile(context);
-            FirebaseCrashlytics.getInstance().log(e.getMessage());
+            FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
         }
     }
 
@@ -66,7 +67,7 @@ public class JsonFileReader {
                 byte[] bytes = new byte[is.available()];
                 is.read(bytes);
                 is.close();
-                json = new String(bytes, "utf-8");
+                json = new String(bytes, StandardCharsets.UTF_8);
                 this.fileContents = json;
                 Log.d(JsonFileReader.class.getSimpleName(), "File read from asset");
             } catch (Exception e) {
@@ -82,7 +83,7 @@ public class JsonFileReader {
             jsonObject = new JSONObject(contents);
         } catch (Exception e) {
             e.printStackTrace();
-            FirebaseCrashlytics.getInstance().log(e.getMessage());
+            FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
             return null;
         }
         return jsonObject;
@@ -138,7 +139,7 @@ public class JsonFileReader {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            FirebaseCrashlytics.getInstance().log(e.getMessage());
+            FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
             return chatCardModel;
         }
         return chatCardModel;
@@ -168,7 +169,7 @@ public class JsonFileReader {
                 return message;
             } catch (JSONException e) {
                 e.printStackTrace();
-                FirebaseCrashlytics.getInstance().log(e.getMessage());
+                FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
                 message = "Sorry, I could not understand what you just said";
             }
         }
@@ -187,7 +188,7 @@ public class JsonFileReader {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                FirebaseCrashlytics.getInstance().log(e.getMessage());
+                FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
             }
         }
     }
@@ -203,7 +204,7 @@ public class JsonFileReader {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                FirebaseCrashlytics.getInstance().log(e.getMessage());
+                FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
                 return value;
             }
         }

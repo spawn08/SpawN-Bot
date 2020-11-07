@@ -1,14 +1,9 @@
 package com.spawn.ai.model;
 
+import lombok.Data;
+
+@Data
 public class NotablePerson {
 
     private Person value;
-
-    public Person getValue() {
-        return value;
-    }
-
-    public void setValue(Person value) {
-        this.value = value;
-    }
 }

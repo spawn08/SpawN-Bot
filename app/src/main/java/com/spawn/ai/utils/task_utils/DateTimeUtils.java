@@ -10,7 +10,6 @@ public class DateTimeUtils {
 
     public String getDate() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm");
-        String date = simpleDateFormat.format(new Date().getTime());
-        return date;
+        return simpleDateFormat.format(new Date().getTime());
     }
 }

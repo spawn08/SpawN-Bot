@@ -1,10 +1,17 @@
 package com.spawn.ai.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /*
     This class is responsible for chat conversation.
     This is master class for populating the chats. The ArrayList of this
     class object is passed to adapter.
 */
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class ChatMessageType {
 
     private String message;
@@ -19,100 +26,4 @@ public class ChatMessageType {
     private SpawnWikiModel spawnWikiModel;
     private String shortMessage;
     private ChatCardModel chatCardModel;
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public int getViewType() {
-        return viewType;
-    }
-
-    public void setViewType(int viewType) {
-        this.viewType = viewType;
-    }
-
-    public BotResponse getBotResponse() {
-        return botResponse;
-    }
-
-    public void setBotResponse(BotResponse botResponse) {
-        this.botResponse = botResponse;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getButtonText() {
-        return buttonText;
-    }
-
-    public void setButtonText(String buttonText) {
-        this.buttonText = buttonText;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public SpawnWikiModel getSpawnWikiModel() {
-        return spawnWikiModel;
-    }
-
-    public void setSpawnWikiModel(SpawnWikiModel spawnWikiModel) {
-        this.spawnWikiModel = spawnWikiModel;
-    }
-
-    public boolean isSpeakFinish() {
-        return speakFinish;
-    }
-
-    public void setSpeakFinish(boolean speakFinish) {
-        this.speakFinish = speakFinish;
-    }
-
-    public boolean isActionCompleted() {
-        return actionCompleted;
-    }
-
-    public void setActionCompleted(boolean actionCompleted) {
-        this.actionCompleted = actionCompleted;
-    }
-
-    public String getShortMessage() {
-        return shortMessage;
-    }
-
-    public void setShortMessage(String shortMessage) {
-        this.shortMessage = shortMessage;
-    }
-
-    public boolean isMessageAdded() {
-        return messageAdded;
-    }
-
-    public void setMessageAdded(boolean messageAdded) {
-        this.messageAdded = messageAdded;
-    }
-
-    public ChatCardModel getChatCardModel() {
-        return chatCardModel;
-    }
-
-    public void setChatCardModel(ChatCardModel chatCardModel) {
-        this.chatCardModel = chatCardModel;
-    }
 }

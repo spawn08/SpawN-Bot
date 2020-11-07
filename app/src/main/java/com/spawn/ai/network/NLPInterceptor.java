@@ -9,8 +9,8 @@ import okhttp3.Response;
 
 public class NLPInterceptor implements Interceptor {
 
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
 
     public NLPInterceptor(String username, String password) {
         this.username = username;

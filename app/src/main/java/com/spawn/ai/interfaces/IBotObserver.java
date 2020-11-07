@@ -6,15 +6,15 @@ import com.spawn.ai.model.SpawnWikiModel;
 
 public interface IBotObserver {
 
-    public void notifyBotResponse(ChatCardModel botResponse);
+    void notifyBotResponse(ChatCardModel botResponse);
 
-    public void notifyBotError();
+    void notifyBotError();
 
-    public void loading();
+    void loading();
 
-    public void speakBot(String message);
+    void speakBot(String message);
 
-    public void setAction(String action, Object object);
+    void setAction(String action, Object object);
 
-    public void setChatMessage(ChatMessageType chatMessage);
+    void setChatMessage(ChatMessageType chatMessage);
 }

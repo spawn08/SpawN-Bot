@@ -5,6 +5,6 @@ import com.spawn.ai.model.SpawnWikiModel;
 
 public interface IBotWikiNLP {
 
-    public void showUI(ChatCardModel chatCardModel);
+    void showUI(ChatCardModel chatCardModel);
 
 }

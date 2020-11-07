@@ -23,14 +23,13 @@ public class SpawnSplashScreen extends AppCompatActivity {
 
     public LottieAnimationView spawnLogo;
     public Context context;
-    private WebSearchViewModel webSearchViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spawn_splash_screen);
         context = this;
-        webSearchViewModel = new ViewModelProvider(this).get(WebSearchViewModel.class);
+        WebSearchViewModel webSearchViewModel = new ViewModelProvider(this).get(WebSearchViewModel.class);
 
         spawnLogo = findViewById(R.id.spawn_logo);
         spawnLogo.setRepeatCount(LottieDrawable.INFINITE);
