@@ -27,18 +27,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import dagger.hilt.android.AndroidEntryPoint;
-
 import com.google.firebase.BuildConfig;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.activities.SpawnWebActivity;
 import com.spawn.ai.adapters.SpawnChatbotAdapter;
+import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
 import com.spawn.ai.interfaces.IBotObserver;
@@ -62,7 +55,13 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
-import com.spawn.ai.constants.AppConstants;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
@@ -828,7 +827,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void setAction(String action, Object object) {
         Handler handler = new Handler();
-        if (action.equals("web_action")) {
+        if (action.equals(AppConstants.WEB_ACTION)) {
             FirebaseCrashlytics.getInstance().setCustomKey("action", "Web Open");
             Intent intent = new Intent(this, SpawnWebActivity.class);
             if (object instanceof SpawnWikiModel)
@@ -838,18 +837,32 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                     intent.putExtra("url", ((ValueResults) object).getAmpUrl());
                 else intent.putExtra("url", ((ValueResults) object).getUrl());
             startActivity(intent);
-        } else if (action.equals("finish")) {
+        } else if (action.equals(AppConstants.FINISH)) {
             handler.postDelayed(this::finish, 1500);
 
-        } else if (action.equals("speak")) {
+        } else if (action.equals(AppConstants.SPEAK)) {
             FirebaseCrashlytics.getInstance().setCustomKey("action", "Context conversation");
             handler.postDelayed(this::startListen, 2500);
 
-        } else if (action.equalsIgnoreCase("google_search")) {
+        } else if (action.equalsIgnoreCase(AppConstants.GOOGLE_SEARCH)) {
             FirebaseCrashlytics.getInstance().setCustomKey("action", "Google Search");
             Intent intent = new Intent(this, SpawnWebActivity.class);
             intent.putExtra("url", getResources().getString(R.string.google_search) + spokenString);
             startActivity(intent);
+        } else if (action.equalsIgnoreCase(AppConstants.RESULT_TYPE_NEWS)) {
+            try {
+                classifyViewModel
+                        .getWebSearch(spokenString,
+                                SharedPreferenceUtility.getInstance(this).getStringPreference("lang"),
+                                AppConstants.RESULT_TYPE_NEWS)
+                        .observe(this,
+                                (chatCardModel ->
+                                        chatViews(null,
+                                                chatCardModel.getType(),
+                                                chatCardModel)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
