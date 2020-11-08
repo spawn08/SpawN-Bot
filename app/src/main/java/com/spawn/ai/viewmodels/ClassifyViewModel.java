@@ -19,6 +19,10 @@ import com.spawn.ai.utils.task_utils.JsonFileReader;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
@@ -49,7 +53,7 @@ public class ClassifyViewModel extends AndroidViewModel {
         return BotUtils.getInstance().classify(sentence, language, results);
     }
 
-    public MutableLiveData<ChatCardModel> getWebSearch(String q, String language, String type) {
+    public MutableLiveData<ChatCardModel> getWebSearch(String q, String language, String type) throws UnsupportedEncodingException {
         chatCardModelMutableLiveData = new MutableLiveData<>();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new AzureInterceptor())
@@ -61,7 +65,7 @@ public class ClassifyViewModel extends AndroidViewModel {
                 .build();
         final AzureService azureService = retrofit.create(AzureService.class);
         if (type.equalsIgnoreCase("search")) {
-            Call<WebSearchResults> data = azureService.getWebResults(q, "5");
+            Call<WebSearchResults> data = azureService.getWebResults(URLEncoder.encode(q, "UTF-8"), "5");
             data.enqueue(new Callback<WebSearchResults>() {
                 @Override
                 public void onResponse(Call<WebSearchResults> call, Response<WebSearchResults> response) {
@@ -97,7 +101,7 @@ public class ClassifyViewModel extends AndroidViewModel {
             data.enqueue(new Callback<News>() {
                 @Override
                 public void onResponse(Call<News> call, Response<News> response) {
-                    if (response.isSuccessful()) {
+                    if (response.isSuccessful() && !response.body().getValue().isEmpty()) {
                         ChatCardModel chatCardModel = new ChatCardModel(response.body(), ChatViewTypes.CHAT_VIEW_NEWS);
                         chatCardModel.setMessage("Here are the latest news: ");
                         chatCardModel.setLang(language);
