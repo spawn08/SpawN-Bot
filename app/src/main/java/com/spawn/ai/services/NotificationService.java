@@ -30,6 +30,7 @@ public class NotificationService extends FirebaseMessagingService {
                 }
                 String token = task.getResult().getToken();
                 Log.e("My Token", token);
+                AppUtils.getInstance().setToken(token);
             }
         });
     }

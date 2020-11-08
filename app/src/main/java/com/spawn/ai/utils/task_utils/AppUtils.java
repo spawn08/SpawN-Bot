@@ -32,6 +32,7 @@ public class AppUtils {
 
     private static AppUtils appUtils;
     private JSONArray jsonArray;
+    private String token;
 
     static {
         System.loadLibrary("native-lib");
@@ -46,6 +47,10 @@ public class AppUtils {
     public native String getDataFile();
 
     public native String getNewsUrl();
+
+    public native String getAzureKey();
+
+    public native String getWebApiUrl();
 
     private AppUtils() {
 
@@ -82,6 +87,15 @@ public class AppUtils {
         return jsonArray;
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getToken(){
+        return token;
+    }
+
+
     public void sendDefaultNotification(Map<String, String> data, Context context) {
         Intent intent = new Intent(context, SpawnBotActivity.class);
         PendingIntent pendingIntent = PendingIntent
@@ -100,7 +114,7 @@ public class AppUtils {
                     .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                     .build();
 
-            channel = new NotificationChannel("222", "vehicle_damage", NotificationManager.IMPORTANCE_HIGH);
+            channel = new NotificationChannel("222", "professor_spawn", NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
         }
 
@@ -141,7 +155,7 @@ public class AppUtils {
         return text + ".";
     }
 
-    public String checkforRegex(String speechString, String language) {
+    public String checkForRegex(String speechString, String language) {
         try {
             Pattern pattern;
             JSONObject jsonObject = new JSONObject(JsonFileReader.getInstance().getFileContents());

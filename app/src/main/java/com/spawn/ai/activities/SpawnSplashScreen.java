@@ -64,26 +64,20 @@ public class SpawnSplashScreen extends AppCompatActivity {
                                 JsonFileReader.getInstance().fileName(AppUtils.getInstance().getDataFile());
                                 JsonFileReader.getInstance().readFile(this, jsonElement);
                                 JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(this).getStringPreference("lang"));
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Intent intent = new Intent(context, SpawnBotActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                        finish();
-                                    }
+                                handler.postDelayed(() -> {
+                                    Intent intent = new Intent(context, SpawnBotActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    finish();
                                 }, 1000);
 
                             } else {
                                 JsonFileReader.getInstance().readFile(this, null);
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Intent intent = new Intent(context, SpawnBotActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                        finish();
-                                    }
+                                handler.postDelayed(() -> {
+                                    Intent intent = new Intent(context, SpawnBotActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    finish();
                                 }, 500);
 
                             }

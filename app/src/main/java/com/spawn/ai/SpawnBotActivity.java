@@ -399,7 +399,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void callService(String speechString) {
         loading();
-        String entity = AppUtils.getInstance().checkforRegex(speechString, language);
+        String entity = AppUtils.getInstance().checkForRegex(speechString, language);
         if (entity != null) {
             classifyViewModel.getWikiResponse(entity, speechString, language)
                     .observe(this, (
@@ -435,7 +435,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             classifyViewModel
                     .getWebSearch(spokenString,
                             SharedPreferenceUtility.getInstance(this).getStringPreference("lang"),
-                            AppConstants.RESULT_TYPE_SEARCH)
+                            AppConstants.RESULT_TYPE_NEWS)
                     .observe(this,
                             (chatCardModel ->
                                     chatViews(null,

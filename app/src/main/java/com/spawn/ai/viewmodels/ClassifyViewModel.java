@@ -4,13 +4,15 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
+import com.spawn.ai.interfaces.AzureService;
 import com.spawn.ai.interfaces.ISpawnAPI;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.model.websearch.News;
 import com.spawn.ai.model.websearch.WebSearchResults;
-import com.spawn.ai.network.NLPInterceptor;
+import com.spawn.ai.network.AzureInterceptor;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.BotUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
@@ -20,8 +22,6 @@ import org.json.JSONObject;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-
-import com.spawn.ai.constants.AppConstants;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,6 +36,7 @@ public class ClassifyViewModel extends AndroidViewModel {
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
     private String[] creds = AppUtils.getInstance().getAPICreds().split(":");
     private String apiUrl = AppUtils.getInstance().getUrl();
+    private String searchUrl = AppUtils.getInstance().getWebApiUrl();
 
     public ClassifyViewModel(@NonNull Application application) {
         super(application);
@@ -51,16 +52,16 @@ public class ClassifyViewModel extends AndroidViewModel {
     public MutableLiveData<ChatCardModel> getWebSearch(String q, String language, String type) {
         chatCardModelMutableLiveData = new MutableLiveData<>();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
+                .addInterceptor(new AzureInterceptor())
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(apiUrl)
+                .baseUrl(searchUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        final AzureService azureService = retrofit.create(AzureService.class);
         if (type.equalsIgnoreCase("search")) {
-            Call<WebSearchResults> data = spawnAPI.getWebResults(q, "5", type);
+            Call<WebSearchResults> data = azureService.getWebResults(q, "5");
             data.enqueue(new Callback<WebSearchResults>() {
                 @Override
                 public void onResponse(Call<WebSearchResults> call, Response<WebSearchResults> response) {
@@ -92,7 +93,7 @@ public class ClassifyViewModel extends AndroidViewModel {
                 }
             });
         } else if (type.equalsIgnoreCase("news")) {
-            Call<News> data = spawnAPI.getNewsResult(q, "10", type);
+            Call<News> data = azureService.getNewsResult(q, "10");
             data.enqueue(new Callback<News>() {
                 @Override
                 public void onResponse(Call<News> call, Response<News> response) {
@@ -167,7 +168,7 @@ public class ClassifyViewModel extends AndroidViewModel {
                 //Handle case for failure
                 ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                 chatCardModelMutableLiveData.postValue(chatCardModel);
-                FirebaseCrashlytics.getInstance().log("Webservice Request Error -->"+ t.getMessage());
+                FirebaseCrashlytics.getInstance().log("Webservice Request Error -->" + t.getMessage());
 
             }
         });
