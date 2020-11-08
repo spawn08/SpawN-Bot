@@ -33,6 +33,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import dagger.hilt.android.AndroidEntryPoint;
 
 import com.google.firebase.BuildConfig;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -63,6 +64,7 @@ import java.util.Random;
 
 import com.spawn.ai.constants.AppConstants;
 
+@AndroidEntryPoint
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
 
     private static final String TAG = SpawnBotActivity.class.getCanonicalName();
@@ -737,7 +739,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void updateLanguageConfig(String lang) {
         locale = new Locale(lang);
-        Configuration overrideConfiguration = SpawnAiApplication.getContext().getResources().getConfiguration();
+        Configuration overrideConfiguration = getApplicationContext().getResources().getConfiguration();
         overrideConfiguration.setLocale(locale);
         createConfigurationContext(overrideConfiguration);
     }
