@@ -14,7 +14,7 @@ import android.os.Build;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
-import com.spawn.ai.SpawnBotActivity;
+import com.spawn.ai.activities.SpawnBotActivity;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

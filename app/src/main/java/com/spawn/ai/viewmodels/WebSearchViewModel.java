@@ -5,7 +5,7 @@ import android.util.Log;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.JsonElement;
 import com.spawn.ai.constants.ChatViewTypes;
-import com.spawn.ai.interfaces.ISpawnAPI;
+import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.BotMLResponse;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnWikiModel;
@@ -44,7 +44,7 @@ public class WebSearchViewModel extends ViewModel {
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
         if (type.equalsIgnoreCase("search")) {
             Call<WebSearchResults> data = spawnAPI.getWebResults(q, "5", type);
             data.enqueue(new Callback<WebSearchResults>() {
@@ -116,7 +116,7 @@ public class WebSearchViewModel extends ViewModel {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         Call<SpawnWikiModel> data;
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
 
         if (language.equalsIgnoreCase("en"))
             data = spawnAPI.getWiki(cloneEntity);
@@ -177,7 +177,7 @@ public class WebSearchViewModel extends ViewModel {
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
         Call<BotMLResponse> data = spawnAPI.getEntityExtract(q, AppConstants.MODEL, language);
 
         data.enqueue(new Callback<BotMLResponse>() {
@@ -252,7 +252,7 @@ public class WebSearchViewModel extends ViewModel {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
-            final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+            final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
             Call<JsonElement> data = spawnAPI.getFile(fileName);
 
             data.enqueue(new Callback<JsonElement>() {

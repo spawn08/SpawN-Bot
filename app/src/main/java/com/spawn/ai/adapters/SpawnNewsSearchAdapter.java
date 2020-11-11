@@ -19,8 +19,8 @@ import java.util.ArrayList;
 
 public class SpawnNewsSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context context;
-    private ArrayList<NewsValue> newsResult;
+    private final Context context;
+    private final ArrayList<NewsValue> newsResult;
 
     public SpawnNewsSearchAdapter(Context context, ArrayList<NewsValue> newsResult) {
         this.newsResult = newsResult;
@@ -45,18 +45,15 @@ public class SpawnNewsSearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             webResultHolder.webDisplayUrl.setText(newsResult.get(position).getUrl());
         if (newsResult.get(position).getDescription() != null)
             webResultHolder.webDescription.setText(AppUtils.getInstance().getInfoFromExtract(newsResult.get(position).getDescription(), "speak"));
-        webResultHolder.webTile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Intent intent = new Intent(context, SpawnWebActivity.class);
-                    if (newsResult.get(position).getAmpUrl() != null)
-                        intent.putExtra("url", newsResult.get(position).getAmpUrl());
-                    else intent.putExtra("url", newsResult.get(position).getUrl());
-                    context.startActivity(intent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        webResultHolder.webTile.setOnClickListener(view -> {
+            try {
+                Intent intent = new Intent(context, SpawnWebActivity.class);
+                if (newsResult.get(position).getAmpUrl() != null)
+                    intent.putExtra("url", newsResult.get(position).getAmpUrl());
+                else intent.putExtra("url", newsResult.get(position).getUrl());
+                context.startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }

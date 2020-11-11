@@ -1,4 +1,4 @@
-package com.spawn.ai;
+package com.spawn.ai.activities;
 
 import android.Manifest;
 import android.animation.Animator;
@@ -27,15 +27,21 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.google.firebase.BuildConfig;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.spawn.ai.activities.SpawnWebActivity;
+import com.spawn.ai.R;
 import com.spawn.ai.adapters.SpawnChatbotAdapter;
 import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
 import com.spawn.ai.interfaces.IBotObserver;
-import com.spawn.ai.interfaces.IBotWikiNLP;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
@@ -55,16 +61,10 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, IBotWikiNLP, TextToSpeech.OnInitListener {
+public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, TextToSpeech.OnInitListener {
 
     private static final String TAG = SpawnBotActivity.class.getCanonicalName();
     public Context context;
@@ -283,8 +283,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     protected void onResume() {
         super.onResume();
         initSpeech();
-        IntentFilter filter = new IntentFilter();
 
+        IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         filter.addAction("com.spawn.ai.CONNECTIVITY_CHANGE");
         registerReceiver(broadcastReceiver, filter);
@@ -393,12 +393,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             Log.d(getClass().getCanonicalName(), "Speech :" + speechString);
             onEndOfSpeech();
             chatViews(speechString, 0, null);
-            callService(speechString);
+            classifyIntent(speechString);
 
         }
     }
 
-    private void callService(String speechString) {
+    private void classifyIntent(String speechString) {
         loading();
         String entity = AppUtils.getInstance().checkForRegex(speechString, language);
         if (entity != null) {
@@ -411,24 +411,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                                             chatCardModel);
                                 else
                                     onFailure();
-
                             }
                     ));
         } else {
             classifyViewModel.classify(speechString, language).observe(this, (this::onChanged));
         }
-
-       /* webSearchViewModel
-                .getSpawnAIResponse(speechString,
-                        SharedPreferenceUtility
-                                .getInstance(this)
-                                .getStringPreference("lang"))
-                .observe(this,
-                        (chatCardModel ->
-                                chatViews(null,
-                                        chatCardModel.getType(),
-                                        chatCardModel)));*/
-
     }
 
     private void onFailure() {
@@ -476,8 +463,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
             if (Objects.requireNonNull(partialResults).get(0) != null) {
                 String partialString = partialResults.get(0);
-                //if (partialString.length() % 2 == 0)
-                //   chatViews(partialString, 0, null);
                 Log.d(TAG, "partialString :" + partialString);
             } else {
                 Log.e(TAG, "Error Partial Results");
@@ -506,96 +491,73 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
         switch (type) {
             case ChatViewTypes.CHAT_VIEW_USER:
-                ChatMessageType chatMessageType = new ChatMessageType();
-                chatMessageType.setMessage(chatMessage);
-                chatMessageType.setViewType(0);
-                chatMessageType.setDate(new DateTimeUtils().getDate());
-                chatMessageType.setBotResponse(null);
-                chatMessageType.setAction(null);
+                ChatMessageType chatMessageType = ChatMessageType.builder()
+                        .message(chatMessage)
+                        .viewType(0)
+                        .date(new DateTimeUtils().getDate())
+                        .botResponse(null)
+                        .action(null)
+                        .build();
                 botResponses.add(chatMessageType);
                 chatbotAdapter.setAdapter(botResponses);
-
                 break;
 
             case ChatViewTypes.CHAT_VIEW_BOT:
-                if (chatCardModel != null) {
-                    ChatMessageType chatMessageType1 = new ChatMessageType();
-                    chatMessageType1.setMessage(chatCardModel.getMessage());
-                    chatMessageType1.setDate(new DateTimeUtils().getDate());
-                    chatMessageType1.setViewType(chatCardModel.getType());
-                    chatMessageType1.setAction(chatCardModel.getAction());
-                    chatMessageType1.setBotResponse(null);
-                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
-                        botResponses.remove(botResponses.size() - 1);
-                    botResponses.add(chatMessageType1);
-                    chatbotAdapter.setAdapter(botResponses);
-                    chatbotAdapter.notifyDataSetChanged();
-                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
-                    setChatMessage(chatMessageType1);
-                }
+                ChatMessageType chatViewBot = ChatMessageType.builder()
+                        .message(chatCardModel.getMessage())
+                        .date(new DateTimeUtils().getDate())
+                        .viewType(chatCardModel.getType())
+                        .action(chatCardModel.getAction())
+                        .botResponse(null)
+                        .build();
+                refreshChat(chatViewBot);
+                setChatMessage(chatViewBot);
 
                 break;
 
             case ChatViewTypes.CHAT_VIEW_LOADING:
-                ChatMessageType chatMessageLoading = new ChatMessageType();
-                if (botResponses.size() > 0 && botResponses.get(botResponses.size() - 1).getViewType() == 2)
-                    botResponses.remove(botResponses.size() - 1);
-                chatMessageLoading.setViewType(2);
-                botResponses.add(chatMessageLoading);
-                chatbotAdapter.setAdapter(botResponses);
-                chatbotAdapter.notifyDataSetChanged();
-                activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
+                ChatMessageType chatMessageLoading = ChatMessageType.builder()
+                        .viewType(2)
+                        .build();
+                refreshChat(chatMessageLoading);
                 break;
 
             case ChatViewTypes.CHAT_VIEW_CARD:
-                if (chatCardModel != null) {
-                    ChatMessageType chatMessageType1 = new ChatMessageType();
-                    chatMessageType1.setMessage(chatCardModel.getMessage());
-                    chatMessageType1.setDate(new DateTimeUtils().getDate());
-                    chatMessageType1.setButtonText(chatCardModel.getButton_text());
-                    chatMessageType1.setViewType(chatCardModel.getType());
-                    chatMessageType1.setAction(chatCardModel.getAction());
-                    chatMessageType1.setBotResponse(null);
-                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
-                        botResponses.remove(botResponses.size() - 1);
-                    botResponses.add(chatMessageType1);
-                    chatbotAdapter.setAdapter(botResponses);
-                    chatbotAdapter.notifyDataSetChanged();
-                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
-                }
+                ChatMessageType chatViewCard = ChatMessageType.builder()
+                        .message(chatCardModel.getMessage())
+                        .date(new DateTimeUtils().getDate())
+                        .buttonText(chatCardModel.getButton_text())
+                        .viewType(chatCardModel.getType())
+                        .action(chatCardModel.getAction())
+                        .botResponse(null)
+                        .build();
+                refreshChat(chatViewCard);
                 break;
 
             case ChatViewTypes.CHAT_VIEW_WIKI:
                 if (chatCardModel != null) {
-                    ChatMessageType wikiType = new ChatMessageType();
-                    wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
-                    wikiType.setViewType(chatCardModel.getType());
-                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
-                        botResponses.remove(botResponses.size() - 1);
-                    botResponses.add(wikiType);
-                    chatbotAdapter.setAdapter(botResponses);
-                    chatbotAdapter.notifyDataSetChanged();
-                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
+                    ChatMessageType wikiType = ChatMessageType.builder()
+                            .spawnWikiModel(chatCardModel.getSpawnWikiModel())
+                            .viewType(chatCardModel.getType())
+                            .build();
+                    refreshChat(wikiType);
                 } else {
                     if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
                         botResponses.remove(botResponses.size() - 1);
-
                 }
 
                 break;
 
             case ChatViewTypes.CHAT_VIEW_WEB:
                 if (chatCardModel != null) {
-                    ChatMessageType webSearch = new ChatMessageType();
-                    webSearch.setChatCardModel(chatCardModel);
-                    webSearch.setViewType(chatCardModel.getType());
-                    webSearch.setMessage(AppUtils.getStringRes(R.string.result_text, context, SharedPreferenceUtility.getInstance(this).getStringPreference("lang")));
-                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
-                        botResponses.remove(botResponses.size() - 1);
-                    botResponses.add(webSearch);
-                    chatbotAdapter.setAdapter(botResponses);
-                    chatbotAdapter.notifyDataSetChanged();
-                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
+                    ChatMessageType webSearch = ChatMessageType.builder()
+                            .chatCardModel(chatCardModel)
+                            .viewType(chatCardModel.getType())
+                            .message(AppUtils.getStringRes(R.string.result_text, context,
+                                    SharedPreferenceUtility.getInstance(this).getStringPreference("lang")))
+                            .build();
+
+                    refreshChat(webSearch);
                 } else {
                     if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
                         botResponses.remove(botResponses.size() - 1);
@@ -604,25 +566,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 break;
 
             case ChatViewTypes.CHAT_VIEW_NEWS:
-
-                if (chatCardModel != null) {
-                    ChatMessageType newsType = new ChatMessageType();
-//                    wikiType.setSpawnWikiModel(chatCardModel.getSpawnWikiModel());
-//                    wikiType.setViewType(chatCardModel.getType());
-                    newsType.setChatCardModel(chatCardModel);
-                    newsType.setViewType(chatCardModel.getType());
-                    if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
-                        botResponses.remove(botResponses.size() - 1);
-                    botResponses.add(newsType);
-                    chatbotAdapter.setAdapter(botResponses);
-                    chatbotAdapter.notifyDataSetChanged();
-                    activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
-                }
-
+                ChatMessageType newsType = ChatMessageType.builder()
+                        .chatCardModel(chatCardModel)
+                        .viewType(chatCardModel.getType())
+                        .build();
+                refreshChat(newsType);
                 break;
 
         }
-
     }
 
     @Override
@@ -674,9 +625,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 textToSpeech.stop();
             }
         } else if (i == R.id.volume_down) {
-            setUpVolumeButton(false);
+            setUpVolumeButton();
         } else if (i == R.id.volume_up) {
-            setUpVolumeButton(true);
+            setUpVolumeButton();
 
         } else if (i == R.id.chat_recycler) {
 
@@ -743,39 +694,18 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         createConfigurationContext(overrideConfiguration);
     }
 
-    public void setUpVolumeButton(boolean setup) {
-        if (setup) {
-            if (activitySpawnBotBinding.volumeDown.getVisibility() == View.GONE) {
-                activitySpawnBotBinding.volumeDown.setVisibility(View.VISIBLE);
-                activitySpawnBotBinding.volumeUp.setVisibility(View.GONE);
-                SharedPreferenceUtility.getInstance(this).storePreference("speak", false);
-                if (chatMessage != null)
-                    chatMessage.setSpeakFinish(true);
-                notifyBotError();
-            } else {
-                activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
-                activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
-                SharedPreferenceUtility.getInstance(this).storePreference("speak", true);
-                /*if (chatMessage != null)
-                    speakBot(chatMessage.getShortMessage());*/
-
-            }
+    public void setUpVolumeButton() {
+        if (activitySpawnBotBinding.volumeDown.getVisibility() == View.GONE) {
+            activitySpawnBotBinding.volumeDown.setVisibility(View.VISIBLE);
+            activitySpawnBotBinding.volumeUp.setVisibility(View.GONE);
+            SharedPreferenceUtility.getInstance(this).storePreference("speak", false);
+            if (chatMessage != null)
+                chatMessage.setSpeakFinish(true);
+            notifyBotError();
         } else {
-            if (activitySpawnBotBinding.volumeDown.getVisibility() == View.GONE) {
-                activitySpawnBotBinding.volumeDown.setVisibility(View.VISIBLE);
-                activitySpawnBotBinding.volumeUp.setVisibility(View.GONE);
-                SharedPreferenceUtility.getInstance(this).storePreference("speak", false);
-                if (chatMessage != null)
-                    chatMessage.setSpeakFinish(true);
-                notifyBotError();
-            } else {
-                activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
-                activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
-                SharedPreferenceUtility.getInstance(this).storePreference("speak", true);
-                /*if (chatMessage != null)
-                    speakBot(chatMessage.getShortMessage());*/
-
-            }
+            activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
+            activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
+            SharedPreferenceUtility.getInstance(this).storePreference("speak", true);
         }
     }
 
@@ -798,11 +728,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
         }
 
-    }
-
-    @Override
-    public void notifyBotResponse(ChatCardModel chatCardModel) {
-        chatViews(null, chatCardModel.getType(), chatCardModel);
     }
 
     @Override
@@ -872,13 +797,28 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         this.chatMessage = chatMessage;
     }
 
+    /**
+     * Refreshes the Chat UI. Adds the chat message to botResponse
+     *
+     * @param chatMessage type of the message to display to user
+     */
+    private void refreshChat(ChatMessageType chatMessage) {
+        if (botResponses.get(botResponses.size() - 1).getViewType() == 2)
+            botResponses.remove(botResponses.size() - 1);
+        botResponses.add(chatMessage);
+        chatbotAdapter.setAdapter(botResponses);
+        chatbotAdapter.notifyDataSetChanged();
+        activitySpawnBotBinding.chatRecycler.scrollToPosition(chatbotAdapter.getItemCount() - 1);
+    }
+
+    /**
+     * Start listening for user speech
+     */
     private void startListen() {
         if (SpeechRecognizer.isRecognitionAvailable(this) && isSpeechEnabled) {
-            //botResponses.clear();
             chatbotAdapter.setAdapter(botResponses);
             if (speechRecognizer == null)
                 initSpeech();
-            //initSpeech();
             speechRecognizer.startListening(speechIntentDispatcher);
             activitySpawnBotBinding.micImage.setVisibility(View.GONE);
             activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
@@ -893,17 +833,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             String lang = SharedPreferenceUtility.getInstance(this).getStringPreference("lang");
             textToSpeech.setLanguage(locale);
             FirebaseCrashlytics.getInstance().setCustomKey("TTSLanguage", lang);
-            textToSpeech.setPitch(0.80f);
+            textToSpeech.setPitch(0.99f);
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
         } else {
             Log.e(this.getClass().getName(), "Initilization Failed!");
             FirebaseCrashlytics.getInstance().setCustomKey("ttsInitialization", "Failure");
         }
-    }
-
-    @Override
-    public void showUI(ChatCardModel chatCardModel) {
-        chatViews(null, chatCardModel.getType(), chatCardModel);
     }
 
     private final UtteranceProgressListener utteranceProgressListener = new UtteranceProgressListener() {
@@ -960,16 +895,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }
     };
 
-
     private Intent getConnectivityIntent(boolean noConnection) {
-
         Intent intent = new Intent();
-
         intent.setAction("com.spawn.ai.CONNECTIVITY_CHANGE");
         intent.putExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, noConnection);
-
         return intent;
-
     }
 
     private void onChanged(JSONObject jsonObject) {

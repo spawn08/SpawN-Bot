@@ -26,7 +26,7 @@ import retrofit2.http.Query;
  * Created by amarthakur on 11/02/19.
  */
 
-public interface ISpawnAPI {
+public interface SpawnAPIService {
 
     @GET("https://en.wikipedia.org/api/rest_v1/page/summary/{entity}")
     Call<SpawnWikiModel> getWiki(@Path("entity") String entity);

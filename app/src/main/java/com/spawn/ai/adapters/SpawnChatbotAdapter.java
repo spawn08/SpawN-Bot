@@ -5,6 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.spawn.ai.R;
@@ -26,10 +30,6 @@ import com.spawn.ai.viewholders.SpawnWikiViewHolder;
 import com.spawn.ai.viewholders.websearch_holders.SpawnWebSearchHolder;
 
 import java.util.ArrayList;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -122,7 +122,9 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         !chatMessageType.get(position).getAction().isEmpty() &&
                         !chatMessageType.get(position).isActionCompleted()) {
                     chatMessageType.get(position).setActionCompleted(true);
-                    iBotObserver.setAction(chatMessageType.get(position).getAction(), null);
+                    if (iBotObserver != null) {
+                        iBotObserver.setAction(chatMessageType.get(position).getAction(), null);
+                    }
                 }
 
                 break;

@@ -9,7 +9,6 @@ import android.os.Handler;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.spawn.ai.R;
-import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
@@ -17,7 +16,6 @@ import com.spawn.ai.viewmodels.WebSearchViewModel;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 public class SpawnSplashScreen extends AppCompatActivity {
 

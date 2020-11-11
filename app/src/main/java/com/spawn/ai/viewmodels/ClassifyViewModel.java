@@ -7,7 +7,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.AzureService;
-import com.spawn.ai.interfaces.ISpawnAPI;
+import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.model.websearch.News;
@@ -21,7 +21,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -38,9 +37,9 @@ public class ClassifyViewModel extends AndroidViewModel {
     private Application application;
     private MutableLiveData<JSONObject> results;
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
-    private String[] creds = AppUtils.getInstance().getAPICreds().split(":");
-    private String apiUrl = AppUtils.getInstance().getUrl();
-    private String searchUrl = AppUtils.getInstance().getWebApiUrl();
+    private final String[] creds = AppUtils.getInstance().getAPICreds().split(":");
+    private final String apiUrl = AppUtils.getInstance().getUrl();
+    private final String searchUrl = AppUtils.getInstance().getWebApiUrl();
 
     public ClassifyViewModel(@NonNull Application application) {
         super(application);
@@ -137,7 +136,7 @@ public class ClassifyViewModel extends AndroidViewModel {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         Call<SpawnWikiModel> data;
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
 
         if (language.equalsIgnoreCase("en"))
             data = spawnAPI.getWiki(cloneEntity);

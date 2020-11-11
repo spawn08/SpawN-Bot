@@ -18,14 +18,13 @@ import java.util.ArrayList;
 
 public class SpawnImageResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context context;
-    private ArrayList<NewsValue> imageResult;
+    private final Context context;
+    private final ArrayList<NewsValue> imageResult;
 
     public SpawnImageResultAdapter(Context context, ArrayList<NewsValue> imageResult) {
         this.imageResult = imageResult;
         this.context = context;
     }
-
 
     @NonNull
     @Override

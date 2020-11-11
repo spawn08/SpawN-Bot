@@ -13,7 +13,7 @@ public class SpawnChatLoadingViewHolder extends RecyclerView.ViewHolder {
     public SpawnChatLoadingViewHolder(View itemView) {
         super(itemView);
 
-        loading = (DotProgressBar) itemView.findViewById(R.id.bot_loading);
+        loading = itemView.findViewById(R.id.bot_loading);
 
     }
 }

@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/chat_activity_background"
-        tools:context=".SpawnBotActivity">
+        tools:context=".activities.SpawnBotActivity">
 
         <LinearLayout
             android:id="@+id/recycler_container"
@@ -198,7 +198,7 @@
 
         <variable
             name="listener"
-            type="com.spawn.ai.SpawnBotActivity">
+            type="com.spawn.ai.activities.SpawnBotActivity">
 
         </variable>
 

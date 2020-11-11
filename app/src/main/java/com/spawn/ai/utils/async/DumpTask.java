@@ -2,7 +2,7 @@ package com.spawn.ai.utils.async;
 
 import android.util.Log;
 
-import com.spawn.ai.interfaces.ISpawnAPI;
+import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.BotMLResponse;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.network.NLPInterceptor;
@@ -39,7 +39,7 @@ public class DumpTask implements Runnable {
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
-            final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+            final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
             Call<Object> data = spawnAPI.postData((SpawnWikiModel) object);
             data.enqueue(new Callback<Object>() {
                 @Override
@@ -64,7 +64,7 @@ public class DumpTask implements Runnable {
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
-            final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+            final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
             Call<Object> data = spawnAPI.postData((BotMLResponse) object);
             data.enqueue(new Callback<Object>() {
                 @Override
