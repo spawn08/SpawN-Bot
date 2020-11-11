@@ -50,8 +50,7 @@ import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.DateTimeUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
-import com.spawn.ai.utils.views.AlertUpdateDialog;
-import com.spawn.ai.viewmodels.ClassifyViewModel;
+import com.spawn.ai.viewmodels.ClassifyIntentViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -84,7 +83,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     int textCount;
     private ChatMessageType chatMessage;
     //private WebSearchViewModel webSearchViewModel;
-    private ClassifyViewModel classifyViewModel;
+    private ClassifyIntentViewModel classifyViewModel;
 
     private static String spokenString = "";
     private String language;
@@ -95,7 +94,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
         if (BuildConfig.VERSION_CODE != Integer.parseInt(JsonFileReader.getInstance().getValueFromJson("app_version"))
                 && JsonFileReader.getInstance().getValueFromJson("force_update").equalsIgnoreCase("true")) {
-            setUpAlertDialog();
+            AppUtils.getInstance().showVersionUpdateDialog(this);
         }
         context = this;
         activitySpawnBotBinding = DataBindingUtil.setContentView(this, R.layout.activity_spawn_bot);
@@ -129,8 +128,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.chatRecycler.setAdapter(chatbotAdapter);
         textToSpeech = new TextToSpeech(this, this);
 
-        //webSearchViewModel = new ViewModelProvider(this).get(WebSearchViewModel.class);
-        classifyViewModel = new ViewModelProvider(this).get(ClassifyViewModel.class);
+        classifyViewModel = new ViewModelProvider(this).get(ClassifyIntentViewModel.class);
 
         initSpeech();
 
@@ -145,10 +143,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             @Override
             public void onAnimationEnd(Animator animator) {
                 if (isSpeechEnd) {
-                    activitySpawnBotBinding.mic.invalidate();
-                    activitySpawnBotBinding.mic.cancelAnimation();
-                    activitySpawnBotBinding.micImage.setVisibility(View.VISIBLE);
-                    activitySpawnBotBinding.mic.setVisibility(View.GONE);
+                    showMic();
                 } else {
                     activitySpawnBotBinding.mic.playAnimation();
                 }
@@ -166,6 +161,17 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             }
         });
 
+    }
+
+    /**
+     * The method shows mic and cancel the lottie animation
+     * while in listening mode.
+     */
+    private void showMic() {
+        activitySpawnBotBinding.mic.invalidate();
+        activitySpawnBotBinding.mic.cancelAnimation();
+        activitySpawnBotBinding.micImage.setVisibility(View.VISIBLE);
+        activitySpawnBotBinding.mic.setVisibility(View.GONE);
     }
 
     private void setUpQuestionsView(String lang) {
@@ -241,11 +247,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.arrowBack.setOnClickListener(this);
         activitySpawnBotBinding.volumeUp.setOnClickListener(this);
         activitySpawnBotBinding.volumeDown.setOnClickListener(this);
-    }
-
-    private void setUpAlertDialog() {
-        AlertUpdateDialog alertUpdateDialog = new AlertUpdateDialog(this);
-        alertUpdateDialog.show();
     }
 
     private void requestPermission() {
@@ -335,10 +336,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     public void onEndOfSpeech() {
         Log.d(TAG, "onEndOfSpeech");
         isSpeechEnd = true;
-        activitySpawnBotBinding.mic.invalidate();
-        activitySpawnBotBinding.mic.cancelAnimation();
-        activitySpawnBotBinding.micImage.setVisibility(View.VISIBLE);
-        activitySpawnBotBinding.mic.setVisibility(View.GONE);
+        showMic();
     }
 
     @Override

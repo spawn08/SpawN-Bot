@@ -16,7 +16,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.spawn.ai.R;
-import com.spawn.ai.utils.views.DotProgressBar;
+import com.spawn.ai.custom.DotProgressBar;
 
 public class SpawnWebActivity extends AppCompatActivity {
 

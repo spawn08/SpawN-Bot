@@ -18,7 +18,7 @@
 
         </WebView>
 
-        <com.spawn.ai.utils.views.DotProgressBar
+        <com.spawn.ai.custom.DotProgressBar
             android:id="@+id/web_loading"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/margin_25"

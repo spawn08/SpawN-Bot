@@ -1,5 +1,6 @@
 package com.spawn.ai.utils.task_utils;
 
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -15,6 +16,7 @@ import android.os.Build;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.activities.SpawnBotActivity;
+import com.spawn.ai.custom.AlertUpdateDialog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -173,5 +176,14 @@ public class AppUtils {
             return null;
         }
         return null;
+    }
+
+    /**
+     * Show alertdialog for app version update
+     * @param activity Calling activity context
+     */
+    public void showVersionUpdateDialog(Activity activity) {
+        AlertUpdateDialog alertUpdateDialog = new AlertUpdateDialog(activity);
+        alertUpdateDialog.show();
     }
 }

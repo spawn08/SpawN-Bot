@@ -134,28 +134,28 @@ public class BotUtils {
                                     if (probabilities[index] > THRESHOLD) {
                                         if (filecontents.getJSONObject(classesArray.getString(index)) != null) {
                                             JSONObject response = filecontents.getJSONObject(classesArray.getString(index));
-                                            data.postValue(response);
-                                        } else data.postValue(null);
+                                            data.setValue(response);
+                                        } else data.setValue(null);
                                     } else {
 //                                        JSONObject response = filecontents.getJSONObject("default");
 //                                        data.postValue(response);
-                                        data.postValue(null);
+                                        data.setValue(null);
                                     }
                                     Log.e("Bot Response", String.format("%s: %1.4f", classesArray.getString(index), probabilities[index]));
                                 } catch (Exception e) {
                                     e.printStackTrace();
-                                    data.postValue(null);
+                                    data.setValue(null);
                                 }
                             })
                     .addOnFailureListener(
                             e -> {
                                 Log.e("Failed", "NO RESULT");
-                                data.postValue(null);
+                                data.setValue(null);
                             });
             return data;
         } catch (Exception e) {
             e.printStackTrace();
-            data.postValue(null);
+            data.setValue(null);
         }
         return data;
     }

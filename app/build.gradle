@@ -105,6 +105,9 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
 
+    //RxJava Adapter
+    implementation(group: 'com.squareup.retrofit2', name: 'adapter-rxjava3', version: '2.9.0')
+
     //Hilt Dependencies
     implementation "com.google.dagger:hilt-android:2.28-alpha"
     annotationProcessor "com.google.dagger:hilt-android-compiler:2.28-alpha"
