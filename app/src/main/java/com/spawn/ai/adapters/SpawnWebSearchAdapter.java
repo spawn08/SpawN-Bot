@@ -21,10 +21,12 @@ public class SpawnWebSearchAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private final Context context;
     private final ArrayList<ValueResults> valueResults;
+    private AppUtils appUtils;
 
-    public SpawnWebSearchAdapter(Context context, ArrayList<ValueResults> valueResults) {
+    public SpawnWebSearchAdapter(Context context, ArrayList<ValueResults> valueResults, AppUtils appUtils) {
         this.valueResults = valueResults;
         this.context = context;
+        this.appUtils = appUtils;
     }
 
 
@@ -57,7 +59,7 @@ public class SpawnWebSearchAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if (valueResults.get(position).getDisplayUrl() != null)
             webResultHolder.webDisplayUrl.setText(valueResults.get(position).getDisplayUrl());
         if (valueResults.get(position).getSnippet() != null)
-            webResultHolder.webDescription.setText(AppUtils.getInstance().getInfoFromExtract(valueResults.get(position).getSnippet(), "speak"));
+            webResultHolder.webDescription.setText(appUtils.getInfoFromExtract(valueResults.get(position).getSnippet(), "speak"));
         webResultHolder.webTile.setOnClickListener(view -> {
             try {
                 Intent intent = new Intent(context, SpawnWebActivity.class);

@@ -13,6 +13,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 
+import androidx.core.app.NotificationCompat;
+
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
 import com.spawn.ai.activities.SpawnBotActivity;
@@ -26,15 +28,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class AppUtils {
 
-    private static AppUtils appUtils;
-    private JSONArray jsonArray;
     private String token;
 
     static {
@@ -55,18 +52,6 @@ public class AppUtils {
 
     public native String getWebApiUrl();
 
-    private AppUtils() {
-
-    }
-
-    public static AppUtils getInstance() {
-        if (appUtils == null) {
-            appUtils = new AppUtils();
-        }
-
-        return appUtils;
-    }
-
     public static String getStringRes(int resourceId, Context context, String lang) {
         String result = "";
 
@@ -81,20 +66,11 @@ public class AppUtils {
         return result;
     }
 
-    public void setNewsJSON(JSONArray jsonArray) {
-        this.jsonArray = jsonArray;
-
-    }
-
-    public JSONArray getJsonArray() {
-        return jsonArray;
-    }
-
     public void setToken(String token) {
         this.token = token;
     }
 
-    public String getToken(){
+    public String getToken() {
         return token;
     }
 
@@ -180,6 +156,7 @@ public class AppUtils {
 
     /**
      * Show alertdialog for app version update
+     *
      * @param activity Calling activity context
      */
     public void showVersionUpdateDialog(Activity activity) {

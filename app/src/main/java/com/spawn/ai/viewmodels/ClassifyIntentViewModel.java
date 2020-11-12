@@ -15,8 +15,6 @@ import com.spawn.ai.interfaces.AzureService;
 import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnWikiModel;
-import com.spawn.ai.network.AzureInterceptor;
-import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.BotUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
 
@@ -28,7 +26,6 @@ import java.net.URLEncoder;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -38,9 +35,6 @@ public class ClassifyIntentViewModel extends AndroidViewModel {
     private Application application;
     private MutableLiveData<JSONObject> results;
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
-    private final String[] creds = AppUtils.getInstance().getAPICreds().split(":");
-    private final String apiUrl = AppUtils.getInstance().getUrl();
-    private final String searchUrl = AppUtils.getInstance().getWebApiUrl();
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
@@ -60,18 +54,8 @@ public class ClassifyIntentViewModel extends AndroidViewModel {
         return BotUtils.getInstance().classify(sentence, language, results);
     }
 
-    public LiveData<ChatCardModel> getWebSearch(String q, String language, String type) throws UnsupportedEncodingException {
+    public LiveData<ChatCardModel> getWebSearch(String q, String language, String type, AzureService azureService) throws UnsupportedEncodingException {
         chatCardModelMutableLiveData = new MutableLiveData<>();
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(new AzureInterceptor())
-                .build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(searchUrl)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                .build();
-        final AzureService azureService = retrofit.create(AzureService.class);
         if (type.equalsIgnoreCase("search")) {
             compositeDisposable.add(azureService
                     .getWebResults(URLEncoder.encode(q, "UTF-8"), "5")
@@ -107,7 +91,7 @@ public class ClassifyIntentViewModel extends AndroidViewModel {
         return chatCardModelMutableLiveData;
     }
 
-    public LiveData<ChatCardModel> getWikiResponse(String entity, final String query, String language) {
+    public LiveData<ChatCardModel> getWikiResponse(String entity, String language) {
         chatCardModelMutableLiveData = new MutableLiveData<>();
         final String cloneEntity = entity.trim().replace(" ", "_");
 

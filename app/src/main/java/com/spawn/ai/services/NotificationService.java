@@ -14,9 +14,17 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
+@AndroidEntryPoint
 public class NotificationService extends FirebaseMessagingService {
+
+    @Inject
+    AppUtils appUtils;
 
     @Override
     public void onNewToken(@NonNull String s) {
@@ -30,7 +38,7 @@ public class NotificationService extends FirebaseMessagingService {
                 }
                 String token = task.getResult().getToken();
                 Log.e("My Token", token);
-                AppUtils.getInstance().setToken(token);
+                appUtils.setToken(token);
             }
         });
     }
@@ -42,7 +50,7 @@ public class NotificationService extends FirebaseMessagingService {
         String type = dataMessage.get("type");
         if (type != null &&
                 type.equalsIgnoreCase("default")) {
-            AppUtils.getInstance().sendDefaultNotification(dataMessage, getApplicationContext());
+            appUtils.sendDefaultNotification(dataMessage, getApplicationContext());
         }
 
     }

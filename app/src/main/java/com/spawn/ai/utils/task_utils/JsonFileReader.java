@@ -23,10 +23,8 @@ public class JsonFileReader {
 
     private static JsonFileReader jsonFileReader;
     private String fileContents;
-    private String fileName = AppUtils.getInstance().getDataFile();
-    private ChatCardModel cardModel;
     private ArrayList<String> questions = new ArrayList<>();
-    private HashMap<String, ArrayList<String>> questionsMap = new HashMap<>();
+    private final HashMap<String, ArrayList<String>> questionsMap = new HashMap<>();
 
     private JsonFileReader() {
 
@@ -39,27 +37,23 @@ public class JsonFileReader {
         return jsonFileReader;
     }
 
-    public void fileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public void readFile(Context context, JsonElement file) {
+    public void readFile(Context context, JsonElement file, AppUtils appUtils) {
         try {
             if (file != null)
                 fileContents = file.toString();
             else {
                 fileContents = null;
                 Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
-                loadLocalFile(context);
+                loadLocalFile(context, appUtils.getDataFile());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            loadLocalFile(context);
+            loadLocalFile(context, appUtils.getDataFile());
             FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
         }
     }
 
-    private void loadLocalFile(Context context) {
+    private void loadLocalFile(Context context, String fileName) {
         if (fileContents == null || fileContents.isEmpty()) {
             String json;
             try {
@@ -104,7 +98,6 @@ public class JsonFileReader {
                         chatCardModel = new ChatCardModel(body.getString("button_text_" + lang),
                                 message,
                                 body.getInt("type"), body.getString("action"));
-                        setCardModel(chatCardModel);
                         return chatCardModel;
                     }
 
@@ -118,7 +111,6 @@ public class JsonFileReader {
                         chatCardModel = new ChatCardModel(body.getString("button_text_" + lang),
                                 message,
                                 body.getInt("type"), body.getString("action"));
-                        setCardModel(chatCardModel);
                         return chatCardModel;
                     }
 
@@ -132,7 +124,6 @@ public class JsonFileReader {
                         chatCardModel = new ChatCardModel(body.getString("button_text_" + lang),
                                 message,
                                 body.getInt("type"), body.getString("action"));
-                        setCardModel(chatCardModel);
                         return chatCardModel;
                     }
                     return chatCardModel;
@@ -143,14 +134,6 @@ public class JsonFileReader {
             return chatCardModel;
         }
         return chatCardModel;
-    }
-
-    private void setCardModel(ChatCardModel cardModel) {
-        this.cardModel = cardModel;
-    }
-
-    public ChatCardModel getCardModel() {
-        return this.cardModel;
     }
 
     private String getDefaultAnswer(String lang) {

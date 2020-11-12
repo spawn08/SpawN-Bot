@@ -41,6 +41,7 @@ import com.spawn.ai.adapters.SpawnChatbotAdapter;
 import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
+import com.spawn.ai.interfaces.AzureService;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
@@ -59,6 +60,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -88,13 +91,19 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private static String spokenString = "";
     private String language;
 
+    @Inject
+    AzureService azureService;
+
+    @Inject
+    AppUtils appUtils;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (BuildConfig.VERSION_CODE != Integer.parseInt(JsonFileReader.getInstance().getValueFromJson("app_version"))
                 && JsonFileReader.getInstance().getValueFromJson("force_update").equalsIgnoreCase("true")) {
-            AppUtils.getInstance().showVersionUpdateDialog(this);
+            appUtils.showVersionUpdateDialog(this);
         }
         context = this;
         activitySpawnBotBinding = DataBindingUtil.setContentView(this, R.layout.activity_spawn_bot);
@@ -121,7 +130,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.langChange.setOnClickListener(this);
 
         botResponses = new ArrayList<>();
-        chatbotAdapter = new SpawnChatbotAdapter(this, botResponses);
+        chatbotAdapter = new SpawnChatbotAdapter(this, botResponses, appUtils);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(false);
         activitySpawnBotBinding.chatRecycler.setLayoutManager(linearLayoutManager);
@@ -398,9 +407,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private void classifyIntent(String speechString) {
         loading();
-        String entity = AppUtils.getInstance().checkForRegex(speechString, language);
+        String entity = appUtils.checkForRegex(speechString, language);
         if (entity != null) {
-            classifyViewModel.getWikiResponse(entity, speechString, language)
+            classifyViewModel.getWikiResponse(entity, language)
                     .observe(this, (
                             chatCardModel -> {
                                 if (chatCardModel != null)
@@ -421,7 +430,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             classifyViewModel
                     .getWebSearch(spokenString,
                             SharedPreferenceUtility.getInstance(this).getStringPreference("lang"),
-                            AppConstants.RESULT_TYPE_NEWS)
+                            AppConstants.RESULT_TYPE_NEWS,
+                            azureService)
                     .observe(this,
                             (chatCardModel ->
                                     chatViews(null,
@@ -492,7 +502,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 ChatMessageType chatMessageType = ChatMessageType.builder()
                         .message(chatMessage)
                         .viewType(0)
-                        .date(new DateTimeUtils().getDate())
+                        .date(DateTimeUtils.getDate())
                         .botResponse(null)
                         .action(null)
                         .build();
@@ -503,7 +513,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             case ChatViewTypes.CHAT_VIEW_BOT:
                 ChatMessageType chatViewBot = ChatMessageType.builder()
                         .message(chatCardModel.getMessage())
-                        .date(new DateTimeUtils().getDate())
+                        .date(DateTimeUtils.getDate())
                         .viewType(chatCardModel.getType())
                         .action(chatCardModel.getAction())
                         .botResponse(null)
@@ -523,7 +533,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             case ChatViewTypes.CHAT_VIEW_CARD:
                 ChatMessageType chatViewCard = ChatMessageType.builder()
                         .message(chatCardModel.getMessage())
-                        .date(new DateTimeUtils().getDate())
+                        .date(DateTimeUtils.getDate())
                         .buttonText(chatCardModel.getButton_text())
                         .viewType(chatCardModel.getType())
                         .action(chatCardModel.getAction())
@@ -777,7 +787,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 classifyViewModel
                         .getWebSearch(spokenString,
                                 SharedPreferenceUtility.getInstance(this).getStringPreference("lang"),
-                                AppConstants.RESULT_TYPE_NEWS)
+                                AppConstants.RESULT_TYPE_NEWS,
+                                azureService)
                         .observe(this,
                                 (chatCardModel ->
                                         chatViews(null,

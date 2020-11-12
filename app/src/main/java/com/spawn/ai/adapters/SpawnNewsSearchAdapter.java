@@ -21,10 +21,12 @@ public class SpawnNewsSearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private final Context context;
     private final ArrayList<NewsValue> newsResult;
+    private AppUtils appUtils;
 
-    public SpawnNewsSearchAdapter(Context context, ArrayList<NewsValue> newsResult) {
+    public SpawnNewsSearchAdapter(Context context, ArrayList<NewsValue> newsResult, AppUtils appUtils) {
         this.newsResult = newsResult;
         this.context = context;
+        this.appUtils = appUtils;
     }
 
 
@@ -44,7 +46,7 @@ public class SpawnNewsSearchAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (newsResult.get(position).getUrl() != null)
             webResultHolder.webDisplayUrl.setText(newsResult.get(position).getUrl());
         if (newsResult.get(position).getDescription() != null)
-            webResultHolder.webDescription.setText(AppUtils.getInstance().getInfoFromExtract(newsResult.get(position).getDescription(), "speak"));
+            webResultHolder.webDescription.setText(appUtils.getInfoFromExtract(newsResult.get(position).getDescription(), "speak"));
         webResultHolder.webTile.setOnClickListener(view -> {
             try {
                 Intent intent = new Intent(context, SpawnWebActivity.class);

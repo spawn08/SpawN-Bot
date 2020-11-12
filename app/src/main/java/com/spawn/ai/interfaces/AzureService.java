@@ -4,7 +4,6 @@ import com.spawn.ai.model.websearch.News;
 import com.spawn.ai.model.websearch.WebSearchResults;
 
 import io.reactivex.rxjava3.core.Observable;
-import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 

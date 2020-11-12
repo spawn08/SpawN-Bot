@@ -29,8 +29,8 @@ public class WebSearchViewModel extends ViewModel {
 
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
     private MutableLiveData<JsonElement> jsonElementMutableLiveData;
-    private final String[] creds = AppUtils.getInstance().getAPICreds().split(":");
-    private final String apiUrl = AppUtils.getInstance().getUrl();
+    private String[] creds = null;
+    private String apiUrl = null;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
@@ -39,7 +39,9 @@ public class WebSearchViewModel extends ViewModel {
         compositeDisposable.dispose();
     }
 
-    private void getMLResponse(String q, String type, String language) {
+    private void getMLResponse(String q, String type, String language, AppUtils appUtils) {
+        creds = appUtils.getAPICreds().split(":");
+        apiUrl = appUtils.getUrl();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
@@ -85,7 +87,7 @@ public class WebSearchViewModel extends ViewModel {
         }
     }
 
-    private void getWikiResponse(String entity, final String query, String language) {
+    private void getWikiResponse(String entity, String language) {
         final String cloneEntity = entity.trim().replace(" ", "_");
 
         Log.d("ENTITY: ", cloneEntity);
@@ -132,8 +134,9 @@ public class WebSearchViewModel extends ViewModel {
                 }));
     }
 
-    public LiveData<ChatCardModel> getSpawnAIResponse(String q, String language) {
+    public LiveData<ChatCardModel> getSpawnAIResponse(String q, String language, AppUtils appUtils) {
         chatCardModelMutableLiveData = new MutableLiveData<>();
+        apiUrl = appUtils.getUrl();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
@@ -156,12 +159,12 @@ public class WebSearchViewModel extends ViewModel {
                             && !botResponse.getEntities().get(0).getEntity().isEmpty()
                             /*&& botResponse.getIntent().getName() != null
                             && !botResponse.getIntent().getName().equalsIgnoreCase("bot_news")*/) {
-                        getWikiResponse(botResponse.getEntities().get(0).getEntity(), q, language);
+                        getWikiResponse(botResponse.getEntities().get(0).getEntity(), language);
                     } else if (botResponse.getIntent().getName() != null &&
                             !botResponse.getIntent().getName().isEmpty() &&
                             botResponse.getIntent().getName().equalsIgnoreCase("bot_news")
                             && botResponse.getIntent().getConfidence() > 0.80) {
-                        getMLResponse(q, AppConstants.RESULT_TYPE_NEWS, language);
+                        getMLResponse(q, AppConstants.RESULT_TYPE_NEWS, language, appUtils);
 
                     } else if (botResponse.getIntent().getName() != null &&
                             !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.80) {
@@ -169,7 +172,7 @@ public class WebSearchViewModel extends ViewModel {
                         chatCardModelMutableLiveData.setValue(chatCardModel);
                     } else {
                         if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getValue() != null)
-                            getWikiResponse(q, AppConstants.RESULT_TYPE_SEARCH, language);
+                            getWikiResponse(q, language);
                         else {
                             if (botResponse.getIntent().getName() != null &&
                                     !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.65) {
@@ -178,23 +181,24 @@ public class WebSearchViewModel extends ViewModel {
                             } else {
                                 String[] splitQuery = botResponse.getText().split(" ");
                                 if (splitQuery.length < 3)
-                                    getMLResponse(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH, language);
+                                    getMLResponse(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH, language, appUtils);
                                 else {
-                                    getMLResponse(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH, language);
+                                    getMLResponse(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH, language, appUtils);
                                 }
                             }
                         }
                     }
                 }, e -> {
-                    getMLResponse(q, AppConstants.RESULT_TYPE_SEARCH, language);
+                    getMLResponse(q, AppConstants.RESULT_TYPE_SEARCH, language, appUtils);
                 })
         );
         return chatCardModelMutableLiveData;
     }
 
-    public LiveData<JsonElement> getFile(String fileName) {
+    public LiveData<JsonElement> getFile(String fileName, AppUtils appUtils) {
         try {
             jsonElementMutableLiveData = new MutableLiveData<>();
+            apiUrl = appUtils.getUrl();
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(new NLPInterceptor(creds[0], creds[0]))
                     .build();

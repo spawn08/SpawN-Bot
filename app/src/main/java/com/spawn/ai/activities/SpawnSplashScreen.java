@@ -17,10 +17,18 @@ import com.spawn.ai.utils.task_utils.JsonFileReader;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 import com.spawn.ai.viewmodels.WebSearchViewModel;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class SpawnSplashScreen extends AppCompatActivity {
 
     public LottieAnimationView spawnLogo;
     public Context context;
+
+    @Inject
+    AppUtils appUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +64,10 @@ public class SpawnSplashScreen extends AppCompatActivity {
         });
         Handler handler = new Handler();
         webSearchViewModel
-                .getFile(AppUtils.getInstance().getDataFile())
+                .getFile(appUtils.getDataFile(), appUtils)
                 .observe(this, jsonElement -> {
                             if (jsonElement != null) {
-                                JsonFileReader.getInstance().fileName(AppUtils.getInstance().getDataFile());
-                                JsonFileReader.getInstance().readFile(this, jsonElement);
+                                JsonFileReader.getInstance().readFile(this, jsonElement, appUtils);
                                 JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(this).getStringPreference("lang"));
                                 handler.postDelayed(() -> {
                                     Intent intent = new Intent(context, SpawnBotActivity.class);
@@ -70,7 +77,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
                                 }, 1000);
 
                             } else {
-                                JsonFileReader.getInstance().readFile(this, null);
+                                JsonFileReader.getInstance().readFile(this, null, appUtils);
                                 handler.postDelayed(() -> {
                                     Intent intent = new Intent(context, SpawnBotActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -5,10 +5,15 @@ import android.app.Application;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.spawn.ai.utils.task_utils.AppUtils;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.HiltAndroidApp;
 
 @HiltAndroidApp
 public class SpawnAiApplication extends Application {
+
+    @Inject
+    AppUtils appUtils;
 
     @Override
     public void onCreate() {
@@ -16,6 +21,6 @@ public class SpawnAiApplication extends Application {
         FirebaseInstanceId.getInstance()
                 .getInstanceId()
                 .addOnCompleteListener(task ->
-                        AppUtils.getInstance().setToken(task.getResult().getToken()));
+                        appUtils.setToken(task.getResult().getToken()));
     }
 }
