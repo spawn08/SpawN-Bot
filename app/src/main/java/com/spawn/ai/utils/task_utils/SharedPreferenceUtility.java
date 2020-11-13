@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 public class SharedPreferenceUtility {
     private static SharedPreferences sharedPreferences;
     private static SharedPreferenceUtility sharedPreferenceUtility;
-    private static Context mContext;
 
     private SharedPreferenceUtility() {
 
@@ -16,8 +15,7 @@ public class SharedPreferenceUtility {
         if (sharedPreferenceUtility == null) {
             sharedPreferenceUtility = new SharedPreferenceUtility();
         }
-        mContext = context;
-        sharedPreferences = mContext.getSharedPreferences("spawnai", Context.MODE_PRIVATE);
+        sharedPreferences = context.getSharedPreferences("spawnai", Context.MODE_PRIVATE);
         return sharedPreferenceUtility;
     }
 

@@ -27,13 +27,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.google.firebase.BuildConfig;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
@@ -41,6 +34,7 @@ import com.spawn.ai.adapters.SpawnChatbotAdapter;
 import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
+import com.spawn.ai.di.modules.viewmodels.ViewModelFactory;
 import com.spawn.ai.interfaces.AzureService;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatCardModel;
@@ -48,6 +42,7 @@ import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.SpawnWikiModel;
 import com.spawn.ai.model.websearch.ValueResults;
 import com.spawn.ai.utils.task_utils.AppUtils;
+import com.spawn.ai.utils.task_utils.BotUtils;
 import com.spawn.ai.utils.task_utils.DateTimeUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
@@ -63,6 +58,12 @@ import java.util.Random;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
@@ -83,9 +84,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private Animation slideIn;
     private Animation slideOut;
-    int textCount;
+    private int textCount;
     private ChatMessageType chatMessage;
-    //private WebSearchViewModel webSearchViewModel;
     private ClassifyIntentViewModel classifyViewModel;
 
     private static String spokenString = "";
@@ -96,6 +96,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     @Inject
     AppUtils appUtils;
+
+    @Inject
+    ViewModelFactory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +140,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.chatRecycler.setAdapter(chatbotAdapter);
         textToSpeech = new TextToSpeech(this, this);
 
-        classifyViewModel = new ViewModelProvider(this).get(ClassifyIntentViewModel.class);
+        classifyViewModel = new ViewModelProvider(this, viewModelFactory).get(ClassifyIntentViewModel.class);
 
         initSpeech();
 
@@ -293,6 +296,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     protected void onResume() {
         super.onResume();
         initSpeech();
+        BotUtils.getInstance().buildInterpreter(this,
+                SharedPreferenceUtility.getInstance(this).getStringPreference("lang"));
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -667,6 +672,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 updateLanguageConfig("hi");
                 // WebServiceUtils.getInstance().setLanguage("hi");
                 setUpQuestionsView("hi");
+                BotUtils.getInstance().buildInterpreter(this, "hi");
             } else {
                 SharedPreferenceUtility.getInstance(this).storeStringPreference("lang", "en");
                 initSpeech();
@@ -690,6 +696,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 updateLanguageConfig("en");
                 // WebServiceUtils.getInstance().setLanguage("en");
                 setUpQuestionsView("en");
+                BotUtils.getInstance().buildInterpreter(this, "en");
             }
         }
 

@@ -1,12 +1,6 @@
 package com.spawn.ai.viewmodels;
 
-import android.app.Application;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.constants.AppConstants;
@@ -23,6 +17,11 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.inject.Inject;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -30,10 +29,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ClassifyIntentViewModel extends AndroidViewModel {
+public class ClassifyIntentViewModel extends ViewModel {
 
-    private Application application;
-    private MutableLiveData<JSONObject> results;
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -43,14 +40,13 @@ public class ClassifyIntentViewModel extends AndroidViewModel {
         compositeDisposable.dispose();
     }
 
-    public ClassifyIntentViewModel(@NonNull Application application) {
-        super(application);
-        this.application = application;
+    @Inject
+    public ClassifyIntentViewModel(){
+
     }
 
     public LiveData<JSONObject> classify(String sentence, String language) {
-        results = new MutableLiveData<>();
-        BotUtils.getInstance().buildInterpreter(application, language);
+        MutableLiveData<JSONObject> results = new MutableLiveData<>();
         return BotUtils.getInstance().classify(sentence, language, results);
     }
 
