@@ -1,5 +1,6 @@
 package com.spawn.ai.di.modules.network;
 
+import com.spawn.ai.BuildConfig;
 import com.spawn.ai.interfaces.AzureService;
 import com.spawn.ai.network.AzureInterceptor;
 import com.spawn.ai.utils.task_utils.AppUtils;
@@ -46,7 +47,7 @@ public class NetworkModule {
     @Singleton
     public Retrofit provideAzureRetrofit(@Named("ForAzureService") OkHttpClient okHttpClient, AppUtils appUtils) {
         return new Retrofit.Builder()
-                .baseUrl(appUtils.getWebApiUrl())
+                .baseUrl(BuildConfig.BASE_URL)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())

@@ -34,24 +34,6 @@ public class AppUtils {
 
     private String token;
 
-    static {
-        System.loadLibrary("native-lib");
-    }
-
-    public native String getAPICreds();
-
-    public native String getUrl();
-
-    public native String getESCreds();
-
-    public native String getDataFile();
-
-    public native String getNewsUrl();
-
-    public native String getAzureKey();
-
-    public native String getWebApiUrl();
-
     public static String getStringRes(int resourceId, Context context, String lang) {
         String result = "";
 

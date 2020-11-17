@@ -2,6 +2,10 @@ package com.spawn.ai.viewmodels;
 
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
@@ -19,9 +23,6 @@ import java.net.URLEncoder;
 
 import javax.inject.Inject;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -41,7 +42,7 @@ public class ClassifyIntentViewModel extends ViewModel {
     }
 
     @Inject
-    public ClassifyIntentViewModel(){
+    public ClassifyIntentViewModel() {
 
     }
 

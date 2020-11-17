@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
+import com.spawn.ai.BuildConfig;
 import com.spawn.ai.R;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
@@ -64,7 +65,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
         });
         Handler handler = new Handler();
         webSearchViewModel
-                .getFile(appUtils.getDataFile(), appUtils)
+                .getFile(BuildConfig.DATA_FILE, appUtils)
                 .observe(this, jsonElement -> {
                             if (jsonElement != null) {
                                 JsonFileReader.getInstance().readFile(this, jsonElement, appUtils);

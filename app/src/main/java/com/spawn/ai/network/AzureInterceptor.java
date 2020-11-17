@@ -1,5 +1,6 @@
 package com.spawn.ai.network;
 
+import com.spawn.ai.BuildConfig;
 import com.spawn.ai.utils.task_utils.AppUtils;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class AzureInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
-        Request azureReq = request.newBuilder().addHeader("Ocp-Apim-Subscription-Key", appUtils.getAzureKey())
+        Request azureReq = request.newBuilder().addHeader("Ocp-Apim-Subscription-Key", BuildConfig.AZURE_KEY)
                 .addHeader("User-Agent", "Android")
                 .addHeader("BingAPIs-Market", "en-IN")
                 .build();

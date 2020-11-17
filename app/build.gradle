@@ -72,6 +72,7 @@ android {
             applicationIdSuffix name
             applicationId "com.spawn.ai"
             buildConfigField "String", "BASE_URL", "\"https://api.cognitive.microsoft.com/bing/v7.0/\""
+            buildConfigField "String", "SPAWNAI_URL", "\"https://api.spawnai.com/\""
             buildConfigField "String", "AZURE_URL", "\"bot_data.json\""
             buildConfigField "String", "API_CREDS", "\"onebotsolution:OneBotFinancialServices\""
             buildConfigField "String", "ELASTIC_CREDS", "\"elastic:Spawn@#32\""
@@ -83,6 +84,7 @@ android {
             dimension "env"
             applicationId "com.spawn.ai"
             buildConfigField "String", "BASE_URL", "\"https://api.cognitive.microsoft.com/bing/v7.0/\""
+            buildConfigField "String", "SPAWNAI_URL", "\"https://api.spawnai.com/\""
             buildConfigField "String", "AZURE_URL", "\"bot_data.json\""
             buildConfigField "String", "API_CREDS", "\"onebotsolution:OneBotFinancialServices\""
             buildConfigField "String", "ELASTIC_CREDS", "\"elastic:Spawn@#32\""

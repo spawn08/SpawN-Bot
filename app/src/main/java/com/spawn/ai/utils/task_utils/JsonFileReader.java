@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.JsonElement;
+import com.spawn.ai.BuildConfig;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.model.ChatCardModel;
 
@@ -44,11 +45,11 @@ public class JsonFileReader {
             else {
                 fileContents = null;
                 Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
-                loadLocalFile(context, appUtils.getDataFile());
+                loadLocalFile(context, BuildConfig.DATA_FILE);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            loadLocalFile(context, appUtils.getDataFile());
+            loadLocalFile(context, BuildConfig.DATA_FILE);
             FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
         }
     }

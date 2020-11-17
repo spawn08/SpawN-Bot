@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.JsonElement;
+import com.spawn.ai.BuildConfig;
 import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.SpawnAPIService;
@@ -30,7 +31,7 @@ public class WebSearchViewModel extends ViewModel {
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
     private MutableLiveData<JsonElement> jsonElementMutableLiveData;
     private String[] creds = null;
-    private String apiUrl = null;
+    private final String apiUrl = BuildConfig.SPAWNAI_URL;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
@@ -40,8 +41,7 @@ public class WebSearchViewModel extends ViewModel {
     }
 
     private void getMLResponse(String q, String type, String language, AppUtils appUtils) {
-        creds = appUtils.getAPICreds().split(":");
-        apiUrl = appUtils.getUrl();
+        creds = BuildConfig.API_CREDS.split(":");
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
@@ -136,7 +136,6 @@ public class WebSearchViewModel extends ViewModel {
 
     public LiveData<ChatCardModel> getSpawnAIResponse(String q, String language, AppUtils appUtils) {
         chatCardModelMutableLiveData = new MutableLiveData<>();
-        apiUrl = appUtils.getUrl();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
@@ -198,7 +197,6 @@ public class WebSearchViewModel extends ViewModel {
     public LiveData<JsonElement> getFile(String fileName, AppUtils appUtils) {
         try {
             jsonElementMutableLiveData = new MutableLiveData<>();
-            apiUrl = appUtils.getUrl();
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(new NLPInterceptor(creds[0], creds[0]))
                     .build();
