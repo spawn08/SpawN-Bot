@@ -64,6 +64,32 @@ android {
         targetCompatibility = 1.8
     }
     buildToolsVersion = '29.0.3'
+
+    flavorDimensions "env"
+    productFlavors {
+        dev {
+            dimension "env"
+            applicationIdSuffix name
+            applicationId "com.spawn.ai"
+            buildConfigField "String", "BASE_URL", "\"https://api.cognitive.microsoft.com/bing/v7.0/\""
+            buildConfigField "String", "AZURE_URL", "\"bot_data.json\""
+            buildConfigField "String", "API_CREDS", "\"onebotsolution:OneBotFinancialServices\""
+            buildConfigField "String", "ELASTIC_CREDS", "\"elastic:Spawn@#32\""
+            buildConfigField "String", "DATA_FILE", "\"bot_data.json\""
+            buildConfigField "String", "AZURE_KEY", "\"f5873c265b8247a7af3490e7648c6c37\""
+        }
+
+        prod {
+            dimension "env"
+            applicationId "com.spawn.ai"
+            buildConfigField "String", "BASE_URL", "\"https://api.cognitive.microsoft.com/bing/v7.0/\""
+            buildConfigField "String", "AZURE_URL", "\"bot_data.json\""
+            buildConfigField "String", "API_CREDS", "\"onebotsolution:OneBotFinancialServices\""
+            buildConfigField "String", "ELASTIC_CREDS", "\"elastic:Spawn@#32\""
+            buildConfigField "String", "DATA_FILE", "\"bot_data.json\""
+            buildConfigField "String", "AZURE_KEY", "\"f5873c265b8247a7af3490e7648c6c37\""
+        }
+    }
 }
 
 dependencies {
