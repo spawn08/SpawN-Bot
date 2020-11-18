@@ -10,6 +10,8 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.AzureService;
+import com.spawn.ai.interfaces.SensexActiveService;
+import com.spawn.ai.interfaces.SensexService;
 import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.SpawnWikiModel;
@@ -32,6 +34,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ClassifyIntentViewModel extends ViewModel {
 
+    private AzureService azureService;
+    private SensexService sensexService;
+    private SensexActiveService sensexActiveService;
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -42,8 +47,12 @@ public class ClassifyIntentViewModel extends ViewModel {
     }
 
     @Inject
-    public ClassifyIntentViewModel() {
-
+    public ClassifyIntentViewModel(AzureService azureService,
+                                   SensexService sensexService,
+                                   SensexActiveService sensexActiveService) {
+        this.azureService = azureService;
+        this.sensexService = sensexService;
+        this.sensexActiveService = sensexActiveService;
     }
 
     public LiveData<JSONObject> classify(String sentence, String language) {
@@ -51,7 +60,7 @@ public class ClassifyIntentViewModel extends ViewModel {
         return BotUtils.getInstance().classify(sentence, language, results);
     }
 
-    public LiveData<ChatCardModel> getWebSearch(String q, String language, String type, AzureService azureService) throws UnsupportedEncodingException {
+    public LiveData<ChatCardModel> getWebSearch(String q, String language, String type) throws UnsupportedEncodingException {
         chatCardModelMutableLiveData = new MutableLiveData<>();
         if (type.equalsIgnoreCase("search")) {
             compositeDisposable.add(azureService
@@ -104,7 +113,7 @@ public class ClassifyIntentViewModel extends ViewModel {
         Observable<SpawnWikiModel> data;
         final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
 
-        if (language.equalsIgnoreCase("en"))
+        if (language.equalsIgnoreCase(AppConstants.LANG_EN))
             data = spawnAPI.getWiki(cloneEntity);
         else
             data = spawnAPI.getWikiHI(cloneEntity);
@@ -116,7 +125,7 @@ public class ClassifyIntentViewModel extends ViewModel {
                             ChatCardModel chatCardModel;
                             Log.d("API CONTENT: ", spawnWikiModel.toString());
 
-                            if (spawnWikiModel.getType().equals("disambiguation")) {
+                            if (spawnWikiModel.getType().equals(AppConstants.DISAMBIGUATION)) {
                                 chatCardModelMutableLiveData.postValue(null);
                             } else {
                                 chatCardModel = new ChatCardModel(spawnWikiModel, 5);

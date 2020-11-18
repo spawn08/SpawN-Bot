@@ -11,5 +11,9 @@ public class AppConstants {
     public static final String WEB_ACTION = "web_action";
     public static final String RESULT_TYPE_SEARCH = "search";
     public static final String RESULT_TYPE_NEWS = "news";
-
+    public static final String LANG_EN = "en";
+    public static final String LANG_HI = "hi";
+    public static final String DISAMBIGUATION = "disambiguation";
+    public static final String FORCE_UPDATE = "force_update";
+    public static final String ACTION = "action";
 }

@@ -22,6 +22,8 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+import static com.spawn.ai.constants.AppConstants.LANG;
+
 @AndroidEntryPoint
 public class SpawnSplashScreen extends AppCompatActivity {
 
@@ -69,7 +71,7 @@ public class SpawnSplashScreen extends AppCompatActivity {
                 .observe(this, jsonElement -> {
                             if (jsonElement != null) {
                                 JsonFileReader.getInstance().readFile(this, jsonElement, appUtils);
-                                JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(this).getStringPreference("lang"));
+                                JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(this).getStringPreference(LANG));
                                 handler.postDelayed(() -> {
                                     Intent intent = new Intent(context, SpawnBotActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);

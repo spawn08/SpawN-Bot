@@ -2,6 +2,8 @@ package com.spawn.ai.di.modules.network;
 
 import com.spawn.ai.BuildConfig;
 import com.spawn.ai.interfaces.AzureService;
+import com.spawn.ai.interfaces.SensexActiveService;
+import com.spawn.ai.interfaces.SensexService;
 import com.spawn.ai.network.AzureInterceptor;
 import com.spawn.ai.utils.task_utils.AppUtils;
 
@@ -58,5 +60,51 @@ public class NetworkModule {
     @Singleton
     public AzureService provideAzureService(@Named("ForAzureService") Retrofit retrofit) {
         return retrofit.create(AzureService.class);
+    }
+
+    @Named("ForSensexService")
+    @Provides
+    @Singleton
+    public OkHttpClient provideSensexClient() {
+        return new OkHttpClient.Builder()
+                .build();
+    }
+
+    //Retrofit and Service object for gainers, losers, preopen market indices
+    @Named("ForSensexGLService")
+    @Provides
+    @Singleton
+    public Retrofit provideSensexGLRetrofit(@Named("ForSensexService") OkHttpClient okHttpClient) {
+        return new Retrofit.Builder()
+                .baseUrl(BuildConfig.SENSEX_GAINERS_LOSERS)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    public SensexService provideSensexGLService(@Named("ForSensexGLService") Retrofit retrofit) {
+        return retrofit.create(SensexService.class);
+    }
+
+    //Retrofit and Service object for Active, 52Weeks high and low indices
+    @Named("ForSensexActiveService")
+    @Provides
+    @Singleton
+    public Retrofit provideSensexActiveRetrofit(@Named("ForSensexService") OkHttpClient okHttpClient) {
+        return new Retrofit.Builder()
+                .baseUrl(BuildConfig.SENSEX_ACTIVE_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    public SensexActiveService provideSensexActiveService(@Named("ForSensexActiveService") Retrofit retrofit) {
+        return retrofit.create(SensexActiveService.class);
     }
 }

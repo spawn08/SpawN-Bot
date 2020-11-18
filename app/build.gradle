@@ -78,6 +78,10 @@ android {
             buildConfigField "String", "ELASTIC_CREDS", "\"elastic:Spawn@#32\""
             buildConfigField "String", "DATA_FILE", "\"bot_data.json\""
             buildConfigField "String", "AZURE_KEY", "\"f5873c265b8247a7af3490e7648c6c37\""
+            buildConfigField "String", "WIKI_EN_URL", "\"https://en.wikipedia.org/api/rest_v1/page/summary/\""
+            buildConfigField "String", "WIKI_HI_URL", "\"https://hi.wikipedia.org/api/rest_v1/page/summary/\""
+            buildConfigField "String", "SENSEX_GAINERS_LOSERS", "\"https://www1.nseindia.com/live_market/dynaContent/live_analysis/\""
+            buildConfigField "String", "SENSEX_ACTIVE_URL", "\"https://www1.nseindia.com/products/dynaContent/equities/equities/json/\""
         }
 
         prod {
@@ -90,6 +94,10 @@ android {
             buildConfigField "String", "ELASTIC_CREDS", "\"elastic:Spawn@#32\""
             buildConfigField "String", "DATA_FILE", "\"bot_data.json\""
             buildConfigField "String", "AZURE_KEY", "\"f5873c265b8247a7af3490e7648c6c37\""
+            buildConfigField "String", "WIKI_EN_URL", "\"https://en.wikipedia.org/api/rest_v1/page/summary/\""
+            buildConfigField "String", "WIKI_HI_URL", "\"https://hi.wikipedia.org/api/rest_v1/page/summary/\""
+            buildConfigField "String", "SENSEX_GAINERS_LOSERS", "\"https://www1.nseindia.com/live_market/dynaContent/live_analysis/\""
+            buildConfigField "String", "SENSEX_ACTIVE_URL", "\"https://www1.nseindia.com/products/dynaContent/equities/equities/json/\""
         }
     }
 }

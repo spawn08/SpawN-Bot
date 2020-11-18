@@ -66,6 +66,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.hilt.android.AndroidEntryPoint;
 
+import static com.spawn.ai.constants.AppConstants.ACTION;
+import static com.spawn.ai.constants.AppConstants.FORCE_UPDATE;
+import static com.spawn.ai.constants.AppConstants.LANG;
+import static com.spawn.ai.constants.AppConstants.LANG_EN;
+import static com.spawn.ai.constants.AppConstants.LANG_HI;
+import static com.spawn.ai.constants.AppConstants.SPEAK;
+
 @AndroidEntryPoint
 public class SpawnBotActivity extends AppCompatActivity implements RecognitionListener, View.OnClickListener, IBotObserver, TextToSpeech.OnInitListener {
 
@@ -92,9 +99,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private String language;
 
     @Inject
-    AzureService azureService;
-
-    @Inject
     AppUtils appUtils;
 
     @Inject
@@ -105,24 +109,24 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         super.onCreate(savedInstanceState);
 
         if (BuildConfig.VERSION_CODE != Integer.parseInt(JsonFileReader.getInstance().getValueFromJson("app_version"))
-                && JsonFileReader.getInstance().getValueFromJson("force_update").equalsIgnoreCase("true")) {
+                && JsonFileReader.getInstance().getValueFromJson(FORCE_UPDATE).equalsIgnoreCase("true")) {
             appUtils.showVersionUpdateDialog(this);
         }
         context = this;
         activitySpawnBotBinding = DataBindingUtil.setContentView(this, R.layout.activity_spawn_bot);
         activitySpawnBotBinding.setListener(this);
-        locale = new Locale("en");
+        locale = new Locale(LANG_EN);
         requestPermission();
         registerConnectivityNetworkMonitorForAPI21AndUp();
         activitySpawnBotBinding
                 .titleText
-                .setText(AppUtils.getStringRes(R.string.app_name, this, SharedPreferenceUtility.getInstance(this).getStringPreference("lang")));
+                .setText(AppUtils.getStringRes(R.string.app_name, this, SharedPreferenceUtility.getInstance(this).getStringPreference(LANG)));
 
-        FirebaseCrashlytics.getInstance().setCustomKey("action", "App open");
+        FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "App open");
 
         setUpClickListener();
 
-        if (SharedPreferenceUtility.getInstance(this).getPreference("speak")) {
+        if (SharedPreferenceUtility.getInstance(this).getPreference(SPEAK)) {
             activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
             activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
         } else {
@@ -144,7 +148,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
         initSpeech();
 
-        setUpQuestionsView(SharedPreferenceUtility.getInstance(this).getStringPreference("lang"));
+        setUpQuestionsView(SharedPreferenceUtility.getInstance(this).getStringPreference(LANG));
 
         activitySpawnBotBinding.mic.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
@@ -270,10 +274,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     private void initSpeech() {
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
 
-        if (SharedPreferenceUtility.getInstance(this).getStringPreference("lang").equalsIgnoreCase("hi")) {
-            this.language = "hi";
+        if (SharedPreferenceUtility.getInstance(this).getStringPreference(LANG).equalsIgnoreCase(LANG_HI)) {
+            this.language = LANG_HI;
         } else {
-            this.language = "en";
+            this.language = LANG_EN;
         }
 
         speechIntentDispatcher = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -297,7 +301,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         super.onResume();
         initSpeech();
         BotUtils.getInstance().buildInterpreter(this,
-                SharedPreferenceUtility.getInstance(this).getStringPreference("lang"));
+                SharedPreferenceUtility.getInstance(this).getStringPreference(LANG));
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -434,9 +438,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         try {
             classifyViewModel
                     .getWebSearch(spokenString,
-                            SharedPreferenceUtility.getInstance(this).getStringPreference("lang"),
-                            AppConstants.RESULT_TYPE_NEWS,
-                            azureService)
+                            SharedPreferenceUtility.getInstance(this).getStringPreference(LANG),
+                            AppConstants.RESULT_TYPE_NEWS)
                     .observe(this,
                             (chatCardModel ->
                                     chatViews(null,
@@ -455,7 +458,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             chatBotResponseModel.setMessage(jsonArray.get(index).toString());
             chatBotResponseModel.setType(jsonObject.getInt("type"));
             chatBotResponseModel.setLang(language);
-            chatBotResponseModel.setAction(jsonObject.getString("action"));
+            chatBotResponseModel.setAction(jsonObject.getString(ACTION));
             chatViews("", ChatViewTypes.CHAT_VIEW_BOT, chatBotResponseModel);
         } catch (Exception e) {
             e.printStackTrace();
@@ -567,7 +570,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                             .chatCardModel(chatCardModel)
                             .viewType(chatCardModel.getType())
                             .message(AppUtils.getStringRes(R.string.result_text, context,
-                                    SharedPreferenceUtility.getInstance(this).getStringPreference("lang")))
+                                    SharedPreferenceUtility.getInstance(this).getStringPreference(LANG)))
                             .build();
 
                     refreshChat(webSearch);
@@ -605,7 +608,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             activitySpawnBotBinding.micImage.setVisibility(View.GONE);
             activitySpawnBotBinding.mic.setVisibility(View.VISIBLE);
             activitySpawnBotBinding.mic.playAnimation();
-            FirebaseCrashlytics.getInstance().setCustomKey("action", "Mic Listening");
+            FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "Mic Listening");
 
         } else if (i == R.id.mic_image) {
             if (activitySpawnBotBinding.recyclerContainer.getVisibility() == View.GONE)
@@ -629,7 +632,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
                 requestPermission();
             }
-            FirebaseCrashlytics.getInstance().setCustomKey("action", "Mic Listening");
+            FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "Mic Listening");
 
         } else if (i == R.id.recycler_container) {
 
@@ -651,16 +654,17 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         } else if (i == R.id.arrow_back) {
             finish();
         } else if (i == R.id.lang_change) {
-            if (SharedPreferenceUtility.getInstance(this).getStringPreference("lang").equalsIgnoreCase("en")) {
-                SharedPreferenceUtility.getInstance(this).storeStringPreference("lang", "hi");
+            if (SharedPreferenceUtility.getInstance(this)
+                    .getStringPreference(LANG).equalsIgnoreCase(LANG_EN)) {
+                SharedPreferenceUtility.getInstance(this).storeStringPreference(LANG, LANG_HI);
                 initSpeech();
                 textToSpeech.stop();
                 textToSpeech = null;
                 textToSpeech = new TextToSpeech(this, this);
-                activitySpawnBotBinding.langChange.setText(AppUtils.getStringRes(R.string.language_initials, this, "hi"));
+                activitySpawnBotBinding.langChange.setText(AppUtils.getStringRes(R.string.language_initials, this, LANG_HI));
                 activitySpawnBotBinding
                         .titleText
-                        .setText(AppUtils.getStringRes(R.string.app_name, this, "hi"));
+                        .setText(AppUtils.getStringRes(R.string.app_name, this, LANG_HI));
                 // WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_hi));
                 botResponses.clear();
                 chatbotAdapter.setAdapter(botResponses);
@@ -669,22 +673,22 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding.recyclerContainer.setVisibility(View.GONE);
                 activitySpawnBotBinding.textviewAnimation.setVisibility(View.VISIBLE);
 
-                updateLanguageConfig("hi");
+                updateLanguageConfig(LANG_HI);
                 // WebServiceUtils.getInstance().setLanguage("hi");
-                setUpQuestionsView("hi");
-                BotUtils.getInstance().buildInterpreter(this, "hi");
+                setUpQuestionsView(LANG_HI);
+                BotUtils.getInstance().buildInterpreter(this, LANG_HI);
             } else {
-                SharedPreferenceUtility.getInstance(this).storeStringPreference("lang", "en");
+                SharedPreferenceUtility.getInstance(this).storeStringPreference(LANG, LANG_EN);
                 initSpeech();
                 textToSpeech.stop();
                 textToSpeech = null;
                 textToSpeech = new TextToSpeech(this, this);
                 //WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_en));
                 activitySpawnBotBinding.langChange
-                        .setText(AppUtils.getStringRes(R.string.language_initials, this, "en"));
+                        .setText(AppUtils.getStringRes(R.string.language_initials, this, LANG_EN));
                 activitySpawnBotBinding
                         .titleText
-                        .setText(AppUtils.getStringRes(R.string.app_name, this, "en"));
+                        .setText(AppUtils.getStringRes(R.string.app_name, this, LANG_EN));
 
                 botResponses.clear();
                 chatbotAdapter.setAdapter(botResponses);
@@ -693,10 +697,10 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding.recyclerContainer.setVisibility(View.GONE);
                 activitySpawnBotBinding.textviewAnimation.setVisibility(View.VISIBLE);
 
-                updateLanguageConfig("en");
+                updateLanguageConfig(LANG_EN);
                 // WebServiceUtils.getInstance().setLanguage("en");
-                setUpQuestionsView("en");
-                BotUtils.getInstance().buildInterpreter(this, "en");
+                setUpQuestionsView(LANG_EN);
+                BotUtils.getInstance().buildInterpreter(this, LANG_EN);
             }
         }
 
@@ -713,14 +717,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         if (activitySpawnBotBinding.volumeDown.getVisibility() == View.GONE) {
             activitySpawnBotBinding.volumeDown.setVisibility(View.VISIBLE);
             activitySpawnBotBinding.volumeUp.setVisibility(View.GONE);
-            SharedPreferenceUtility.getInstance(this).storePreference("speak", false);
+            SharedPreferenceUtility.getInstance(this).storePreference(SPEAK, false);
             if (chatMessage != null)
                 chatMessage.setSpeakFinish(true);
             notifyBotError();
         } else {
             activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
             activitySpawnBotBinding.volumeDown.setVisibility(View.GONE);
-            SharedPreferenceUtility.getInstance(this).storePreference("speak", true);
+            SharedPreferenceUtility.getInstance(this).storePreference(SPEAK, true);
         }
     }
 
@@ -737,7 +741,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 textToSpeech.shutdown();
                 textToSpeech = null;
             }
-            FirebaseCrashlytics.getInstance().setCustomKey("action", "App close");
+            FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "App close");
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
@@ -761,14 +765,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void speakBot(String message) {
         textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
-        FirebaseCrashlytics.getInstance().setCustomKey("action", "App Speaking");
+        FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "App Speaking");
     }
 
     @Override
     public void setAction(String action, Object object) {
         Handler handler = new Handler();
         if (action.equals(AppConstants.WEB_ACTION)) {
-            FirebaseCrashlytics.getInstance().setCustomKey("action", "Web Open");
+            FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "Web Open");
             Intent intent = new Intent(this, SpawnWebActivity.class);
             if (object instanceof SpawnWikiModel)
                 intent.putExtra("url", ((SpawnWikiModel) object).getContent_urls().getMobile().getPage());
@@ -780,12 +784,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         } else if (action.equals(AppConstants.FINISH)) {
             handler.postDelayed(this::finish, 1500);
 
-        } else if (action.equals(AppConstants.SPEAK)) {
-            FirebaseCrashlytics.getInstance().setCustomKey("action", "Context conversation");
+        } else if (action.equals(SPEAK)) {
+            FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "Context conversation");
             handler.postDelayed(this::startListen, 2500);
 
         } else if (action.equalsIgnoreCase(AppConstants.GOOGLE_SEARCH)) {
-            FirebaseCrashlytics.getInstance().setCustomKey("action", "Google Search");
+            FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "Google Search");
             Intent intent = new Intent(this, SpawnWebActivity.class);
             intent.putExtra("url", getResources().getString(R.string.google_search) + spokenString);
             startActivity(intent);
@@ -793,9 +797,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             try {
                 classifyViewModel
                         .getWebSearch(spokenString,
-                                SharedPreferenceUtility.getInstance(this).getStringPreference("lang"),
-                                AppConstants.RESULT_TYPE_NEWS,
-                                azureService)
+                                SharedPreferenceUtility.getInstance(this).getStringPreference(LANG),
+                                AppConstants.RESULT_TYPE_NEWS)
                         .observe(this,
                                 (chatCardModel ->
                                         chatViews(null,
@@ -846,7 +849,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void onInit(int i) {
         if (i == TextToSpeech.SUCCESS) {
-            String lang = SharedPreferenceUtility.getInstance(this).getStringPreference("lang");
+            String lang = SharedPreferenceUtility.getInstance(this).getStringPreference(LANG);
             textToSpeech.setLanguage(locale);
             FirebaseCrashlytics.getInstance().setCustomKey("TTSLanguage", lang);
             textToSpeech.setPitch(0.99f);
