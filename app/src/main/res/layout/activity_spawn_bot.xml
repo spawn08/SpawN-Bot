@@ -27,13 +27,15 @@
             android:layout_below="@+id/title_bar"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="3dp"
+            android:onClick="@{v -> listener.onClick(v)}"
             android:visibility="gone">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chat_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/chat_activity_background" />
+                android:background="@drawable/chat_activity_background"
+                android:onClick="@{v -> listener.onClick(v)}" />
         </LinearLayout>
 
         <RelativeLayout
@@ -48,6 +50,7 @@
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/margin_5"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_action_name" />
 
@@ -60,6 +63,7 @@
                 android:layout_marginStart="@dimen/margin_5"
                 android:layout_marginEnd="@dimen/margin_20"
                 android:layout_toEndOf="@+id/lang_change"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:padding="@dimen/margin_5"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_volume_up" />
@@ -73,6 +77,7 @@
                 android:layout_marginStart="@dimen/margin_5"
                 android:layout_marginEnd="@dimen/margin_20"
                 android:layout_toEndOf="@+id/lang_change"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:padding="@dimen/margin_5"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_volume_down"
@@ -80,13 +85,14 @@
 
             <TextView
                 android:id="@+id/lang_change"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="@dimen/margin_35"
+                android:layout_height="@dimen/margin_35"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/margin_15"
                 android:layout_toEndOf="@+id/title_text"
                 android:background="@drawable/text_circle"
                 android:gravity="center"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:text="@string/language_initials"
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/textsize_16" />
@@ -169,6 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/mic_round_back"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_mic" />
 
@@ -178,6 +185,7 @@
                 android:layout_height="@dimen/speech_anim_height"
                 android:layout_centerHorizontal="true"
                 android:background="@android:color/transparent"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:visibility="gone"
                 app:lottie_rawRes="@raw/voice_loading_animation" />
 
@@ -190,6 +198,7 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/mic_rl"
             android:background="@android:color/transparent"
+            android:onClick="@{v -> listener.onClick(v)}"
             android:visibility="gone">
 
         </RelativeLayout>

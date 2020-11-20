@@ -7,13 +7,16 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
@@ -25,10 +28,12 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.spawn.ai.constants.AppConstants.CONNECTIVITY_CHANGE_ACTION;
 
 public class AppUtils {
 
@@ -85,7 +90,7 @@ public class AppUtils {
                         "222")
                         .setContentTitle(data.get("title"))
                         .setAutoCancel(true)
-                        .setLargeIcon(((BitmapDrawable) context.getDrawable(R.mipmap.ic_launcher)).getBitmap())
+                        .setLargeIcon(getNotificationDrawable(context))
                         .setSound(defaultSound)
                         .setContentText(data.get("body"))
                         .setSmallIcon(R.mipmap.ic_launcher)
@@ -93,6 +98,10 @@ public class AppUtils {
 
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+    }
+
+    private Bitmap getNotificationDrawable(Context context) {
+        return ((BitmapDrawable) Objects.requireNonNull(ContextCompat.getDrawable(context, R.mipmap.ic_launcher))).getBitmap();
     }
 
     public String getInfoFromExtract(String extract, String type) {
@@ -144,5 +153,18 @@ public class AppUtils {
     public void showVersionUpdateDialog(Activity activity) {
         AlertUpdateDialog alertUpdateDialog = new AlertUpdateDialog(activity);
         alertUpdateDialog.show();
+    }
+
+    /**
+     * Create Intent for checking the connectivity
+     *
+     * @param noConnection boolean flag for connectivity
+     * @return intent Intent object
+     */
+    public Intent getConnectivityIntent(boolean noConnection) {
+        Intent intent = new Intent();
+        intent.setAction(CONNECTIVITY_CHANGE_ACTION);
+        intent.putExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, noConnection);
+        return intent;
     }
 }

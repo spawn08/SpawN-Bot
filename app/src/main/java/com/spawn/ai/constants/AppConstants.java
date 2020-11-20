@@ -16,4 +16,7 @@ public class AppConstants {
     public static final String DISAMBIGUATION = "disambiguation";
     public static final String FORCE_UPDATE = "force_update";
     public static final String ACTION = "action";
+    public static final String ACTION_SPEAKING = "App Speaking";
+    public static final String ACTION_WEB_OPEN = "Web Open";
+    public static final String CONNECTIVITY_CHANGE_ACTION = "com.spawn.ai.CONNECTIVITY_CHANGE";
 }

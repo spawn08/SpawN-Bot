@@ -2,7 +2,6 @@ package com.spawn.ai.activities;
 
 import android.Manifest;
 import android.animation.Animator;
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +26,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.google.firebase.BuildConfig;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
@@ -35,7 +41,6 @@ import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.databinding.ActivitySpawnBotBinding;
 import com.spawn.ai.di.modules.viewmodels.ViewModelFactory;
-import com.spawn.ai.interfaces.AzureService;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
@@ -58,15 +63,12 @@ import java.util.Random;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.hilt.android.AndroidEntryPoint;
 
 import static com.spawn.ai.constants.AppConstants.ACTION;
+import static com.spawn.ai.constants.AppConstants.ACTION_SPEAKING;
+import static com.spawn.ai.constants.AppConstants.ACTION_WEB_OPEN;
+import static com.spawn.ai.constants.AppConstants.CONNECTIVITY_CHANGE_ACTION;
 import static com.spawn.ai.constants.AppConstants.FORCE_UPDATE;
 import static com.spawn.ai.constants.AppConstants.LANG;
 import static com.spawn.ai.constants.AppConstants.LANG_EN;
@@ -117,14 +119,12 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         activitySpawnBotBinding.setListener(this);
         locale = new Locale(LANG_EN);
         requestPermission();
-        registerConnectivityNetworkMonitorForAPI21AndUp();
+        registerConnectivityNetworkMonitor();
         activitySpawnBotBinding
                 .titleText
                 .setText(AppUtils.getStringRes(R.string.app_name, this, SharedPreferenceUtility.getInstance(this).getStringPreference(LANG)));
 
         FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "App open");
-
-        setUpClickListener();
 
         if (SharedPreferenceUtility.getInstance(this).getPreference(SPEAK)) {
             activitySpawnBotBinding.volumeUp.setVisibility(View.VISIBLE);
@@ -133,8 +133,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             activitySpawnBotBinding.volumeUp.setVisibility(View.GONE);
             activitySpawnBotBinding.volumeDown.setVisibility(View.VISIBLE);
         }
-
-        activitySpawnBotBinding.langChange.setOnClickListener(this);
 
         botResponses = new ArrayList<>();
         chatbotAdapter = new SpawnChatbotAdapter(this, botResponses, appUtils);
@@ -255,16 +253,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     }
 
-    private void setUpClickListener() {
-        activitySpawnBotBinding.mic.setOnClickListener(this);
-        activitySpawnBotBinding.micImage.setOnClickListener(this);
-        activitySpawnBotBinding.recyclerContainer.setOnClickListener(this);
-        activitySpawnBotBinding.chatRecycler.setOnClickListener(this);
-        activitySpawnBotBinding.arrowBack.setOnClickListener(this);
-        activitySpawnBotBinding.volumeUp.setOnClickListener(this);
-        activitySpawnBotBinding.volumeDown.setOnClickListener(this);
-    }
-
     private void requestPermission() {
         ActivityCompat.requestPermissions(SpawnBotActivity.this,
                 new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.INTERNET},
@@ -317,7 +305,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 isSpeechEnabled = true;
             } else {
                 isSpeechEnabled = false;
-                Toast.makeText(this, "Permission for speech input is disabled", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.speech_perm_denied), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -336,7 +324,6 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             textToSpeech.stop();
         }
         activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
-        activitySpawnBotBinding.containerStop.setOnClickListener(this);
         activitySpawnBotBinding.containerStop.requestFocus();
     }
 
@@ -370,7 +357,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
                 activitySpawnBotBinding.containerStop.setVisibility(View.GONE);
                 onEndOfSpeech();
-                Toast.makeText(this, "No permission to perform the action", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.speech_perm_denied), Toast.LENGTH_LONG).show();
                 break;
 
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
@@ -404,9 +391,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
             activitySpawnBotBinding.mic.cancelAnimation();
             activitySpawnBotBinding.mic.invalidate();
             ArrayList<String> returnSpeech = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            String speechString = Objects.requireNonNull(returnSpeech).get(0);
+            String speechString = returnSpeech != null ? (returnSpeech).get(0) : "";
             spokenString = speechString;
-            Log.d(getClass().getCanonicalName(), "Speech :" + speechString);
+            Log.d(TAG, "Speech :" + speechString);
             onEndOfSpeech();
             chatViews(speechString, 0, null);
             classifyIntent(speechString);
@@ -426,7 +413,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                                             chatCardModel.getType(),
                                             chatCardModel);
                                 else
-                                    onFailure();
+                                    performWebSearch();
                             }
                     ));
         } else {
@@ -434,7 +421,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }
     }
 
-    private void onFailure() {
+    private void performWebSearch() {
         try {
             classifyViewModel
                     .getWebSearch(spokenString,
@@ -765,14 +752,14 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     @Override
     public void speakBot(String message) {
         textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, "10000");
-        FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "App Speaking");
+        FirebaseCrashlytics.getInstance().setCustomKey(ACTION, ACTION_SPEAKING);
     }
 
     @Override
     public void setAction(String action, Object object) {
         Handler handler = new Handler();
         if (action.equals(AppConstants.WEB_ACTION)) {
-            FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "Web Open");
+            FirebaseCrashlytics.getInstance().setCustomKey(ACTION, ACTION_WEB_OPEN);
             Intent intent = new Intent(this, SpawnWebActivity.class);
             if (object instanceof SpawnWikiModel)
                 intent.putExtra("url", ((SpawnWikiModel) object).getContent_urls().getMobile().getPage());
@@ -878,32 +865,35 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }
     };
 
-    @SuppressLint("NewApi")
-    private void registerConnectivityNetworkMonitorForAPI21AndUp() {
-
+    /**
+     * Check whether the application is connected to internet or not
+     */
+    private void registerConnectivityNetworkMonitor() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkRequest.Builder builder = new NetworkRequest.Builder();
 
-        Objects.requireNonNull(connectivityManager).registerNetworkCallback(
-                builder.build(),
-                new ConnectivityManager.NetworkCallback() {
-                    @Override
-                    public void onAvailable(@NonNull Network network) {
-                        sendBroadcast(getConnectivityIntent(false));
-                    }
+        if (connectivityManager != null) {
+            connectivityManager.registerNetworkCallback(
+                    builder.build(),
+                    new ConnectivityManager.NetworkCallback() {
+                        @Override
+                        public void onAvailable(@NonNull Network network) {
+                            sendBroadcast(appUtils.getConnectivityIntent(false));
+                        }
 
-                    @Override
-                    public void onLost(@NonNull Network network) {
-                        sendBroadcast(getConnectivityIntent(true));
+                        @Override
+                        public void onLost(@NonNull Network network) {
+                            sendBroadcast(appUtils.getConnectivityIntent(true));
+                        }
                     }
-                }
-        );
+            );
+        }
     }
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ("com.spawn.ai.CONNECTIVITY_CHANGE".equals(Objects.requireNonNull(intent.getAction()))) {
+            if (CONNECTIVITY_CHANGE_ACTION.equals(Objects.requireNonNull(intent.getAction()))) {
                 boolean isConnected = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
                 if (!isConnected) {
                     activitySpawnBotBinding.micRl.setVisibility(View.VISIBLE);
@@ -914,16 +904,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }
     };
 
-    private Intent getConnectivityIntent(boolean noConnection) {
-        Intent intent = new Intent();
-        intent.setAction("com.spawn.ai.CONNECTIVITY_CHANGE");
-        intent.putExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, noConnection);
-        return intent;
-    }
-
     private void onChanged(JSONObject jsonObject) {
         if (jsonObject != null) {
             onSuccess(jsonObject);
-        } else onFailure();
+        } else performWebSearch();
     }
 }
