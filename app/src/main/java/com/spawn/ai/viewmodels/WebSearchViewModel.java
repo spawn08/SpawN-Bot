@@ -2,40 +2,46 @@ package com.spawn.ai.viewmodels;
 
 import android.util.Log;
 
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.gson.JsonElement;
-import com.spawn.ai.constants.ChatViewTypes;
-import com.spawn.ai.interfaces.ISpawnAPI;
-import com.spawn.ai.model.BotMLResponse;
-import com.spawn.ai.model.ChatCardModel;
-import com.spawn.ai.model.SpawnWikiModel;
-import com.spawn.ai.model.websearch.News;
-import com.spawn.ai.model.websearch.WebSearchResults;
-import com.spawn.ai.network.NLPInterceptor;
-import com.spawn.ai.utils.task_utils.AppUtils;
-import com.spawn.ai.utils.task_utils.JsonFileReader;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.gson.JsonElement;
+import com.spawn.ai.BuildConfig;
 import com.spawn.ai.constants.AppConstants;
+import com.spawn.ai.constants.ChatViewTypes;
+import com.spawn.ai.interfaces.SpawnAPIService;
+import com.spawn.ai.model.ChatCardModel;
+import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.network.NLPInterceptor;
+import com.spawn.ai.utils.task_utils.AppUtils;
+import com.spawn.ai.utils.task_utils.JsonFileReader;
 
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WebSearchViewModel extends ViewModel {
 
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
     private MutableLiveData<JsonElement> jsonElementMutableLiveData;
-    private String[] creds = AppUtils.getInstance().getAPICreds().split(":");
-    private final String apiUrl = AppUtils.getInstance().getUrl();
+    private String[] creds = null;
+    private final String apiUrl = BuildConfig.SPAWNAI_URL;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    private void getMLResponse(String q, String type, String language) {
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        compositeDisposable.dispose();
+    }
+
+    private void getMLResponse(String q, String type, String language, AppUtils appUtils) {
+        creds = BuildConfig.API_CREDS.split(":");
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
                 .build();
@@ -43,68 +49,45 @@ public class WebSearchViewModel extends ViewModel {
                 .baseUrl(apiUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .build();
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
         if (type.equalsIgnoreCase("search")) {
-            Call<WebSearchResults> data = spawnAPI.getWebResults(q, "5", type);
-            data.enqueue(new Callback<WebSearchResults>() {
-                @Override
-                public void onResponse(Call<WebSearchResults> call, Response<WebSearchResults> response) {
-                    if (response.isSuccessful()) {
-
-                        ChatCardModel chatCardModel = new ChatCardModel(response.body(), ChatViewTypes.CHAT_VIEW_WEB);
+            compositeDisposable.add(spawnAPI.getWebResults(q, "5", type)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(webSearchResults -> {
+                        ChatCardModel chatCardModel = new ChatCardModel(webSearchResults, ChatViewTypes.CHAT_VIEW_WEB);
                         chatCardModel.setMessage("Here are some results: ");
                         chatCardModel.setLang(language);
                         chatCardModelMutableLiveData.setValue(chatCardModel);
-                    } else {
+                    }, e -> {
                         ChatCardModel fallBack = JsonFileReader
                                 .getInstance()
                                 .getJsonFromKey(AppConstants.FALL_BACK,
                                         ChatViewTypes.CHAT_VIEW_DEFAULT,
                                         language);
                         chatCardModelMutableLiveData.setValue(fallBack);
-
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<WebSearchResults> call, Throwable t) {
-                    ChatCardModel fallBack = JsonFileReader
-                            .getInstance()
-                            .getJsonFromKey(AppConstants.FALL_BACK,
-                                    ChatViewTypes.CHAT_VIEW_DEFAULT,
-                                    language);
-                    chatCardModelMutableLiveData.setValue(fallBack);
-                }
-            });
+                    })
+            );
         } else if (type.equalsIgnoreCase("news")) {
-            Call<News> data = spawnAPI.getNewsResult(q, "10", type);
-            data.enqueue(new Callback<News>() {
-                @Override
-                public void onResponse(Call<News> call, Response<News> response) {
-                    if (response.isSuccessful()) {
-                        ChatCardModel chatCardModel = new ChatCardModel(response.body(), ChatViewTypes.CHAT_VIEW_NEWS);
+            compositeDisposable.add(spawnAPI.getNewsResult(q, "10", type)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(news -> {
+                        ChatCardModel chatCardModel = new ChatCardModel(news, ChatViewTypes.CHAT_VIEW_NEWS);
                         chatCardModel.setMessage("Here are the latest news: ");
                         chatCardModel.setLang(language);
                         chatCardModelMutableLiveData.setValue(chatCardModel);
-                    } else {
+                    }, e -> {
                         ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK,
                                 ChatViewTypes.CHAT_VIEW_DEFAULT,
                                 language);
                         chatCardModelMutableLiveData.setValue(fallBack);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<News> call, Throwable t) {
-                    ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
-                    chatCardModelMutableLiveData.setValue(fallBack);
-                }
-            });
+                    })
+            );
         }
     }
 
-    private void getWikiResponse(String entity, final String query, String language) {
+    private void getWikiResponse(String entity, String language) {
         final String cloneEntity = entity.trim().replace(" ", "_");
 
         Log.d("ENTITY: ", cloneEntity);
@@ -114,24 +97,21 @@ public class WebSearchViewModel extends ViewModel {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .build();
-        Call<SpawnWikiModel> data;
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
+        Observable<SpawnWikiModel> data;
+        final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
 
         if (language.equalsIgnoreCase("en"))
             data = spawnAPI.getWiki(cloneEntity);
         else
             data = spawnAPI.getWikiHI(cloneEntity);
 
-        data.enqueue(new Callback<SpawnWikiModel>() {
-            @Override
-            public void onResponse(Call<SpawnWikiModel> call, Response<SpawnWikiModel> response) {
-                if (response.isSuccessful()) {
+        compositeDisposable.add(data
+                .subscribeOn(Schedulers.io())
+                .subscribe(spawnWikiModel -> {
                     ChatCardModel chatCardModel;
-                    Log.d("API CONTENT: ", response.body().toString());
-                    SpawnWikiModel spawnWikiModel = response.body();
-
-                    //FireCalls.exec(new DumpTask(spawnWikiModel));
+                    Log.d("API CONTENT: ", spawnWikiModel.toString());
                     if (spawnWikiModel.getType().equals("disambiguation")) {
                         //Handle case for page not found
                         String[] disambiguationSplit = spawnWikiModel.getExtract().split(":");
@@ -147,27 +127,14 @@ public class WebSearchViewModel extends ViewModel {
                         chatCardModel = new ChatCardModel(spawnWikiModel, 5);
                         chatCardModelMutableLiveData.setValue(chatCardModel);
                     }
-
-                } else {
-
+                }, e -> {
                     ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
                     chatCardModelMutableLiveData.setValue(chatCardModel);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<SpawnWikiModel> call, Throwable t) {
-                //Handle case for failure
-                ChatCardModel chatCardModel = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK, 4, language);
-                chatCardModelMutableLiveData.setValue(chatCardModel);
-                FirebaseCrashlytics.getInstance().log("Webservice Request Error -->" + t.getMessage());
-
-            }
-        });
-
+                    FirebaseCrashlytics.getInstance().log("Webservice Request Error -->" + e.getMessage());
+                }));
     }
 
-    public LiveData<ChatCardModel> getSpawnAIResponse(String q, String language) {
+    public LiveData<ChatCardModel> getSpawnAIResponse(String q, String language, AppUtils appUtils) {
         chatCardModelMutableLiveData = new MutableLiveData<>();
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new NLPInterceptor(creds[0], creds[1]))
@@ -176,30 +143,27 @@ public class WebSearchViewModel extends ViewModel {
                 .baseUrl(apiUrl)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .build();
-        final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-        Call<BotMLResponse> data = spawnAPI.getEntityExtract(q, AppConstants.MODEL, language);
 
-        data.enqueue(new Callback<BotMLResponse>() {
-            @Override
-            public void onResponse(Call<BotMLResponse> call, Response<BotMLResponse> response) {
-                if (response.isSuccessful()) {
+        final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
+        compositeDisposable.add(spawnAPI.getEntityExtract(q, AppConstants.MODEL, language)
+                .subscribeOn(Schedulers.io())
+                .subscribe(botResponse -> {
                     ChatCardModel chatCardModel;
-                    BotMLResponse botResponse = response.body();
                     botResponse.setLang(language);
-                    // FireCalls.exec(new DumpTask(botResponse));
 
                     if (botResponse.getEntities().size() > 0
                             && botResponse.getEntities().get(0).getEntity() != null
                             && !botResponse.getEntities().get(0).getEntity().isEmpty()
                             /*&& botResponse.getIntent().getName() != null
                             && !botResponse.getIntent().getName().equalsIgnoreCase("bot_news")*/) {
-                        getWikiResponse(botResponse.getEntities().get(0).getEntity(), q, language);
+                        getWikiResponse(botResponse.getEntities().get(0).getEntity(), language);
                     } else if (botResponse.getIntent().getName() != null &&
                             !botResponse.getIntent().getName().isEmpty() &&
                             botResponse.getIntent().getName().equalsIgnoreCase("bot_news")
                             && botResponse.getIntent().getConfidence() > 0.80) {
-                        getMLResponse(q, AppConstants.RESULT_TYPE_NEWS, language);
+                        getMLResponse(q, AppConstants.RESULT_TYPE_NEWS, language, appUtils);
 
                     } else if (botResponse.getIntent().getName() != null &&
                             !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.80) {
@@ -207,7 +171,7 @@ public class WebSearchViewModel extends ViewModel {
                         chatCardModelMutableLiveData.setValue(chatCardModel);
                     } else {
                         if (botResponse.getEntities().size() > 0 && botResponse.getEntities().get(0).getValue() != null)
-                            getWikiResponse(q, AppConstants.RESULT_TYPE_SEARCH, language);
+                            getWikiResponse(q, language);
                         else {
                             if (botResponse.getIntent().getName() != null &&
                                     !botResponse.getIntent().getName().isEmpty() && botResponse.getIntent().getConfidence() > 0.65) {
@@ -216,31 +180,21 @@ public class WebSearchViewModel extends ViewModel {
                             } else {
                                 String[] splitQuery = botResponse.getText().split(" ");
                                 if (splitQuery.length < 3)
-                                    getMLResponse(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH, language);
+                                    getMLResponse(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH, language, appUtils);
                                 else {
-                                    getMLResponse(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH, language);
+                                    getMLResponse(botResponse.getText(), AppConstants.RESULT_TYPE_SEARCH, language, appUtils);
                                 }
                             }
                         }
                     }
-
-                } else {
-                    getMLResponse(q, AppConstants.RESULT_TYPE_SEARCH, language);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BotMLResponse> call, Throwable t) {
-                ChatCardModel fallBack = JsonFileReader.getInstance().getJsonFromKey(AppConstants.FALL_BACK,
-                        ChatViewTypes.CHAT_VIEW_DEFAULT,
-                        language);
-                chatCardModelMutableLiveData.setValue(fallBack);
-            }
-        });
+                }, e -> {
+                    getMLResponse(q, AppConstants.RESULT_TYPE_SEARCH, language, appUtils);
+                })
+        );
         return chatCardModelMutableLiveData;
     }
 
-    public LiveData<JsonElement> getFile(String fileName) {
+    public LiveData<JsonElement> getFile(String fileName, AppUtils appUtils) {
         try {
             jsonElementMutableLiveData = new MutableLiveData<>();
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -250,37 +204,23 @@ public class WebSearchViewModel extends ViewModel {
                     .baseUrl(apiUrl)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                     .build();
 
-            final ISpawnAPI spawnAPI = retrofit.create(ISpawnAPI.class);
-            Call<JsonElement> data = spawnAPI.getFile(fileName);
+            final SpawnAPIService spawnAPI = retrofit.create(SpawnAPIService.class);
 
-            data.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    try {
-                        if (response.isSuccessful()) {
-                            JsonElement file = response.body();
-                            jsonElementMutableLiveData.setValue(file);
-                        } else jsonElementMutableLiveData.setValue(null);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        jsonElementMutableLiveData.setValue(null);
-                        FirebaseCrashlytics.getInstance().log("Webservice -->"+ e.getMessage());
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("ERROR: ", t.getMessage());
-                    FirebaseCrashlytics.getInstance().log("Webservice Request Error -->"+ t.getMessage());
-                    jsonElementMutableLiveData.setValue(null);
-                }
-            });
+            compositeDisposable.add(spawnAPI.getFile(fileName)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(jsonElement -> {
+                        jsonElementMutableLiveData.postValue(jsonElement);
+                    }, e -> {
+                        jsonElementMutableLiveData.postValue(null);
+                        FirebaseCrashlytics.getInstance().log("Webservice -->" + e.getMessage());
+                    }));
         } catch (Exception e) {
             e.printStackTrace();
             jsonElementMutableLiveData.setValue(null);
-            FirebaseCrashlytics.getInstance().log("Webservice -> "+ e.getMessage());
+            FirebaseCrashlytics.getInstance().log("Webservice -> " + e.getMessage());
         }
         return jsonElementMutableLiveData;
     }

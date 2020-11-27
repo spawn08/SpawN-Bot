@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import com.spawn.ai.R;
-import com.spawn.ai.utils.views.DotProgressBar;
+import com.spawn.ai.custom.DotProgressBar;
 
 public class SpawnChatLoadingViewHolder extends RecyclerView.ViewHolder {
 
@@ -13,7 +13,7 @@ public class SpawnChatLoadingViewHolder extends RecyclerView.ViewHolder {
     public SpawnChatLoadingViewHolder(View itemView) {
         super(itemView);
 
-        loading = (DotProgressBar) itemView.findViewById(R.id.bot_loading);
+        loading = itemView.findViewById(R.id.bot_loading);
 
     }
 }

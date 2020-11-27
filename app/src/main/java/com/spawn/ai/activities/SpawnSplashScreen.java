@@ -6,31 +6,39 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
+import com.spawn.ai.BuildConfig;
 import com.spawn.ai.R;
-import com.spawn.ai.SpawnBotActivity;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
 import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 import com.spawn.ai.viewmodels.WebSearchViewModel;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
+import javax.inject.Inject;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+import static com.spawn.ai.constants.AppConstants.LANG;
+
+@AndroidEntryPoint
 public class SpawnSplashScreen extends AppCompatActivity {
 
     public LottieAnimationView spawnLogo;
     public Context context;
-    private WebSearchViewModel webSearchViewModel;
+
+    @Inject
+    AppUtils appUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spawn_splash_screen);
         context = this;
-        webSearchViewModel = new ViewModelProvider(this).get(WebSearchViewModel.class);
+        WebSearchViewModel webSearchViewModel = new ViewModelProvider(this).get(WebSearchViewModel.class);
 
         spawnLogo = findViewById(R.id.spawn_logo);
         spawnLogo.setRepeatCount(LottieDrawable.INFINITE);
@@ -59,32 +67,25 @@ public class SpawnSplashScreen extends AppCompatActivity {
         });
         Handler handler = new Handler();
         webSearchViewModel
-                .getFile(AppUtils.getInstance().getDataFile())
+                .getFile(BuildConfig.DATA_FILE, appUtils)
                 .observe(this, jsonElement -> {
                             if (jsonElement != null) {
-                                JsonFileReader.getInstance().fileName(AppUtils.getInstance().getDataFile());
-                                JsonFileReader.getInstance().readFile(this, jsonElement);
-                                JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(this).getStringPreference("lang"));
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Intent intent = new Intent(context, SpawnBotActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                        finish();
-                                    }
+                                JsonFileReader.getInstance().readFile(this, jsonElement, appUtils);
+                                JsonFileReader.getInstance().setQuestions(SharedPreferenceUtility.getInstance(this).getStringPreference(LANG));
+                                handler.postDelayed(() -> {
+                                    Intent intent = new Intent(context, SpawnBotActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    finish();
                                 }, 1000);
 
                             } else {
-                                JsonFileReader.getInstance().readFile(this, null);
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Intent intent = new Intent(context, SpawnBotActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                        finish();
-                                    }
+                                JsonFileReader.getInstance().readFile(this, null, appUtils);
+                                handler.postDelayed(() -> {
+                                    Intent intent = new Intent(context, SpawnBotActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    finish();
                                 }, 500);
 
                             }

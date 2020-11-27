@@ -11,4 +11,6 @@
     <string name="language_initials">E</string>
     <string name="result_text">Here are some results I found</string>
     <string name="info">More Info</string>
+    <string name="enter_text" translatable="false">Enter text</string>
+    <string name="speech_perm_denied" translatable="false">Permission for speech input is disabled</string>
 </resources>

@@ -1,63 +1,43 @@
 package com.spawn.ai.utils.task_utils;
 
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.spawn.ai.R;
-import com.spawn.ai.SpawnBotActivity;
+import com.spawn.ai.activities.SpawnBotActivity;
+import com.spawn.ai.custom.AlertUpdateDialog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.core.app.NotificationCompat;
-
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.spawn.ai.constants.AppConstants.CONNECTIVITY_CHANGE_ACTION;
 
 public class AppUtils {
 
-    private static AppUtils appUtils;
-    private JSONArray jsonArray;
-
-    static {
-        System.loadLibrary("native-lib");
-    }
-
-    public native String getAPICreds();
-
-    public native String getUrl();
-
-    public native String getESCreds();
-
-    public native String getDataFile();
-
-    public native String getNewsUrl();
-
-    private AppUtils() {
-
-    }
-
-    public static AppUtils getInstance() {
-        if (appUtils == null) {
-            appUtils = new AppUtils();
-        }
-
-        return appUtils;
-    }
+    private String token;
 
     public static String getStringRes(int resourceId, Context context, String lang) {
         String result = "";
@@ -73,14 +53,14 @@ public class AppUtils {
         return result;
     }
 
-    public void setNewsJSON(JSONArray jsonArray) {
-        this.jsonArray = jsonArray;
-
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    public JSONArray getJsonArray() {
-        return jsonArray;
+    public String getToken() {
+        return token;
     }
+
 
     public void sendDefaultNotification(Map<String, String> data, Context context) {
         Intent intent = new Intent(context, SpawnBotActivity.class);
@@ -100,7 +80,7 @@ public class AppUtils {
                     .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                     .build();
 
-            channel = new NotificationChannel("222", "vehicle_damage", NotificationManager.IMPORTANCE_HIGH);
+            channel = new NotificationChannel("222", "professor_spawn", NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
         }
 
@@ -110,7 +90,7 @@ public class AppUtils {
                         "222")
                         .setContentTitle(data.get("title"))
                         .setAutoCancel(true)
-                        .setLargeIcon(((BitmapDrawable) context.getDrawable(R.mipmap.ic_launcher)).getBitmap())
+                        .setLargeIcon(getNotificationDrawable(context))
                         .setSound(defaultSound)
                         .setContentText(data.get("body"))
                         .setSmallIcon(R.mipmap.ic_launcher)
@@ -118,6 +98,10 @@ public class AppUtils {
 
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+    }
+
+    private Bitmap getNotificationDrawable(Context context) {
+        return ((BitmapDrawable) Objects.requireNonNull(ContextCompat.getDrawable(context, R.mipmap.ic_launcher))).getBitmap();
     }
 
     public String getInfoFromExtract(String extract, String type) {
@@ -141,7 +125,7 @@ public class AppUtils {
         return text + ".";
     }
 
-    public String checkforRegex(String speechString, String language) {
+    public String checkForRegex(String speechString, String language) {
         try {
             Pattern pattern;
             JSONObject jsonObject = new JSONObject(JsonFileReader.getInstance().getFileContents());
@@ -159,5 +143,28 @@ public class AppUtils {
             return null;
         }
         return null;
+    }
+
+    /**
+     * Show alertdialog for app version update
+     *
+     * @param activity Calling activity context
+     */
+    public void showVersionUpdateDialog(Activity activity) {
+        AlertUpdateDialog alertUpdateDialog = new AlertUpdateDialog(activity);
+        alertUpdateDialog.show();
+    }
+
+    /**
+     * Create Intent for checking the connectivity
+     *
+     * @param noConnection boolean flag for connectivity
+     * @return intent Intent object
+     */
+    public Intent getConnectivityIntent(boolean noConnection) {
+        Intent intent = new Intent();
+        intent.setAction(CONNECTIVITY_CHANGE_ACTION);
+        intent.putExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, noConnection);
+        return intent;
     }
 }

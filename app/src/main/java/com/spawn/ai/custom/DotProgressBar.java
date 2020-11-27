@@ -1,4 +1,4 @@
-package com.spawn.ai.utils.views;
+package com.spawn.ai.custom;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
@@ -9,15 +9,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
-import androidx.annotation.ColorInt;
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.Transformation;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.spawn.ai.R;
 

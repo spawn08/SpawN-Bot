@@ -1,20 +1,15 @@
 package com.spawn.ai.interfaces;
 
-import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
-import com.spawn.ai.model.SpawnWikiModel;
 
 public interface IBotObserver {
+    void notifyBotError();
 
-    public void notifyBotResponse(ChatCardModel botResponse);
+    void loading();
 
-    public void notifyBotError();
+    void speakBot(String message);
 
-    public void loading();
+    void setAction(String action, Object object);
 
-    public void speakBot(String message);
-
-    public void setAction(String action, Object object);
-
-    public void setChatMessage(ChatMessageType chatMessage);
+    void setChatMessage(ChatMessageType chatMessage);
 }

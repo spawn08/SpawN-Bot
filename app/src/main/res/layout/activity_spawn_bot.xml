@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <data>
+
+        <variable
+            name="listener"
+            type="com.spawn.ai.activities.SpawnBotActivity">
+
+        </variable>
+
+    </data>
+
+    <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/chat_activity_background"
-        tools:context=".SpawnBotActivity">
+        tools:context=".activities.SpawnBotActivity">
 
         <LinearLayout
             android:id="@+id/recycler_container"
@@ -16,17 +25,17 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/mic_rl"
             android:layout_below="@+id/title_bar"
-            android:layout_marginBottom="3dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="3dp"
+            android:onClick="@{v -> listener.onClick(v)}"
             android:visibility="gone">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chat_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/chat_activity_background" />
-
-
+                android:background="@drawable/chat_activity_background"
+                android:onClick="@{v -> listener.onClick(v)}" />
         </LinearLayout>
 
         <RelativeLayout
@@ -40,7 +49,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/margin_5"
+                android:layout_marginStart="@dimen/margin_5"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_action_name" />
 
@@ -48,11 +58,12 @@
                 android:id="@+id/volume_up"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/margin_20"
                 android:layout_marginStart="@dimen/margin_5"
-                android:layout_toRightOf="@+id/lang_change"
+                android:layout_marginEnd="@dimen/margin_20"
+                android:layout_toEndOf="@+id/lang_change"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:padding="@dimen/margin_5"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_volume_up" />
@@ -61,11 +72,12 @@
                 android:id="@+id/volume_down"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/margin_20"
                 android:layout_marginStart="@dimen/margin_5"
-                android:layout_toRightOf="@+id/lang_change"
+                android:layout_marginEnd="@dimen/margin_20"
+                android:layout_toEndOf="@+id/lang_change"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:padding="@dimen/margin_5"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_volume_down"
@@ -73,13 +85,14 @@
 
             <TextView
                 android:id="@+id/lang_change"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="@dimen/margin_35"
+                android:layout_height="@dimen/margin_35"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/margin_15"
-                android:layout_toRightOf="@+id/title_text"
+                android:layout_toEndOf="@+id/title_text"
                 android:background="@drawable/text_circle"
                 android:gravity="center"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:text="@string/language_initials"
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/textsize_16" />
@@ -128,8 +141,6 @@
                 android:text=""
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/textsize_18" />
-
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -145,15 +156,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/layout_45"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="@dimen/margin_10"
                 android:layout_marginLeft="@dimen/margin_10"
                 android:layout_marginRight="@dimen/margin_10"
+                android:layout_marginBottom="@dimen/margin_10"
+                android:autofillHints="@string/enter_text"
                 android:background="@drawable/edit_text_background"
-                android:hint="Enter text"
+                android:hint="@string/enter_text"
+                android:inputType="text"
                 android:maxEms="15"
                 android:maxLines="1"
-                android:paddingLeft="@dimen/margin_15"
-                android:visibility="gone" />
+                android:paddingStart="@dimen/margin_15"
+                android:visibility="gone"
+                tools:ignore="RtlSymmetry" />
 
             <ImageView
                 android:id="@+id/mic_image"
@@ -161,6 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/mic_round_back"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_mic" />
 
@@ -170,6 +185,7 @@
                 android:layout_height="@dimen/speech_anim_height"
                 android:layout_centerHorizontal="true"
                 android:background="@android:color/transparent"
+                android:onClick="@{v -> listener.onClick(v)}"
                 android:visibility="gone"
                 app:lottie_rawRes="@raw/voice_loading_animation" />
 
@@ -182,6 +198,7 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/mic_rl"
             android:background="@android:color/transparent"
+            android:onClick="@{v -> listener.onClick(v)}"
             android:visibility="gone">
 
         </RelativeLayout>
@@ -193,14 +210,4 @@
             android:background="@color/colorPrimary" />
 
     </RelativeLayout>
-
-    <data>
-
-        <variable
-            name="listener"
-            type="com.spawn.ai.SpawnBotActivity">
-
-        </variable>
-
-    </data>
 </layout>

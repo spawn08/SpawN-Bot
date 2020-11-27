@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.spawn.ai.interfaces.ISpawnAPI;
+import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.BotMLResponse;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.utils.task_utils.AppUtils;
@@ -101,7 +101,7 @@ public class WebServiceUtils {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        final ISpawnAPI iSpawnAPI = retrofit.create(ISpawnAPI.class);
+        final SpawnAPIService iSpawnAPI = retrofit.create(SpawnAPIService.class);
         Call<JsonElement> data = iSpawnAPI.getNewsData();
 
         data.enqueue(new Callback<JsonElement>() {

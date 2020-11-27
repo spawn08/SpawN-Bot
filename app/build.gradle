@@ -6,6 +6,7 @@ buildscript {
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'dagger.hilt.android.plugin'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -17,7 +18,7 @@ android {
         applicationId "com.spawn.ai"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 18
+        versionCode 19
         versionName "1.0.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -63,6 +64,42 @@ android {
         targetCompatibility = 1.8
     }
     buildToolsVersion = '29.0.3'
+
+    flavorDimensions "env"
+    productFlavors {
+        dev {
+            dimension "env"
+            applicationIdSuffix name
+            applicationId "com.spawn.ai"
+            buildConfigField "String", "BASE_URL", "\"https://api.cognitive.microsoft.com/bing/v7.0/\""
+            buildConfigField "String", "SPAWNAI_URL", "\"https://api.spawnai.com/\""
+            buildConfigField "String", "AZURE_URL", "\"bot_data.json\""
+            buildConfigField "String", "API_CREDS", "\"onebotsolution:OneBotFinancialServices\""
+            buildConfigField "String", "ELASTIC_CREDS", "\"elastic:Spawn@#32\""
+            buildConfigField "String", "DATA_FILE", "\"bot_data.json\""
+            buildConfigField "String", "AZURE_KEY", "\"f5873c265b8247a7af3490e7648c6c37\""
+            buildConfigField "String", "WIKI_EN_URL", "\"https://en.wikipedia.org/api/rest_v1/page/summary/\""
+            buildConfigField "String", "WIKI_HI_URL", "\"https://hi.wikipedia.org/api/rest_v1/page/summary/\""
+            buildConfigField "String", "SENSEX_GAINERS_LOSERS", "\"https://www1.nseindia.com/live_market/dynaContent/live_analysis/\""
+            buildConfigField "String", "SENSEX_ACTIVE_URL", "\"https://www1.nseindia.com/products/dynaContent/equities/equities/json/\""
+        }
+
+        prod {
+            dimension "env"
+            applicationId "com.spawn.ai"
+            buildConfigField "String", "BASE_URL", "\"https://api.cognitive.microsoft.com/bing/v7.0/\""
+            buildConfigField "String", "SPAWNAI_URL", "\"https://api.spawnai.com/\""
+            buildConfigField "String", "AZURE_URL", "\"bot_data.json\""
+            buildConfigField "String", "API_CREDS", "\"onebotsolution:OneBotFinancialServices\""
+            buildConfigField "String", "ELASTIC_CREDS", "\"elastic:Spawn@#32\""
+            buildConfigField "String", "DATA_FILE", "\"bot_data.json\""
+            buildConfigField "String", "AZURE_KEY", "\"f5873c265b8247a7af3490e7648c6c37\""
+            buildConfigField "String", "WIKI_EN_URL", "\"https://en.wikipedia.org/api/rest_v1/page/summary/\""
+            buildConfigField "String", "WIKI_HI_URL", "\"https://hi.wikipedia.org/api/rest_v1/page/summary/\""
+            buildConfigField "String", "SENSEX_GAINERS_LOSERS", "\"https://www1.nseindia.com/live_market/dynaContent/live_analysis/\""
+            buildConfigField "String", "SENSEX_ACTIVE_URL", "\"https://www1.nseindia.com/products/dynaContent/equities/equities/json/\""
+        }
+    }
 }
 
 dependencies {
@@ -73,28 +110,57 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    //Lottie Animation Dependency
     implementation 'com.airbnb.android:lottie:3.4.1'
+
+    //Retrofit Dependency
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    //GSON Dependency
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'androidx.room:room-runtime:2.2.5'
 
     implementation 'com.google.android.gms:play-services-vision:20.1.2'
 
+    //Firebase ML Dependency
     implementation 'com.google.firebase:firebase-core:18.0.0'
     implementation 'com.google.firebase:firebase-analytics:18.0.0'
     implementation 'com.google.firebase:firebase-ml-vision:24.1.0'
     implementation 'com.google.firebase:firebase-ml-model-interpreter:22.0.4'
-    //Change it to firebase crashlytics
-    //implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+
+    //Firebase Crashlytics dependency
     implementation platform('com.google.firebase:firebase-bom:26.0.0')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
+
+    //Room DB Dependency
+    implementation 'androidx.room:room-runtime:2.2.5'
     annotationProcessor 'androidx.room:room-compiler:2.2.5'
-    implementation 'com.github.bumptech.glide:glide:4.9.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+
+    //Glide Dependency
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+
+    //Firebase Messaging dependency
     implementation 'com.google.firebase:firebase-messaging:21.0.0'
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+
+    //Lombok Dependency
+    compileOnly "org.projectlombok:lombok:1.18.16"
+    annotationProcessor "org.projectlombok:lombok:1.18.16"
+
+    //RX Java Dependency
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
+
+    //RxJava Adapter
+    implementation(group: 'com.squareup.retrofit2', name: 'adapter-rxjava3', version: '2.9.0')
+
+    //Hilt Dependencies
+    implementation "com.google.dagger:hilt-android:2.28-alpha"
+    annotationProcessor "com.google.dagger:hilt-android-compiler:2.28-alpha"
+
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

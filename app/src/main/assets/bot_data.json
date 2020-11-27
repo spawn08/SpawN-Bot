@@ -343,6 +343,17 @@
     "button_text": "",
     "action": ""
   },
+  "bot_news": {
+    "type": 1,
+    "message_en": [
+      "Here are some latest news."
+    ],
+    "message_hi": [
+    ],
+    "button_text_en": "",
+    "button_text_hi": "",
+    "action": "news"
+  },
   "default_wiki": {
     "type": 3,
     "message_en": [

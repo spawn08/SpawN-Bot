@@ -20,8 +20,8 @@ import java.util.ArrayList;
 
 public class SpawnVideoResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context context;
-    private ArrayList<VideoValueResult> videoResult;
+    private final Context context;
+    private final ArrayList<VideoValueResult> videoResult;
 
     public SpawnVideoResultAdapter(Context context, ArrayList<VideoValueResult> videoResult) {
         this.videoResult = videoResult;
@@ -48,13 +48,10 @@ public class SpawnVideoResultAdapter extends RecyclerView.Adapter<RecyclerView.V
                 .into(videoResultHolder.videoView);
         //videoResultHolder.videoView.setVideoPath(videoResult.get(position).getHostPageDisplayUrl());
         //videoResultHolder.videoView.seekTo(1);
-        videoResultHolder.videoView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, SpawnWebActivity.class);
-                intent.putExtra("url", videoResult.get(position).getHostPageUrl());
-                context.startActivity(intent);
-            }
+        videoResultHolder.videoView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, SpawnWebActivity.class);
+            intent.putExtra("url", videoResult.get(position).getHostPageUrl());
+            context.startActivity(intent);
         });
 //        imageResultHolder.imageResult.setOnClickListener(new View.OnClickListener() {
 //            @Override

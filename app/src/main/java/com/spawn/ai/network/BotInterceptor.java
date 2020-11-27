@@ -8,7 +8,7 @@ import okhttp3.Response;
 
 public class BotInterceptor implements Interceptor {
 
-    private String token;
+    private final String token;
 
     public BotInterceptor(String token) {
         this.token = token;

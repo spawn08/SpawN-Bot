@@ -1,5 +1,6 @@
 package com.spawn.ai.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -15,19 +16,20 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.spawn.ai.R;
-import com.spawn.ai.utils.views.DotProgressBar;
+import com.spawn.ai.custom.DotProgressBar;
 
 public class SpawnWebActivity extends AppCompatActivity {
 
     private WebView infoWebview;
     private DotProgressBar dotProgressBar;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spawn_web);
-        infoWebview = (WebView) findViewById(R.id.info_wiki);
-        dotProgressBar = (DotProgressBar) findViewById(R.id.web_loading);
+        infoWebview = findViewById(R.id.info_wiki);
+        dotProgressBar = findViewById(R.id.web_loading);
 
 
         WebSettings webSettings = infoWebview.getSettings();
