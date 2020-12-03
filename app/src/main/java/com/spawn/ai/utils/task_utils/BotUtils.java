@@ -14,11 +14,12 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import io.reactivex.rxjava3.core.Observable;
 
 import static com.spawn.ai.constants.AppConstants.CLASSES;
-import static com.spawn.ai.constants.AppConstants.LANG;
 import static com.spawn.ai.constants.AppConstants.LANG_EN;
 import static com.spawn.ai.constants.AppConstants.SUCCESS;
 import static com.spawn.ai.constants.AppConstants.WORDS;
@@ -45,10 +46,10 @@ public class BotUtils {
             modelInterpreter = new Interpreter(getLocalModelType(context, language));
 
             if (jsonEn == null)
-                jsonEn = new JSONObject(loadJSONFromAsset(context, "bot_en/data_en.json"));
+                jsonEn = new JSONObject(Objects.requireNonNull(loadJSONFromAsset(context, "bot_en/data_en.json")));
 
             if (jsonHi == null)
-                jsonHi = new JSONObject(loadJSONFromAsset(context, "bot_hi/data_hi.json"));
+                jsonHi = new JSONObject(Objects.requireNonNull(loadJSONFromAsset(context, "bot_hi/data_hi.json")));
 
             if (stemmer == null)
                 stemmer = new LancasterStemmer(context);
@@ -67,7 +68,6 @@ public class BotUtils {
      * @param context   context
      * @param modelPath path where model is present
      * @return MappedByteBuffer object
-     * @throws IOException
      */
     private static MappedByteBuffer loadModelFile(Context context, String modelPath)
             throws IOException {
@@ -83,10 +83,9 @@ public class BotUtils {
     /**
      * Load model based on language
      *
-     * @param context
-     * @param language
+     * @param context  Context for loading assets
+     * @param language language of the app
      * @return ByteBuffer for model loaded
-     * @throws IOException
      */
     private ByteBuffer getLocalModelType(Context context, String language) throws IOException {
         if (language.equalsIgnoreCase("en")) {
@@ -108,7 +107,7 @@ public class BotUtils {
             byte[] buffer = new byte[size];
             is.read(buffer);
             is.close();
-            json = new String(buffer, "UTF-8");
+            json = new String(buffer, StandardCharsets.UTF_8);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -141,9 +140,7 @@ public class BotUtils {
             int index = getIndexOfLargest(output[0]);
             JSONObject filecontents = new JSONObject(fileContents);
             if (probabilities[index] > THRESHOLD) {
-                if (filecontents.getJSONObject(classesArray.getString(index)) != null) {
-                    response = Observable.just(filecontents.getJSONObject(classesArray.getString(index)));
-                } else return Observable.just(new JSONObject());
+                response = Observable.just(filecontents.getJSONObject(classesArray.getString(index)));
             } else {
                 return Observable.just(new JSONObject());
             }
