@@ -1,21 +1,27 @@
 package com.spawn.ai.utils.task_utils;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.util.Log;
-
-import com.google.firebase.ml.custom.FirebaseCustomLocalModel;
-import com.google.firebase.ml.custom.FirebaseModelDataType;
-import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
-import com.google.firebase.ml.custom.FirebaseModelInputs;
-import com.google.firebase.ml.custom.FirebaseModelInterpreter;
-import com.google.firebase.ml.custom.FirebaseModelInterpreterOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.tensorflow.lite.Interpreter;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
-import androidx.lifecycle.MutableLiveData;
+import io.reactivex.rxjava3.core.Observable;
+
+import static com.spawn.ai.constants.AppConstants.CLASSES;
+import static com.spawn.ai.constants.AppConstants.LANG;
+import static com.spawn.ai.constants.AppConstants.LANG_EN;
+import static com.spawn.ai.constants.AppConstants.SUCCESS;
+import static com.spawn.ai.constants.AppConstants.WORDS;
 
 public class BotUtils {
 
@@ -25,6 +31,7 @@ public class BotUtils {
     private boolean isEn;
     private static String fileContents;
     private static float THRESHOLD = 0.80f;
+    private Interpreter modelInterpreter;
 
     public static BotUtils getInstance() {
         if (botUtils == null) {
@@ -35,10 +42,7 @@ public class BotUtils {
 
     public Observable<String> buildInterpreter(Context context, String language) {
         try {
-            FirebaseCustomLocalModel customLocalModel = getLocalModelType(language);
-            options = new FirebaseModelInterpreterOptions.Builder(customLocalModel).build();
-
-            this.firebaseModelInterpreter = FirebaseModelInterpreter.getInstance(options);
+            modelInterpreter = new Interpreter(getLocalModelType(context, language));
 
             if (jsonEn == null)
                 jsonEn = new JSONObject(loadJSONFromAsset(context, "bot_en/data_en.json"));
@@ -57,7 +61,34 @@ public class BotUtils {
         return Observable.just(SUCCESS);
     }
 
-    private FirebaseCustomLocalModel getLocalModelType(String language) {
+    /**
+     * Load TFLite model from modelpath
+     *
+     * @param context   context
+     * @param modelPath path where model is present
+     * @return MappedByteBuffer object
+     * @throws IOException
+     */
+    private static MappedByteBuffer loadModelFile(Context context, String modelPath)
+            throws IOException {
+        try (AssetFileDescriptor fileDescriptor = context.getAssets().openFd(modelPath);
+             FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor())) {
+            FileChannel fileChannel = inputStream.getChannel();
+            long startOffset = fileDescriptor.getStartOffset();
+            long declaredLength = fileDescriptor.getDeclaredLength();
+            return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+        }
+    }
+
+    /**
+     * Load model based on language
+     *
+     * @param context
+     * @param language
+     * @return ByteBuffer for model loaded
+     * @throws IOException
+     */
+    private ByteBuffer getLocalModelType(Context context, String language) throws IOException {
         if (language.equalsIgnoreCase("en")) {
             isEn = true;
             THRESHOLD = 0.80f;
@@ -92,6 +123,7 @@ public class BotUtils {
             JSONArray wordsArray = jsonObject.getJSONArray(WORDS);
             JSONArray classesArray = jsonObject.getJSONArray(CLASSES);
 
+            float[][] output = new float[1][classesArray.length()];
             String[] sent = sentence.split(" ");
             float[][] input = new float[1][wordsArray.length()];
             for (String s : sent) {
@@ -103,39 +135,20 @@ public class BotUtils {
                         input[0][i] = 1.0f;
                 }
             }
-            FirebaseModelInputs inputs = new FirebaseModelInputs.Builder()
-                    .add(input)
-                    .build();
-            this.firebaseModelInterpreter.run(inputs, inputOutputOptions)
-                    .addOnSuccessListener(
-                            result -> {
-                                try {
-                                    float[][] output = result.getOutput(0);
-                                    float[] probabilities = output[0];
-                                    int index = getIndexOfLargest(probabilities);
-                                    JSONObject filecontents = new JSONObject(fileContents);
-                                    if (probabilities[index] > THRESHOLD) {
-                                        if (filecontents.getJSONObject(classesArray.getString(index)) != null) {
-                                            JSONObject response = filecontents.getJSONObject(classesArray.getString(index));
-                                            data.setValue(response);
-                                        } else data.setValue(null);
-                                    } else {
-//                                        JSONObject response = filecontents.getJSONObject("default");
-//                                        data.postValue(response);
-                                        data.setValue(null);
-                                    }
-                                    Log.e("Bot Response", String.format("%s: %1.4f", classesArray.getString(index), probabilities[index]));
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    data.setValue(null);
-                                }
-                            })
-                    .addOnFailureListener(
-                            e -> {
-                                Log.e("Failed", "NO RESULT");
-                                data.setValue(null);
-                            });
-            return data;
+
+            modelInterpreter.run(input, output);
+            float[] probabilities = output[0];
+            int index = getIndexOfLargest(output[0]);
+            JSONObject filecontents = new JSONObject(fileContents);
+            if (probabilities[index] > THRESHOLD) {
+                if (filecontents.getJSONObject(classesArray.getString(index)) != null) {
+                    response = Observable.just(filecontents.getJSONObject(classesArray.getString(index)));
+                } else return Observable.just(new JSONObject());
+            } else {
+                return Observable.just(new JSONObject());
+            }
+
+            Log.e("Model Output: ", classesArray.getString(index));
         } catch (Exception e) {
             e.printStackTrace();
             return Observable.just(new JSONObject());
