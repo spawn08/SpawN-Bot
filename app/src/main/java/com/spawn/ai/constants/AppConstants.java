@@ -2,6 +2,8 @@ package com.spawn.ai.constants;
 
 public class AppConstants {
 
+    public static final String WORDS = "words";
+    public static final String CLASSES = "classes";
     public static final String FALL_BACK = "default_wiki";
     public static final String LANG = "lang";
     public static final String MODEL = "spawn";
@@ -18,5 +20,6 @@ public class AppConstants {
     public static final String ACTION = "action";
     public static final String ACTION_SPEAKING = "App Speaking";
     public static final String ACTION_WEB_OPEN = "Web Open";
+    public static final String SUCCESS = "success";
     public static final String CONNECTIVITY_CHANGE_ACTION = "com.spawn.ai.CONNECTIVITY_CHANGE";
 }
