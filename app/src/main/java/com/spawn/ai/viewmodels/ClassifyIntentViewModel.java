@@ -32,13 +32,16 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.spawn.ai.constants.AppConstants.RESULT_TYPE_NEWS;
+import static com.spawn.ai.constants.AppConstants.RESULT_TYPE_SEARCH;
+
 public class ClassifyIntentViewModel extends ViewModel {
 
-    private AzureService azureService;
+    private final AzureService azureService;
     private SensexService sensexService;
     private SensexActiveService sensexActiveService;
     private MutableLiveData<ChatCardModel> chatCardModelMutableLiveData;
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable;
 
     @Override
     protected void onCleared() {
@@ -49,20 +52,35 @@ public class ClassifyIntentViewModel extends ViewModel {
     @Inject
     public ClassifyIntentViewModel(AzureService azureService,
                                    SensexService sensexService,
-                                   SensexActiveService sensexActiveService) {
+                                   SensexActiveService sensexActiveService,
+                                   CompositeDisposable compositeDisposable) {
         this.azureService = azureService;
         this.sensexService = sensexService;
         this.sensexActiveService = sensexActiveService;
+        this.compositeDisposable = compositeDisposable;
     }
 
+    /**
+     * Perform classification task on sentence
+     *
+     * @param sentence user defined query
+     * @param language language of the user query
+     * @return LiveData object to observe on
+     */
     public LiveData<JSONObject> classify(String sentence, String language) {
         MutableLiveData<JSONObject> results = new MutableLiveData<>();
-        return BotUtils.getInstance().classify(sentence, language, results);
+        compositeDisposable.add(BotUtils.getInstance().classify(sentence, language).subscribe(
+                results::setValue,
+                throwable -> {
+                    results.setValue(null);
+                }
+        ));
+        return results;
     }
 
     public LiveData<ChatCardModel> getWebSearch(String q, String language, String type) throws UnsupportedEncodingException {
         chatCardModelMutableLiveData = new MutableLiveData<>();
-        if (type.equalsIgnoreCase("search")) {
+        if (type.equalsIgnoreCase(RESULT_TYPE_SEARCH)) {
             compositeDisposable.add(azureService
                     .getWebResults(URLEncoder.encode(q, "UTF-8"), "5")
                     .subscribeOn(Schedulers.io())
@@ -79,7 +97,7 @@ public class ClassifyIntentViewModel extends ViewModel {
                                         language);
                         chatCardModelMutableLiveData.postValue(fallBack);
                     }));
-        } else if (type.equalsIgnoreCase("news")) {
+        } else if (type.equalsIgnoreCase(RESULT_TYPE_NEWS)) {
             compositeDisposable.add(azureService.getNewsResult(q, "10")
                     .subscribeOn(Schedulers.io())
                     .subscribe(news -> {

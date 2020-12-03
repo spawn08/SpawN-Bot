@@ -64,6 +64,7 @@ import java.util.Random;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 import static com.spawn.ai.constants.AppConstants.ACTION;
 import static com.spawn.ai.constants.AppConstants.ACTION_SPEAKING;
@@ -99,6 +100,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     private static String spokenString = "";
     private String language;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Inject
     AppUtils appUtils;
@@ -288,9 +290,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     protected void onResume() {
         super.onResume();
         initSpeech();
-        BotUtils.getInstance().buildInterpreter(this,
-                SharedPreferenceUtility.getInstance(this).getStringPreference(LANG));
-
+        loadInterpreter();
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         filter.addAction("com.spawn.ai.CONNECTIVITY_CHANGE");
@@ -652,7 +652,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding
                         .titleText
                         .setText(AppUtils.getStringRes(R.string.app_name, this, LANG_HI));
-                // WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_hi));
+
                 botResponses.clear();
                 chatbotAdapter.setAdapter(botResponses);
                 chatbotAdapter.notifyDataSetChanged();
@@ -661,16 +661,15 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding.textviewAnimation.setVisibility(View.VISIBLE);
 
                 updateLanguageConfig(LANG_HI);
-                // WebServiceUtils.getInstance().setLanguage("hi");
                 setUpQuestionsView(LANG_HI);
-                BotUtils.getInstance().buildInterpreter(this, LANG_HI);
+                loadInterpreter();
             } else {
                 SharedPreferenceUtility.getInstance(this).storeStringPreference(LANG, LANG_EN);
                 initSpeech();
                 textToSpeech.stop();
                 textToSpeech = null;
                 textToSpeech = new TextToSpeech(this, this);
-                //WebServiceUtils.getInstance().setToken(getString(R.string.wit_token_en));
+
                 activitySpawnBotBinding.langChange
                         .setText(AppUtils.getStringRes(R.string.language_initials, this, LANG_EN));
                 activitySpawnBotBinding
@@ -685,9 +684,8 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 activitySpawnBotBinding.textviewAnimation.setVisibility(View.VISIBLE);
 
                 updateLanguageConfig(LANG_EN);
-                // WebServiceUtils.getInstance().setLanguage("en");
                 setUpQuestionsView(LANG_EN);
-                BotUtils.getInstance().buildInterpreter(this, LANG_EN);
+                loadInterpreter();
             }
         }
 
@@ -728,12 +726,22 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
                 textToSpeech.shutdown();
                 textToSpeech = null;
             }
+            compositeDisposable.dispose();
+            compositeDisposable = null;
             FirebaseCrashlytics.getInstance().setCustomKey(ACTION, "App close");
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().log(Objects.requireNonNull(e.getMessage()));
         }
 
+    }
+
+    /**
+     * Load the model interpreter for tflite inference.
+     */
+    public void loadInterpreter() {
+        compositeDisposable.add(BotUtils.getInstance().buildInterpreter(this,
+                SharedPreferenceUtility.getInstance(this).getStringPreference(LANG)).subscribe());
     }
 
     @Override
@@ -832,12 +840,11 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
         }
     }
 
-
     @Override
     public void onInit(int i) {
         if (i == TextToSpeech.SUCCESS) {
             String lang = SharedPreferenceUtility.getInstance(this).getStringPreference(LANG);
-            textToSpeech.setLanguage(locale);
+            textToSpeech.setLanguage(new Locale(lang));
             FirebaseCrashlytics.getInstance().setCustomKey("TTSLanguage", lang);
             textToSpeech.setPitch(0.99f);
             textToSpeech.setOnUtteranceProgressListener(utteranceProgressListener);
@@ -905,7 +912,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
     };
 
     private void onChanged(JSONObject jsonObject) {
-        if (jsonObject != null) {
+        if (jsonObject != null && jsonObject.length() != 0) {
             onSuccess(jsonObject);
         } else performWebSearch();
     }

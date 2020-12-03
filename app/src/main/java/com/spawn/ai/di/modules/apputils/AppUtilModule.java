@@ -9,6 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.android.components.ApplicationComponent;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 @Module
 @InstallIn(ApplicationComponent.class)
@@ -19,5 +20,10 @@ public class AppUtilModule {
     @Named("ForAppUtils")
     public AppUtils provideAppUtils() {
         return new AppUtils();
+    }
+
+    @Provides
+    public CompositeDisposable provideCompositeDisposable(){
+        return new CompositeDisposable();
     }
 }
