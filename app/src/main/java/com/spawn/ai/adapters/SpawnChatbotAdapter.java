@@ -31,12 +31,15 @@ import com.spawn.ai.viewholders.websearch_holders.SpawnWebSearchHolder;
 
 import java.util.ArrayList;
 
+import static com.spawn.ai.constants.AppConstants.SPEAK;
+import static com.spawn.ai.constants.AppConstants.WEB_ACTION;
+
 public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final Context context;
     private ArrayList<ChatMessageType> chatMessageType;
     private final IBotObserver iBotObserver;
-    private AppUtils appUtils;
+    private final AppUtils appUtils;
 
     public SpawnChatbotAdapter(Context context, ArrayList<ChatMessageType> chatMessageType, AppUtils appUtils) {
         this.context = context;
@@ -106,7 +109,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 if (iBotObserver != null
                         && !chatMessageType.get(position).getAction().equals("shutup")
                         && !chatMessageType.get(position).isSpeakFinish()
-                        && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
+                        && SharedPreferenceUtility.getInstance(context).getPreference(SPEAK)) {
                     chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(botMessage);
                 } else {
@@ -143,12 +146,11 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 spawnChatCardViewHolder.card_button.setOnClickListener(view -> {
                     chatMessageType.get(position).setActionCompleted(true);
                     iBotObserver.setAction(chatMessageType.get(position).getAction(), null);
-
                 });
 
                 if (iBotObserver != null
                         && !chatMessageType.get(position).isSpeakFinish()
-                        && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
+                        && SharedPreferenceUtility.getInstance(context).getPreference(SPEAK)) {
                     chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(chatMessageType.get(position).getMessage());
                 } else {
@@ -192,20 +194,20 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 }
                 spawnWikiViewHolder.wikiButton.setOnClickListener(view -> {
                     chatMessageType.get(position).setActionCompleted(true);
-                    iBotObserver.setAction("web_action", spawnWikiModel);
+                    iBotObserver.setAction(WEB_ACTION, spawnWikiModel);
 
                 });
 
                 spawnWikiViewHolder.cardView.setOnClickListener(view -> {
                     chatMessageType.get(position).setActionCompleted(true);
-                    iBotObserver.setAction("web_action", spawnWikiModel);
+                    iBotObserver.setAction(WEB_ACTION, spawnWikiModel);
                 });
 
                 if (iBotObserver != null
                         && !chatMessageType.get(position).isSpeakFinish()
-                        && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
+                        && SharedPreferenceUtility.getInstance(context).getPreference(SPEAK)) {
                     chatMessageType.get(position).setSpeakFinish(true);
-                    iBotObserver.speakBot(appUtils.getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), "speak"));
+                    iBotObserver.speakBot(appUtils.getInfoFromExtract(chatMessageType.get(position).getSpawnWikiModel().getExtract(), SPEAK));
                 } else {
                     chatMessageType.get(position).setSpeakFinish(true);
                 }
@@ -227,7 +229,7 @@ public class SpawnChatbotAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         webSearchResults.getNews() != null ? webSearchResults.getNews().getValue() : null;
                 if (iBotObserver != null
                         && !chatMessageType.get(position).isSpeakFinish()
-                        && SharedPreferenceUtility.getInstance(context).getPreference("speak")) {
+                        && SharedPreferenceUtility.getInstance(context).getPreference(SPEAK)) {
                     chatMessageType.get(position).setSpeakFinish(true);
                     iBotObserver.speakBot(chatMessageType.get(position).getMessage());
                 } else {
