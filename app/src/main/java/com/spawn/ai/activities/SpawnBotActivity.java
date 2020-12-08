@@ -46,11 +46,11 @@ import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
 import com.spawn.ai.model.wiki.SpawnWikiModel;
 import com.spawn.ai.model.websearch.ValueResults;
-import com.spawn.ai.utils.task_utils.AppUtils;
-import com.spawn.ai.utils.task_utils.BotUtils;
-import com.spawn.ai.utils.task_utils.DateTimeUtils;
-import com.spawn.ai.utils.task_utils.JsonFileReader;
-import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
+import com.spawn.ai.utils.AppUtils;
+import com.spawn.ai.utils.BotUtils;
+import com.spawn.ai.utils.DateTimeUtils;
+import com.spawn.ai.utils.JsonFileReader;
+import com.spawn.ai.utils.SharedPreferenceUtility;
 import com.spawn.ai.viewmodels.ClassifyIntentViewModel;
 
 import org.json.JSONArray;

@@ -1,4 +1,4 @@
-package com.spawn.ai.utils.task_utils;
+package com.spawn.ai.utils;
 
 import android.content.Context;
 

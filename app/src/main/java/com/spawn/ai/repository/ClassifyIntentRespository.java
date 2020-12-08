@@ -14,8 +14,8 @@ import com.spawn.ai.interfaces.SensexService;
 import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.wiki.SpawnWikiModel;
-import com.spawn.ai.utils.task_utils.BotUtils;
-import com.spawn.ai.utils.task_utils.JsonFileReader;
+import com.spawn.ai.utils.BotUtils;
+import com.spawn.ai.utils.JsonFileReader;
 
 import org.json.JSONObject;
 

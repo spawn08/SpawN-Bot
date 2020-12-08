@@ -3,7 +3,7 @@ package com.spawn.ai;
 import android.app.Application;
 
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.spawn.ai.utils.task_utils.AppUtils;
+import com.spawn.ai.utils.AppUtils;
 
 import javax.inject.Inject;
 
