@@ -1,4 +1,4 @@
-package com.spawn.ai.utils;
+package com.spawn.ai.utils.task_utils;
 
 import android.app.Activity;
 import android.app.NotificationChannel;

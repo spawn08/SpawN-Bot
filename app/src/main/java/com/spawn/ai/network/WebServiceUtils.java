@@ -8,8 +8,8 @@ import com.google.gson.JsonObject;
 import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.BotMLResponse;
 import com.spawn.ai.model.ChatCardModel;
-import com.spawn.ai.utils.AppUtils;
-import com.spawn.ai.utils.JsonFileReader;
+import com.spawn.ai.utils.task_utils.AppUtils;
+import com.spawn.ai.utils.task_utils.JsonFileReader;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

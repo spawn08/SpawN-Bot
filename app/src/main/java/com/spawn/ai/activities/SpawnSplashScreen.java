@@ -13,9 +13,9 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.spawn.ai.BuildConfig;
 import com.spawn.ai.R;
-import com.spawn.ai.utils.AppUtils;
-import com.spawn.ai.utils.JsonFileReader;
-import com.spawn.ai.utils.SharedPreferenceUtility;
+import com.spawn.ai.utils.task_utils.AppUtils;
+import com.spawn.ai.utils.task_utils.JsonFileReader;
+import com.spawn.ai.utils.task_utils.SharedPreferenceUtility;
 import com.spawn.ai.viewmodels.WebSearchViewModel;
 
 import javax.inject.Inject;

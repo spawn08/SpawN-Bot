@@ -5,7 +5,7 @@ import com.spawn.ai.interfaces.AzureService;
 import com.spawn.ai.interfaces.SensexActiveService;
 import com.spawn.ai.interfaces.SensexService;
 import com.spawn.ai.network.AzureInterceptor;
-import com.spawn.ai.utils.AppUtils;
+import com.spawn.ai.utils.task_utils.AppUtils;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

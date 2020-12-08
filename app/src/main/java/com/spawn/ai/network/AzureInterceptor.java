@@ -1,7 +1,7 @@
 package com.spawn.ai.network;
 
 import com.spawn.ai.BuildConfig;
-import com.spawn.ai.utils.AppUtils;
+import com.spawn.ai.utils.task_utils.AppUtils;
 
 import java.io.IOException;
 

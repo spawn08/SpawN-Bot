@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.spawn.ai.R;
 import com.spawn.ai.activities.SpawnWebActivity;
 import com.spawn.ai.model.websearch.ValueResults;
-import com.spawn.ai.utils.AppUtils;
+import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.viewholders.websearch_holders.WebResultHolder;
 
 import java.util.ArrayList;
