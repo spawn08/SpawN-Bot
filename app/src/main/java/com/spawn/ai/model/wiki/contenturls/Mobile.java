@@ -1,4 +1,4 @@
-package com.spawn.ai.model.content_urls;
+package com.spawn.ai.model.wiki.contenturls;
 
 import lombok.Data;
 

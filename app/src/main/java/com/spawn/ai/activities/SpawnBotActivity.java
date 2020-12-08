@@ -44,7 +44,7 @@ import com.spawn.ai.di.modules.viewmodels.ViewModelFactory;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatCardModel;
 import com.spawn.ai.model.ChatMessageType;
-import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.model.wiki.SpawnWikiModel;
 import com.spawn.ai.model.websearch.ValueResults;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.BotUtils;
@@ -104,6 +104,9 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
 
     @Inject
     AppUtils appUtils;
+
+    @Inject
+    BotUtils botUtils;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -740,7 +743,7 @@ public class SpawnBotActivity extends AppCompatActivity implements RecognitionLi
      * Load the model interpreter for tflite inference.
      */
     public void loadInterpreter() {
-        compositeDisposable.add(BotUtils.getInstance().buildInterpreter(this,
+        compositeDisposable.add(botUtils.buildInterpreter(this,
                 SharedPreferenceUtility.getInstance(this).getStringPreference(LANG)).subscribe());
     }
 

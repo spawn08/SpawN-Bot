@@ -1,5 +1,7 @@
 package com.spawn.ai.model;
 
+import com.spawn.ai.model.wiki.SpawnWikiModel;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

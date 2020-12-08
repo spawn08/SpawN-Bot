@@ -2,6 +2,7 @@ package com.spawn.ai.model;
 
 import com.spawn.ai.model.websearch.News;
 import com.spawn.ai.model.websearch.WebSearchResults;
+import com.spawn.ai.model.wiki.SpawnWikiModel;
 
 public class ChatCardModel {
 

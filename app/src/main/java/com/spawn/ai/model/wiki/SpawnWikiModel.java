@@ -1,6 +1,6 @@
-package com.spawn.ai.model;
+package com.spawn.ai.model.wiki;
 
-import com.spawn.ai.model.content_urls.Content_Urls;
+import com.spawn.ai.model.wiki.contenturls.ContentUrls;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,5 +19,5 @@ public class SpawnWikiModel {
     public String query;
     public Thumbnail thumbnail;
     public String type;
-    public Content_Urls content_urls;
+    public ContentUrls content_urls;
 }

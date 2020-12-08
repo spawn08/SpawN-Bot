@@ -13,7 +13,7 @@ import com.spawn.ai.constants.AppConstants;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.SpawnAPIService;
 import com.spawn.ai.model.ChatCardModel;
-import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.model.wiki.SpawnWikiModel;
 import com.spawn.ai.network.NLPInterceptor;
 import com.spawn.ai.utils.task_utils.AppUtils;
 import com.spawn.ai.utils.task_utils.JsonFileReader;
