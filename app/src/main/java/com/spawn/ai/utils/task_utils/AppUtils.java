@@ -26,18 +26,30 @@ import com.spawn.ai.custom.AlertUpdateDialog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.spawn.ai.constants.AppConstants.CONNECTIVITY_CHANGE_ACTION;
 
+@Singleton
 public class AppUtils {
 
     private String token;
+
+    @Inject
+    public AppUtils() {
+
+    }
 
     public static String getStringRes(int resourceId, Context context, String lang) {
         String result = "";
@@ -166,5 +178,78 @@ public class AppUtils {
         intent.setAction(CONNECTIVITY_CHANGE_ACTION);
         intent.putExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, noConnection);
         return intent;
+    }
+
+    /**
+     * Create input features for given sentence query.
+     * The below method will create bag of words features for input sentence.
+     *
+     * @param sentence   user query for which input features is to be created
+     * @param input      float[][] for input features
+     * @param wordsArray Array of stemmed words
+     * @param stemmer    {@link LancasterStemmer} object for stemming the words
+     * @param isEn       if true, then language is en or hi
+     * @return input 2-D input feature array
+     */
+    public float[][] getInputFeatures(String sentence,
+                                      float[][] input,
+                                      ArrayList<String> wordsArray,
+                                      LancasterStemmer stemmer,
+                                      boolean isEn) {
+        try {
+            String[] sent = sentence.split(" ");
+            for (String s : sent) {
+                String stemmedWord = stemmer.stem(s);
+                for (int i = 0; i < wordsArray.size(); i++) {
+                    String wordIndex = wordsArray.get(i);
+                    if (stemmedWord.equalsIgnoreCase(wordIndex) && isEn)
+                        input[0][i] = 1.0f;
+                }
+            }
+
+            return input;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return input;
+        }
+    }
+
+    /**
+     * Get the index of largest float value in an array of float probabilities
+     *
+     * @param array input float array
+     * @return largest index of the largest element
+     */
+    public int getIndexOfLargest(float[] array) {
+        if (array == null || array.length == 0) return -1;
+
+        int largest = 0;
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > array[largest]) largest = i;
+        }
+        return largest;
+    }
+
+    /**
+     * Load json file from assets folder in android
+     *
+     * @param context  context of calling activity
+     * @param fileName name of the file to load the file from assets
+     * @return string data
+     */
+    public String loadJSONFromAsset(Context context, String fileName) {
+        String json;
+        try {
+            InputStream is = context.getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, StandardCharsets.UTF_8);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
     }
 }

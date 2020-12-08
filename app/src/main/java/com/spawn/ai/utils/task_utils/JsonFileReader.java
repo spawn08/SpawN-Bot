@@ -22,6 +22,7 @@ import java.util.Random;
 
 public class JsonFileReader {
 
+    private final static String TAG = JsonFileReader.class.getSimpleName();
     private static JsonFileReader jsonFileReader;
     private String fileContents;
     private ArrayList<String> questions = new ArrayList<>();
@@ -44,7 +45,7 @@ public class JsonFileReader {
                 fileContents = file.toString();
             else {
                 fileContents = null;
-                Log.d(JsonFileReader.class.getSimpleName(), "File from server " + fileContents);
+                Log.d(TAG, "File from server " + fileContents);
                 loadLocalFile(context, BuildConfig.DATA_FILE);
             }
         } catch (Exception e) {
@@ -64,7 +65,7 @@ public class JsonFileReader {
                 is.close();
                 json = new String(bytes, StandardCharsets.UTF_8);
                 this.fileContents = json;
-                Log.d(JsonFileReader.class.getSimpleName(), "File read from asset");
+                Log.d(TAG, "File read from asset");
             } catch (Exception e) {
                 e.printStackTrace();
 

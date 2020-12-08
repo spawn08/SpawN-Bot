@@ -23,7 +23,7 @@
 -keep class com.spawn.ai.model.* {*;}
 -keepclassmembers class com.spawn.ai.model.* {*;}
 
--keep class com.spawn.ai.model.content_urls.* {*;}
+-keep class com.spawn.ai.model.wiki.contenturls.* {*;}
 
 -keep class com.spawn.ai.model.websearch.* {*;}
 

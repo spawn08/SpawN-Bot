@@ -4,52 +4,65 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.util.Log;
 
-import org.json.JSONArray;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.spawn.ai.model.localdata.PreprocessData;
+
 import org.json.JSONObject;
 import org.tensorflow.lite.Interpreter;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.util.ArrayList;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.rxjava3.core.Observable;
 
-import static com.spawn.ai.constants.AppConstants.CLASSES;
 import static com.spawn.ai.constants.AppConstants.LANG_EN;
+import static com.spawn.ai.constants.AppConstants.PREPROCESS_EN_FILE;
+import static com.spawn.ai.constants.AppConstants.PREPROCESS_HI_FILE;
 import static com.spawn.ai.constants.AppConstants.SUCCESS;
-import static com.spawn.ai.constants.AppConstants.WORDS;
 
+@Singleton
 public class BotUtils {
 
-    private static BotUtils botUtils;
-    private JSONObject jsonEn, jsonHi;
+    private PreprocessData preprocessDataEn, preprocessDataHi;
     private LancasterStemmer stemmer;
     private boolean isEn;
     private static String fileContents;
     private static float THRESHOLD = 0.80f;
     private Interpreter modelInterpreter;
 
-    public static BotUtils getInstance() {
-        if (botUtils == null) {
-            botUtils = new BotUtils();
-        }
-        return botUtils;
+    private final AppUtils appUtils;
+
+    @Inject
+    public BotUtils(AppUtils appUtils){
+        this.appUtils = appUtils;
     }
 
     public Observable<String> buildInterpreter(Context context, String language) {
         try {
             modelInterpreter = new Interpreter(getLocalModelType(context, language));
 
-            if (jsonEn == null)
-                jsonEn = new JSONObject(Objects.requireNonNull(loadJSONFromAsset(context, "bot_en/data_en.json")));
+            if (preprocessDataEn == null) {
+                Gson gson = new Gson();
+                Type type = new TypeToken<PreprocessData>() {
+                }.getType();
+                preprocessDataEn = gson.fromJson(appUtils.loadJSONFromAsset(context, PREPROCESS_EN_FILE), type);
+            }
 
-            if (jsonHi == null)
-                jsonHi = new JSONObject(Objects.requireNonNull(loadJSONFromAsset(context, "bot_hi/data_hi.json")));
+            if (preprocessDataHi == null) {
+                Gson gson = new Gson();
+                Type type = new TypeToken<PreprocessData>() {
+                }.getType();
+                preprocessDataHi = gson.fromJson(appUtils.loadJSONFromAsset(context, PREPROCESS_HI_FILE), type);
+            }
 
             if (stemmer == null)
                 stemmer = new LancasterStemmer(context);
@@ -99,68 +112,40 @@ public class BotUtils {
         }
     }
 
-    private String loadJSONFromAsset(Context context, String fileName) {
-        String json;
-        try {
-            InputStream is = context.getAssets().open(fileName);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, StandardCharsets.UTF_8);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
-
+    /**
+     * Perform inference on user defined sentence based on language model
+     *
+     * @param sentence User defined query
+     * @param language language of the query
+     * @return result in {@link JSONObject} format
+     */
     public Observable<JSONObject> classify(String sentence, String language) {
         Observable<JSONObject> response;
         try {
-            JSONObject jsonObject = language.equalsIgnoreCase(LANG_EN) ? jsonEn : jsonHi;
-            JSONArray wordsArray = jsonObject.getJSONArray(WORDS);
-            JSONArray classesArray = jsonObject.getJSONArray(CLASSES);
+            PreprocessData preprocessData = language.equalsIgnoreCase(LANG_EN) ? preprocessDataEn : preprocessDataHi;
+            ArrayList<String> wordsArray = preprocessData.getWords();
+            ArrayList<String> classesArray = preprocessData.getClasses();
 
-            float[][] output = new float[1][classesArray.length()];
-            String[] sent = sentence.split(" ");
-            float[][] input = new float[1][wordsArray.length()];
-            for (String s : sent) {
-                for (int i = 0; i < wordsArray.length(); i++) {
-                    String wordIndex = wordsArray.getString(i);
-                    if (stemmer.stem(s).equalsIgnoreCase(wordIndex) && isEn)
-                        input[0][i] = 1.0f;
-                    else if (s.equalsIgnoreCase(wordIndex))
-                        input[0][i] = 1.0f;
-                }
-            }
+            float[][] output = new float[1][classesArray.size()];
+            float[][] input = new float[1][wordsArray.size()];
+            input = appUtils.getInputFeatures(sentence, input, wordsArray, stemmer, isEn);
 
             modelInterpreter.run(input, output);
             float[] probabilities = output[0];
-            int index = getIndexOfLargest(output[0]);
+            int index = appUtils.getIndexOfLargest(output[0]);
             JSONObject filecontents = new JSONObject(fileContents);
             if (probabilities[index] > THRESHOLD) {
-                response = Observable.just(filecontents.getJSONObject(classesArray.getString(index)));
+                response = Observable.just(filecontents.getJSONObject(classesArray.get(index)));
             } else {
                 return Observable.just(new JSONObject());
             }
 
-            Log.e("Model Output: ", classesArray.getString(index));
+            Log.e("Model Output: ", classesArray.get(index));
         } catch (Exception e) {
             e.printStackTrace();
             return Observable.just(new JSONObject());
         }
         return response;
-    }
-
-    public int getIndexOfLargest(float[] array) {
-        if (array == null || array.length == 0) return -1;
-
-        int largest = 0;
-        for (int i = 1; i < array.length; i++) {
-            if (array[i] > array[largest]) largest = i;
-        }
-        return largest;
     }
 }
 

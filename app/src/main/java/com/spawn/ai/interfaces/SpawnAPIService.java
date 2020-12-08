@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.spawn.ai.model.BotMLResponse;
 import com.spawn.ai.model.BotResponse;
 import com.spawn.ai.model.SpawnEntityModel;
-import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.model.wiki.SpawnWikiModel;
 import com.spawn.ai.model.websearch.News;
 import com.spawn.ai.model.websearch.WebSearchResults;
 

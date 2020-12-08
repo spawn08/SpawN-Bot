@@ -14,6 +14,7 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.android.components.ApplicationComponent;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
@@ -24,9 +25,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetworkModule {
 
     @Provides
-    @Singleton
-    public AppUtils provideAppUtils() {
-        return new AppUtils();
+    public CompositeDisposable provideCompositeDisposable(){
+        return new CompositeDisposable();
     }
 
     @Provides

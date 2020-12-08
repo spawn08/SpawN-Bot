@@ -21,5 +21,7 @@ public class AppConstants {
     public static final String ACTION_SPEAKING = "App Speaking";
     public static final String ACTION_WEB_OPEN = "Web Open";
     public static final String SUCCESS = "success";
+    public static final String PREPROCESS_EN_FILE = "bot_en/data_en.json";
+    public static final String PREPROCESS_HI_FILE = "bot_hi/data_hi.json";
     public static final String CONNECTIVITY_CHANGE_ACTION = "com.spawn.ai.CONNECTIVITY_CHANGE";
 }

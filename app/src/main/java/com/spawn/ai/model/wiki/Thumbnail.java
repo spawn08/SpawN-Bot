@@ -1,4 +1,4 @@
-package com.spawn.ai.model;
+package com.spawn.ai.model.wiki;
 
 import lombok.Data;
 

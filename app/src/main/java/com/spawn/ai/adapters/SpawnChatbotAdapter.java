@@ -15,7 +15,7 @@ import com.spawn.ai.R;
 import com.spawn.ai.constants.ChatViewTypes;
 import com.spawn.ai.interfaces.IBotObserver;
 import com.spawn.ai.model.ChatMessageType;
-import com.spawn.ai.model.SpawnWikiModel;
+import com.spawn.ai.model.wiki.SpawnWikiModel;
 import com.spawn.ai.model.websearch.NewsValue;
 import com.spawn.ai.model.websearch.ValueResults;
 import com.spawn.ai.model.websearch.WebSearchResults;
